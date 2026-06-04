@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { mockSubjects } from '../data/subjects';
 import { SubjectCard } from '../components/subjects/SubjectCard';
 import { authService } from '../services/authService';
-import { Play, BookOpen, Check, X, Plus, Minus, ArrowLeft } from 'lucide-react';
+import { Play, BookOpen, Check, X, Plus, Minus, ArrowLeft, Star, Video, Award, TrendingUp, Unlock } from 'lucide-react';
 
 export const Home = () => {
     const navigate = useNavigate();
@@ -47,40 +47,83 @@ export const Home = () => {
             <section className="hero">
                 <div className="container hero-grid">
                     <div className="hero-content">
-                        <h1>منصة <span>جيل 2010</span> التعليمية</h1>
-                        <p>تعلم مواد الصف الأول الثانوي بطريقة منظمة وبأسلوب تفاعلي ممتع من خلال فيديوهات شرح مبسطة، ملخصات مركزة، أنشطة عملية، واختبارات قصيرة تقيس فهمك أولاً بأول.</p>
+                        <div className="hero-badge">
+                            <Star size={16} fill="currentColor" />
+                            <span>منصة تعليمية لطلاب الأول الثانوي</span>
+                        </div>
+                        <h1>ابدأ رحلة التفوق في مواد <span>جيل 2010</span></h1>
+                        <p>منصة تعليمية منظمة لطلاب الصف الأول الثانوي، تجمع بين الفيديوهات، الملخصات، الأنشطة، والاختبارات القصيرة لتساعدك على الدراسة بثقة ووضوح.</p>
                         <div className="hero-btns">
                             <Link to="/subjects" className="btn btn-primary">
                                 <span>ابدأ التعلم الآن</span>
                                 <ArrowLeft size={20} />
                             </Link>
-                            <Link to="/subjects" className="btn btn-outline">شاهد الدروس المجانية</Link>
+                            <Link to="/subjects" className="btn btn-outline">تصفح المواد</Link>
+                        </div>
+                        
+                        {/* Social Proof / Stats */}
+                        <div className="hero-stats">
+                            <div className="student-avatars">
+                                <div className="avatar-placeholder" style={{ backgroundColor: '#ffdad6', color: '#ba1a1a' }}>أ</div>
+                                <div className="avatar-placeholder" style={{ backgroundColor: '#dee2ed', color: '#252a32' }}>م</div>
+                                <div className="avatar-placeholder" style={{ backgroundColor: '#dce1ff', color: '#00236f' }}>س</div>
+                                <div className="avatar-placeholder" style={{ backgroundColor: '#d3e4fe', color: '#0058be' }}>+10k</div>
+                            </div>
+                            <div className="stats-text">
+                                <div className="stars-row">
+                                    <Star size={14} fill="currentColor" />
+                                    <Star size={14} fill="currentColor" />
+                                    <Star size={14} fill="currentColor" />
+                                    <Star size={14} fill="currentColor" />
+                                    <Star size={14} fill="currentColor" />
+                                </div>
+                                <span className="stats-label">4.9/5 من قبل الطلاب المتميزين</span>
+                            </div>
                         </div>
                     </div>
                     
-                    <div className="hero-image-wrapper">
-                        <div className="hero-image-bg"></div>
-                        <img src="/jeel2010-logo.svg" alt="شعار منصة جيل 2010 التعليمية" className="hero-image hero-logo-image" />
-                        
-                        {/* Floating Badge 1 */}
-                        <div className="badge-floating badge-1">
-                            <div className="badge-icon" style={{ backgroundColor: 'var(--primary-light)', color: 'var(--primary-color)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <Play size={20} fill="currentColor" />
+                    {/* Visual Card / Graphic Column */}
+                    <div className="hero-visual">
+                        <div className="visual-container">
+                            {/* Card 1: Progress Tracker */}
+                            <div className="visual-card">
+                                <div className="visual-progress">
+                                    <div className="progress-header">
+                                        <span>التقدم في مادة الرياضيات</span>
+                                        <span style={{ color: 'var(--secondary-color)' }}>75%</span>
+                                    </div>
+                                    <div className="progress-track">
+                                        <div className="progress-fill" style={{ width: '75%' }}></div>
+                                    </div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                                        <span>12 درس مكتمل</span>
+                                        <span>4 دروس متبقية</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="badge-info">
-                                <h4>فيديوهات مسجلة</h4>
-                                <p>بجودة عالية وشرح مبسط</p>
-                            </div>
-                        </div>
-                        
-                        {/* Floating Badge 2 */}
-                        <div className="badge-floating badge-2">
-                            <div className="badge-icon" style={{ backgroundColor: 'var(--bg-islamic)', color: 'var(--accent-islamic)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <BookOpen size={20} />
-                            </div>
-                            <div className="badge-info">
-                                <h4>ملخصات واختبارات</h4>
-                                <p>لكل درس دراسي مباشرة</p>
+                            
+                            {/* Card 2: Interactive Learning features */}
+                            <div className="visual-card">
+                                <div className="visual-features-mini">
+                                    <div className="feature-mini-item">
+                                        <div className="feature-mini-icon">
+                                            <Video size={16} />
+                                        </div>
+                                        <div className="feature-mini-text">
+                                            <h5>دروس مسجلة عالية الجودة</h5>
+                                            <p>شرح تفاعلي وبسيط ومباشر</p>
+                                        </div>
+                                    </div>
+                                    <div className="feature-mini-item">
+                                        <div className="feature-mini-icon" style={{ backgroundColor: 'var(--bg-islamic)', color: 'var(--accent-islamic)' }}>
+                                            <Award size={16} />
+                                        </div>
+                                        <div className="feature-mini-text">
+                                            <h5>اختبارات دورية تفاعلية</h5>
+                                            <p>بعد كل درس مباشرة لقياس الفهم</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -103,34 +146,57 @@ export const Home = () => {
                 </div>
             </section>
 
-            {/* How It Works Section */}
-            <section id="how-it-works" className="section-padding how-it-works">
+            {/* Features Section */}
+            <section id="features" className="features-section">
                 <div className="container">
                     <div className="section-header">
-                        <h2>كيف تعمل المنصة؟</h2>
-                        <p>أربع خطوات بسيطة تفصلك عن التفوق الدراسي والتعلم بذكاء من منزلك</p>
+                        <h2>ميزات منصة جيل 2010</h2>
+                        <p>كل ما تحتاجه للتميز والتفوق الدراسي في مكان واحد وبطريقة منظمة</p>
                     </div>
                     
-                    <div className="steps-grid">
-                        <div className="step-card">
-                            <div className="step-number">01</div>
-                            <h3>أنشئ حسابك</h3>
-                            <p>قم بإنشاء حساب طالب جديد مجاناً في ثوانٍ معدودة لتسجيل تقدمك الدراسي.</p>
+                    <div className="features-grid">
+                        {/* Feature 1 */}
+                        <div className="feature-card">
+                            <div className="feature-icon-wrapper">
+                                <Video size={24} />
+                            </div>
+                            <div className="feature-info">
+                                <h3>دروس منظمة</h3>
+                                <p>فيديوهات وملخصات مرتبة حسب المادة والوحدة والدرس.</p>
+                            </div>
                         </div>
-                        <div className="step-card">
-                            <div className="step-number">02</div>
-                            <h3>اختر المادة</h3>
-                            <p>تصفح قائمة المواد المتاحة واختر المادة التي ترغب في دراستها الآن.</p>
+                        
+                        {/* Feature 2 */}
+                        <div className="feature-card">
+                            <div className="feature-icon-wrapper" style={{ backgroundColor: '#E8F7E6', color: '#00AF45' }}>
+                                <Award size={24} />
+                            </div>
+                            <div className="feature-info">
+                                <h3>اختبارات قصيرة</h3>
+                                <p>أسئلة بعد كل درس لقياس الفهم مباشرة.</p>
+                            </div>
                         </div>
-                        <div className="step-card">
-                            <div className="step-number">03</div>
-                            <h3>شاهد أول درسين مجاناً</h3>
-                            <p>جرب الشرح والملخصات التفاعلية وحل الاختبارات لأول درسين من كل مادة مجاناً.</p>
+                        
+                        {/* Feature 3 */}
+                        <div className="feature-card">
+                            <div className="feature-icon-wrapper" style={{ backgroundColor: '#F4E9F8', color: '#A000EA' }}>
+                                <TrendingUp size={24} />
+                            </div>
+                            <div className="feature-info">
+                                <h3>متابعة التقدم</h3>
+                                <p>اعرف آخر درس شاهدته ونتائج اختباراتك.</p>
+                            </div>
                         </div>
-                        <div className="step-card">
-                            <div className="step-number">04</div>
-                            <h3>اشترك للوصول الكامل</h3>
-                            <p>اشترك في باقة الوصول الكامل لتفتح جميع الوحدات والدروس والاختبارات المتبقية.</p>
+                        
+                        {/* Feature 4 */}
+                        <div className="feature-card">
+                            <div className="feature-icon-wrapper" style={{ backgroundColor: '#FAE8E8', color: '#EA3C07' }}>
+                                <Unlock size={24} />
+                            </div>
+                            <div className="feature-info">
+                                <h3>اشتراك بسيط</h3>
+                                <p>أول درسين مجانًا، وباقي المحتوى للمشتركين.</p>
+                            </div>
                         </div>
                     </div>
                 </div>

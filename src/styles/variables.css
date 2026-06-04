@@ -1,21 +1,24 @@
 /* CSS Variables for design system */
 :root {
-    --primary-color: #0171F1;
-    --primary-light: #EAF8FF;
-    --secondary-color: #442E66;
-    --secondary-light: #F4E9F8;
-    --bg-color: #F7FAFC;
+    --primary-color: #00236f;
+    --primary-light: #eff4ff;
+    --secondary-color: #0058be;
+    --secondary-light: #e5eeff;
+    --tertiary-color: #252a32;
+    --bg-color: #f8f9ff;
     --card-bg: #FFFFFF;
-    --text-main: #2D3748;
-    --text-muted: #718096;
+    --text-main: #0b1c30;
+    --text-muted: #444651;
     --text-white: #FFFFFF;
-    --border-color: #E2E8F0;
+    --border-color: #c5c5d3;
+    
+    --surface-container-low: #eff4ff;
     
     /* Subject Card Backgrounds & Accents */
     --accent-arabic: #EA3C07;
     --bg-arabic: #FAE8E8;
-    --accent-math: #0171F1;
-    --bg-math: #EAF8FF;
+    --accent-math: #0058be;
+    --bg-math: #eff4ff;
     --accent-history: #A000EA;
     --bg-history: #F4E9F8;
     --accent-islamic: #00AF45;
@@ -28,10 +31,11 @@
     --border-radius-pill: 50px;
     
     --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.02);
-    --shadow-md: 0 10px 25px rgba(1, 113, 241, 0.05);
-    --shadow-lg: 0 15px 35px rgba(1, 113, 241, 0.1);
+    --shadow-md: 0 10px 25px rgba(0, 35, 111, 0.05);
+    --shadow-lg: 0 15px 35px rgba(0, 35, 111, 0.1);
     
     /* Fonts & Transitions */
-    --font-family: 'Cairo', sans-serif;
+    --font-family: 'IBM Plex Sans Arabic', sans-serif;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+

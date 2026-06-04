@@ -2,9 +2,8 @@
    منصة جيل 2010 التعليمية - Phase 1 Stylesheet
    Design System: Modern Educational Platform (Arabic / RTL)
 */
+/* Google Fonts Import - IBM Plex Sans Arabic is imported in global.css */
 
-/* Google Fonts Import - Cairo */
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap');
 
 /* Variables */
 :root {
@@ -283,153 +282,270 @@ header {
 
 /* Hero Section */
 .hero {
-    background: linear-gradient(135deg, #F0F6FC 0%, #EBF4FC 100%);
+    background-color: var(--bg-color);
     position: relative;
-    padding: 100px 0;
+    padding: 80px 0;
     overflow: hidden;
-}
-
-.hero::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 150px;
-    background: linear-gradient(to top, var(--bg-color), transparent);
-    pointer-events: none;
 }
 
 .hero-grid {
     display: grid;
     grid-template-columns: 1.1fr 0.9fr;
-    gap: 50px;
+    gap: 48px;
     align-items: center;
 }
 
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+    border-radius: var(--border-radius-pill);
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 24px;
+    width: fit-content;
+}
+
 .hero-content h1 {
-    font-size: 3.2rem;
-    color: var(--secondary-color);
-    font-weight: 800;
-    line-height: 1.3;
-    margin-bottom: 20px;
+    font-size: clamp(2rem, 4vw, 3rem);
+    color: var(--primary-color);
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 16px;
 }
 
 .hero-content h1 span {
-    color: var(--primary-color);
-    position: relative;
-    display: inline-block;
-}
-
-.hero-content h1 span::after {
-    content: '';
-    position: absolute;
-    bottom: 5px;
-    left: 0;
-    width: 100%;
-    height: 8px;
-    background-color: rgba(1, 113, 241, 0.15);
-    z-index: -1;
+    color: var(--secondary-color);
 }
 
 .hero-content p {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
+    line-height: 1.7;
     color: var(--text-muted);
-    margin-bottom: 35px;
+    margin-bottom: 32px;
     max-width: 600px;
 }
 
 .hero-btns {
     display: flex;
-    gap: 15px;
+    gap: 16px;
     flex-wrap: wrap;
+    margin-bottom: 40px;
 }
 
-.hero-image-wrapper {
+/* Social Proof / Stats in Hero */
+.hero-stats {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-color);
+}
+
+.student-avatars {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.avatar-placeholder {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid var(--card-bg);
+    background-color: var(--border-color);
+    margin-left: -12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.avatar-placeholder:first-child {
+    margin-left: 0;
+}
+
+.stats-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.stars-row {
+    display: flex;
+    color: #FFB800;
+    gap: 2px;
+}
+
+.stats-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* Visual Column */
+.hero-visual {
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
-    max-width: 420px;
     width: 100%;
-    margin-inline: auto;
 }
 
-.hero-image-bg {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle, rgba(1, 113, 241, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
-    z-index: 1;
-}
-
-.hero-image {
+.visual-container {
     position: relative;
-    z-index: 2;
-    filter: drop-shadow(0 20px 30px rgba(1, 113, 241, 0.15));
-    border-radius: 30px;
-    max-height: 480px;
-    object-fit: cover;
-}
-
-.hero-logo-image {
-    width: min(100%, 320px);
-    height: auto;
-    object-fit: contain;
-}
-
-/* Floating Badges */
-.badge-floating {
-    position: absolute;
-    background-color: var(--card-bg);
+    width: 100%;
+    max-width: 440px;
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--secondary-light) 100%);
     border-radius: var(--border-radius-lg);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
-    padding: 14px 16px;
+    padding: 30px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+}
+
+.visual-card {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius-md);
+    padding: 20px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-color);
+    margin-bottom: 16px;
+}
+
+.visual-card:last-child {
+    margin-bottom: 0;
+}
+
+.visual-progress {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.progress-track {
+    width: 100%;
+    height: 8px;
+    background-color: var(--primary-light);
+    border-radius: var(--border-radius-pill);
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: var(--secondary-color);
+    border-radius: var(--border-radius-pill);
+    width: 75%;
+}
+
+.visual-features-mini {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.feature-mini-item {
     display: flex;
     align-items: center;
     gap: 12px;
-    z-index: 3;
-    max-width: 240px;
 }
 
-.badge-1 {
-    top: 15%;
-    right: -20px;
-    animation: float 6s ease-in-out infinite;
-}
-
-.badge-2 {
-    bottom: 15%;
-    left: -20px;
-    animation: float 6s ease-in-out infinite 3s;
-}
-
-.badge-icon {
-    width: 45px;
-    height: 45px;
-    border-radius: var(--border-radius-md);
+.feature-mini-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background-color: var(--primary-light);
+    color: var(--primary-color);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.3rem;
 }
 
-.badge-info h4 {
-    font-size: 0.95rem;
-    font-weight: 800;
-    color: var(--secondary-color);
+.feature-mini-text h5 {
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin: 0;
 }
 
-.badge-info p {
-    font-size: 0.8rem;
+.feature-mini-text p {
+    font-size: 0.75rem;
     color: var(--text-muted);
     margin: 0;
 }
 
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+/* Features Grid */
+.features-section {
+    background-color: var(--surface-container-low);
+    padding: 64px 0;
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
 }
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+.feature-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+
+.feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--secondary-color);
+}
+
+.feature-icon-wrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    background-color: var(--secondary-light);
+    color: var(--secondary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.feature-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.feature-info h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 0;
+}
+
+.feature-info p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+    margin: 0;
+}
+
 
 /* Subjects Section */
 .subjects-grid {
@@ -877,34 +993,32 @@ footer {
 @media (max-width: 1024px) {
     .hero-grid {
         grid-template-columns: 1fr;
-        gap: 40px;
+        gap: 32px;
         text-align: center;
     }
     
-    .hero-content h1 {
-        font-size: 2.8rem;
+    .hero-badge {
+        margin-inline: auto;
     }
     
     .hero-content p {
-        margin-left: auto;
-        margin-right: auto;
+        margin-inline: auto;
     }
     
     .hero-btns {
         justify-content: center;
     }
     
-    .hero-image-wrapper {
-        max-width: 500px;
-        margin: 0 auto;
+    .hero-stats {
+        justify-content: center;
     }
     
-    .badge-1 {
-        right: 0;
+    .visual-container {
+        max-width: 100%;
     }
     
-    .badge-2 {
-        left: 0;
+    .features-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
@@ -976,54 +1090,30 @@ footer {
     }
 }
 
-/* Responsive overrides for hero sections and badge boxes */
-@media (max-width: 768px) {
-    .hero-image-wrapper {
-        max-width: 340px !important;
-        margin-top: 30px !important;
-        margin-inline: auto !important;
+@media (max-width: 640px) {
+    .features-grid {
+        grid-template-columns: 1fr;
     }
-
-    .hero-logo-image {
-        width: min(100%, 240px) !important;
-        margin-inline: auto !important;
-    }
-
-    .badge-floating {
-        position: static !important;
-        transform: none !important;
-        max-width: 100% !important;
-        width: 100% !important;
-        margin-top: 12px !important;
-        padding: 12px !important;
-        animation: none !important; /* disable floating animation on mobile */
-    }
-
-    .badge-floating .badge-icon {
-        width: 38px !important;
-        height: 38px !important;
-        font-size: 18px !important;
-        flex-shrink: 0 !important;
-    }
-
-    .badge-info h4 {
-        font-size: 14px !important;
-        margin: 0 !important;
-    }
-
-    .badge-info p {
-        font-size: 12px !important;
-        margin: 2px 0 0 !important;
+    
+    .feature-card {
+        flex-direction: row;
+        align-items: start;
+        gap: 16px;
+        padding: 20px;
     }
 }
 
 @media (max-width: 480px) {
-    .hero-image-wrapper {
-        max-width: 100% !important;
+    .hero {
+        padding: 48px 0;
     }
-
-    .badge-floating {
-        font-size: 13px !important;
+    
+    .hero-btns .btn {
+        width: 100%;
+    }
+    
+    .visual-container {
+        padding: 16px;
     }
 }
 

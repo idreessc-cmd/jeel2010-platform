@@ -53,6 +53,13 @@ export const Header = () => {
                     >
                         المواد
                     </Link>
+                    <a 
+                        href="/#pricing" 
+                        className="nav-link"
+                        onClick={handleLinkClick}
+                    >
+                        الاشتراك
+                    </a>
                     
                     {user && (
                         <>
@@ -61,15 +68,17 @@ export const Header = () => {
                                 className={`nav-link ${location.pathname === '/dashboard' ? 'active' : ''}`}
                                 onClick={handleLinkClick}
                             >
-                                لوحة التحكم
+                                لوحة الطالب
                             </Link>
-                            <Link 
-                                to="/admin" 
-                                className={`nav-link ${location.pathname === '/admin' ? 'active' : ''}`}
-                                onClick={handleLinkClick}
-                            >
-                                لوحة الإدارة
-                            </Link>
+                            {user.role === 'admin' && (
+                                <Link 
+                                    to="/admin" 
+                                    className={`nav-link ${location.pathname === '/admin' ? 'active' : ''}`}
+                                    onClick={handleLinkClick}
+                                >
+                                    لوحة الإدارة
+                                </Link>
+                            )}
                         </>
                     )}
 

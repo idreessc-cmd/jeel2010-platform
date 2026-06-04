@@ -30,7 +30,7 @@ export const Footer = () => {
                     <ul>
                         <li><Link to="/">الرئيسية</Link></li>
                         <li><Link to="/subjects">المواد الدراسية</Link></li>
-                        <li><a href="#how-it-works">كيف تعمل المنصة؟</a></li>
+                        <li><a href="#features">ميزات المنصة</a></li>
                         <li><a href="#pricing">الباقات والاشتراكات</a></li>
                         <li><a href="#faq">الأسئلة الشائعة</a></li>
                     </ul>
