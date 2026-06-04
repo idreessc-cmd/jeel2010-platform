@@ -7,6 +7,7 @@ import { progressService } from '../services/progressService';
 import { subscriptionService } from '../services/subscriptionService';
 import { UnitAccordion } from '../components/subjects/UnitAccordion';
 import { Badge } from '../components/ui/Badge';
+import { BookOpen, Search, ClipboardList, Download, Award, Unlock, Gem, Key, Lock, Book, Compass, Landmark } from 'lucide-react';
 
 export const SubjectDetails = () => {
     const { id } = useParams();
@@ -37,6 +38,21 @@ export const SubjectDetails = () => {
         );
     }
 
+    const getSubjectIcon = (id) => {
+        switch (id) {
+            case 'arabic':
+                return <Book size={48} style={{ color: 'var(--accent-arabic)' }} />;
+            case 'math':
+                return <Compass size={48} style={{ color: 'var(--accent-math)' }} />;
+            case 'history':
+                return <Landmark size={48} style={{ color: 'var(--accent-history)' }} />;
+            case 'islamic':
+                return <BookOpen size={48} style={{ color: 'var(--accent-islamic)' }} />;
+            default:
+                return <BookOpen size={48} />;
+        }
+    };
+
     // Flatten lessons to calculate statistics
     const allLessons = units.flatMap(unit => unit.lessons);
     const progress = user ? progressService.getSubjectProgressPercentage(user.email, allLessons) : 0;
@@ -48,21 +64,12 @@ export const SubjectDetails = () => {
         <section className="section-padding">
             <div className="container">
                 {/* Course Header */}
-                <div style={{
-                    backgroundColor: '#FFFFFF',
-                    borderRadius: 'var(--border-radius-lg)',
-                    padding: '40px',
-                    boxShadow: 'var(--shadow-sm)',
-                    border: '1px solid var(--border-color)',
-                    marginBottom: '35px',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    flexWrap: 'wrap',
-                    gap: '30px'
-                }}>
-                    <div style={{ flex: '1', minWidth: '300px' }}>
+                <div className="subject-header-box">
+                    <div className="subject-header-content">
                         <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '15px' }}>
-                            <span style={{ fontSize: '3rem' }}>{subject.icon}</span>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                                {getSubjectIcon(subject.id)}
+                            </span>
                             <div>
                                 <h1 style={{ color: 'var(--secondary-color)', fontWeight: '800', margin: 0 }}>
                                     منهج {subject.title}
@@ -89,24 +96,14 @@ export const SubjectDetails = () => {
                     </div>
 
                     {/* Subscription & Call to Action Box */}
-                    <div style={{
-                        width: '100%',
-                        maxWidth: '320px',
-                        backgroundColor: 'var(--bg-color)',
-                        borderRadius: 'var(--border-radius-md)',
-                        padding: '25px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'center',
-                        border: '1px dashed var(--border-color)',
-                        textAlign: 'center'
-                    }}>
+                    <div className="subject-subscription-card">
                         {user ? (
                             <>
                                 <h4 style={{ color: 'var(--secondary-color)', fontWeight: '800', marginBottom: '10px' }}>حالة اشتراكك:</h4>
                                 <div style={{ marginBottom: '20px' }}>
-                                    <Badge type={isSubscribed ? 'success' : 'primary'} className="badge-lg">
-                                        {isSubscribed ? '👑 الباقة كاملة الوصول' : '🔓 الحساب التجريبي المجاني'}
+                                    <Badge type={isSubscribed ? 'success' : 'primary'} className="badge-lg" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                                        {isSubscribed ? <Award size={14} /> : <Unlock size={14} />}
+                                        {isSubscribed ? 'الباقة كاملة الوصول' : 'الحساب التجريبي المجاني'}
                                     </Badge>
                                 </div>
                                 
@@ -119,7 +116,10 @@ export const SubjectDetails = () => {
                                         <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '20px' }}>
                                             يمكنك مشاهدة أول درسين مجاناً، ويجب تفعيل الباقة لمشاهدة المنهج كاملاً.
                                         </p>
-                                        <a href="#footer" className="btn btn-primary">💎 اشترك لفتح المادة كاملة</a>
+                                        <a href="#footer" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                                            <Gem size={16} />
+                                            اشترك لفتح المادة كاملة
+                                        </a>
                                     </>
                                 )}
                             </>
@@ -129,7 +129,10 @@ export const SubjectDetails = () => {
                                 <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '20px' }}>
                                     سجل حسابك مجاناً لتسجيل تقدمك وحل الاختبارات ومشاهدة الشروحات.
                                 </p>
-                                <button onClick={() => navigate('/login')} className="btn btn-primary">🔐 تسجيل دخول تجريبي</button>
+                                <button onClick={() => navigate('/login')} className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                                    <Key size={16} />
+                                    تسجيل دخول تجريبي
+                                </button>
                             </>
                         )}
                     </div>
@@ -140,26 +143,34 @@ export const SubjectDetails = () => {
                     <button 
                         onClick={() => setActiveTab('lessons')}
                         className={`tab-btn ${activeTab === 'lessons' ? 'active' : ''}`}
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
                     >
-                        📚 المحتوى والدروس
+                        <BookOpen size={18} />
+                        المحتوى والدروس
                     </button>
                     <button 
                         onClick={() => setActiveTab('overview')}
                         className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
                     >
-                        🔍 نظرة عامة عن المادة
+                        <Search size={18} />
+                        نظرة عامة عن المادة
                     </button>
                     <button 
                         onClick={() => setActiveTab('quizzes')}
                         className={`tab-btn ${activeTab === 'quizzes' ? 'active' : ''}`}
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
                     >
-                        📝 الاختبارات
+                        <ClipboardList size={18} />
+                        الاختبارات
                     </button>
                     <button 
                         onClick={() => setActiveTab('files')}
                         className={`tab-btn ${activeTab === 'files' ? 'active' : ''}`}
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
                     >
-                        📥 الملفات والمذكرات
+                        <Download size={18} />
+                        الملفات والمذكرات
                     </button>
                 </div>
 
@@ -188,16 +199,7 @@ export const SubjectDetails = () => {
                     )}
 
                     {activeTab === 'overview' && (
-                        <div style={{
-                            backgroundColor: '#FFFFFF',
-                            borderRadius: 'var(--border-radius-lg)',
-                            padding: '35px',
-                            boxShadow: 'var(--shadow-sm)',
-                            border: '1px solid var(--border-color)',
-                            maxWidth: '850px',
-                            margin: '0 auto',
-                            lineHeight: '1.8'
-                        }}>
+                        <div className="subject-info-card">
                             <h3 style={{ color: 'var(--secondary-color)', fontWeight: '800', marginBottom: '15px' }}>أهداف دراسة منهج {subject.title}:</h3>
                             <p style={{ color: 'var(--text-main)', fontSize: '1.05rem', marginBottom: '30px' }}>
                                 {subject.objectives}
@@ -213,14 +215,8 @@ export const SubjectDetails = () => {
 
                     {activeTab === 'quizzes' && (
                         <div style={{ maxWidth: '850px', margin: '0 auto', textAlign: 'center' }}>
-                            <div style={{
-                                backgroundColor: '#FFFFFF',
-                                borderRadius: 'var(--border-radius-lg)',
-                                padding: '40px',
-                                boxShadow: 'var(--shadow-sm)',
-                                border: '1px solid var(--border-color)'
-                            }}>
-                                <span style={{ fontSize: '3rem', display: 'block', marginBottom: '15px' }}>📝</span>
+                            <div className="subject-info-card" style={{ textAlign: 'center' }}>
+                                <ClipboardList size={48} style={{ color: 'var(--primary-color)', margin: '0 auto 15px auto', display: 'block' }} />
                                 <h3 style={{ color: 'var(--secondary-color)', fontWeight: '800', marginBottom: '10px' }}>الاختبارات التقييمية للمادة</h3>
                                 <p style={{ color: 'var(--text-muted)', fontSize: '1rem', maxWidth: '600px', margin: '0 auto 25px auto' }}>
                                     يحتوي كل درس على اختبار تقييمي تفاعلي من 5 أسئلة، يمكنك الدخول إليه بعد تصفح الدرس لتقييم فهمك وحفظ نتيجتك.
@@ -228,8 +224,10 @@ export const SubjectDetails = () => {
                                 <button 
                                     onClick={() => setActiveTab('lessons')} 
                                     className="btn btn-primary"
+                                    style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', margin: '0 auto' }}
                                 >
-                                    👀 تصفح قائمة الدروس لبدء اختباراتها
+                                    <BookOpen size={16} />
+                                    تصفح قائمة الدروس لبدء اختباراتها
                                 </button>
                             </div>
                         </div>
@@ -237,15 +235,8 @@ export const SubjectDetails = () => {
 
                     {activeTab === 'files' && (
                         <div style={{ maxWidth: '850px', margin: '0 auto' }}>
-                            <div style={{
-                                backgroundColor: '#FFFFFF',
-                                borderRadius: 'var(--border-radius-lg)',
-                                padding: '45px 30px',
-                                boxShadow: 'var(--shadow-sm)',
-                                border: '1px solid var(--border-color)',
-                                textAlign: 'center'
-                            }}>
-                                <span style={{ fontSize: '3rem', display: 'block', marginBottom: '15px' }}>📚</span>
+                            <div className="subject-info-card" style={{ textAlign: 'center' }}>
+                                <Download size={48} style={{ color: 'var(--primary-color)', margin: '0 auto 15px auto', display: 'block' }} />
                                 <h3 style={{ color: 'var(--secondary-color)', fontWeight: '800', marginBottom: '10px' }}>مركز تحميل ملفات المادة</h3>
                                 <p style={{ color: 'var(--text-muted)', fontSize: '1rem', maxWidth: '600px', margin: '0 auto 30px auto' }}>
                                     مذكرات الشرح وتلخيص الدروس بصيغة PDF قابلة للتحميل والطباعة متوفرة ومرفقة داخل كل درس دراسي.
@@ -261,12 +252,15 @@ export const SubjectDetails = () => {
                                         <button 
                                             onClick={() => alert('ميزة تجريبية: جاري تجميع كل ملفات الـ PDF في أرشيف واحد لتحميلها!')}
                                             className="btn btn-primary"
+                                            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
                                         >
-                                            📥 تحميل كل مذكرات المادة (PDF) دفعة واحدة
+                                            <Download size={16} />
+                                            تحميل كل مذكرات المادة (PDF) دفعة واحدة
                                         </button>
                                     ) : (
-                                        <div style={{ padding: '15px 25px', backgroundColor: 'var(--primary-light)', borderRadius: 'var(--border-radius-md)', border: '1px dashed var(--primary-color)' }}>
-                                            <span style={{ fontWeight: 'bold', color: 'var(--primary-color)' }}>🔒 ميزة تحميل كافة مذكرات الـ PDF مقصورة على المشتركين بالكامل.</span>
+                                        <div style={{ padding: '15px 25px', backgroundColor: 'var(--primary-light)', borderRadius: 'var(--border-radius-md)', border: '1px dashed var(--primary-color)', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                                            <Lock size={16} style={{ color: 'var(--primary-color)' }} />
+                                            <span style={{ fontWeight: 'bold', color: 'var(--primary-color)' }}>ميزة تحميل كافة مذكرات الـ PDF مقصورة على المشتركين بالكامل.</span>
                                         </div>
                                     )}
                                 </div>

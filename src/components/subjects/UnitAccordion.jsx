@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { LessonItem } from './LessonItem';
+import { ChevronDown } from 'lucide-react';
 
 export const UnitAccordion = ({ 
     unit, 
@@ -44,11 +45,12 @@ export const UnitAccordion = ({
             >
                 <span>{unit.unitTitle}</span>
                 <span style={{ 
-                    fontSize: '1.2rem', 
+                    display: 'inline-flex',
+                    alignItems: 'center',
                     transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
                     transition: 'var(--transition)'
                 }}>
-                    ▼
+                    <ChevronDown size={20} />
                 </span>
             </button>
             

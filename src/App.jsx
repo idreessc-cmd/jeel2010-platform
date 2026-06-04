@@ -15,6 +15,7 @@ import { Lesson } from './pages/Lesson';
 import { Quiz } from './pages/Quiz';
 import { Login } from './pages/Login';
 import { Admin } from './pages/Admin';
+import { Dashboard } from './pages/Dashboard';
 import { NotFound } from './pages/NotFound';
 
 // Helper component to scroll to top on route change
@@ -43,6 +44,7 @@ function App() {
                         <Route path="/subject/:subjectId/lesson/:lessonId/quiz" element={<Quiz />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/admin" element={<Admin />} />
+                        <Route path="/dashboard" element={<Dashboard />} />
                         <Route path="*" element={<NotFound />} />
                     </Routes>
                 </main>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { mockSubjects } from '../data/subjects';
 import { SubjectCard } from '../components/subjects/SubjectCard';
+import { Lightbulb, Mail } from 'lucide-react';
 
 export const Subjects = () => {
     return (
@@ -26,14 +27,16 @@ export const Subjects = () => {
                     border: '1px solid var(--border-color)',
                     textAlign: 'center'
                 }}>
-                    <h3 style={{ color: 'var(--secondary-color)', fontWeight: '800', marginBottom: '15px' }}>
-                        💡 هل تبحث عن باقي مواد الصف الأول الثانوي؟
+                    <h3 style={{ color: 'var(--secondary-color)', fontWeight: '800', marginBottom: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                        <Lightbulb size={24} style={{ color: 'var(--primary-color)' }} />
+                        هل تبحث عن باقي مواد الصف الأول الثانوي؟
                     </h3>
                     <p style={{ color: 'var(--text-muted)', fontSize: '1.05rem', maxWidth: '700px', margin: '0 auto 20px auto' }}>
                         نحن نعمل حالياً على إضافة باقي المواد العلمية والأدبية (الفيزياء، الكيمياء، الأحياء، الفلسفة، والجغرافيا) لتوفير تجربة تعليمية متكاملة لجيل 2010 قريباً جداً.
                     </p>
-                    <a href="#footer" className="btn btn-outline" style={{ display: 'inline-block' }}>
-                        ✉️ اتصل بنا للاقتراحات
+                    <a href="#footer" className="btn btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                        <Mail size={18} />
+                        اتصل بنا للاقتراحات
                     </a>
                 </div>
             </div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Users, Gem, Unlock } from 'lucide-react';
 
 export const AdminStats = ({ students = [] }) => {
     const totalStudents = students.length;
@@ -10,7 +11,7 @@ export const AdminStats = ({ students = [] }) => {
         {
             title: 'إجمالي الطلاب المسجلين',
             value: totalStudents,
-            icon: '👥',
+            icon: <Users size={28} />,
             bgColor: '#EAF8FF',
             iconColor: '#0171F1',
             subtext: 'نشطين على خادم الـ LocalStorage'
@@ -18,7 +19,7 @@ export const AdminStats = ({ students = [] }) => {
         {
             title: 'الطلاب المشتركين بالكامل',
             value: activeSubscribers,
-            icon: '💎',
+            icon: <Gem size={28} />,
             bgColor: '#E8F7E6',
             iconColor: '#00AF45',
             subtext: `نسبة الاشتراك الفعلي: ${activeRate}%`
@@ -26,7 +27,7 @@ export const AdminStats = ({ students = [] }) => {
         {
             title: 'حسابات التجربة المجانية',
             value: freeTrialists,
-            icon: '🔓',
+            icon: <Unlock size={28} />,
             bgColor: '#FAE8E8',
             iconColor: '#EA3C07',
             subtext: 'متاح لهم أول درسين فقط مجاناً'
@@ -59,8 +60,7 @@ export const AdminStats = ({ students = [] }) => {
                         color: stat.iconColor,
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '1.8rem'
+                        justifyContent: 'center'
                     }}>
                         {stat.icon}
                     </div>

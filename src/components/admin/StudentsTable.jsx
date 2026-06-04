@@ -1,5 +1,6 @@
 import React from 'react';
 import { Badge } from '../ui/Badge';
+import { UserCheck, UserX } from 'lucide-react';
 
 export const StudentsTable = ({ students = [], onToggleSubscription }) => {
     return (
@@ -29,7 +30,7 @@ export const StudentsTable = ({ students = [], onToggleSubscription }) => {
                             <th style={{ padding: '15px 25px', color: 'var(--text-muted)', fontWeight: '700' }}>البريد الإلكتروني</th>
                             <th style={{ padding: '15px 25px', color: 'var(--text-muted)', fontWeight: '700' }}>تاريخ الانضمام</th>
                             <th style={{ padding: '15px 25px', color: 'var(--text-muted)', fontWeight: '700' }}>حالة الاشتراك</th>
-                            <th style={{ padding: '15px 25px', color: 'var(--text-muted)', fontWeight: '700', textClassName: 'center' }}>التحكم اليدوي</th>
+                            <th style={{ padding: '15px 25px', color: 'var(--text-muted)', fontWeight: '700', textAlign: 'center' }}>التحكم اليدوي</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -43,7 +44,7 @@ export const StudentsTable = ({ students = [], onToggleSubscription }) => {
                                         {student.subscriptionStatus === 'active' ? 'مشترك بالكامل' : 'تجريبي مجاني'}
                                     </Badge>
                                 </td>
-                                <td style={{ padding: '15px 25px' }}>
+                                <td style={{ padding: '15px 25px', display: 'flex', justifyContent: 'center' }}>
                                     <button 
                                         onClick={() => onToggleSubscription(
                                             student.email, 
@@ -54,10 +55,24 @@ export const StudentsTable = ({ students = [], onToggleSubscription }) => {
                                             padding: '6px 14px', 
                                             fontSize: '0.85rem', 
                                             borderRadius: 'var(--border-radius-sm)',
-                                            width: '120px'
+                                            width: '140px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: '6px'
                                         }}
                                     >
-                                        {student.subscriptionStatus === 'active' ? '🚫 إلغاء التفعيل' : '💎 تفعيل الحساب'}
+                                        {student.subscriptionStatus === 'active' ? (
+                                            <>
+                                                <UserX size={14} />
+                                                <span>إلغاء التفعيل</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <UserCheck size={14} />
+                                                <span>تفعيل الحساب</span>
+                                            </>
+                                        )}
                                     </button>
                                 </td>
                             </tr>

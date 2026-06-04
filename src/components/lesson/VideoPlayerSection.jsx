@@ -1,4 +1,5 @@
 import React from 'react';
+import { Video } from 'lucide-react';
 
 export const VideoPlayerSection = ({ lessonVideo }) => {
     if (!lessonVideo || !lessonVideo.videoId) {
@@ -25,7 +26,8 @@ export const VideoPlayerSection = ({ lessonVideo }) => {
     return (
         <div style={{ marginBottom: '30px' }}>
             <h4 style={{ color: 'var(--secondary-color)', fontWeight: '800', marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                🎥 شرح بالفيديو للدرس
+                <Video size={20} style={{ color: 'var(--primary-color)' }} />
+                <span>شرح بالفيديو للدرس</span>
             </h4>
             
             <div style={{ position: 'relative', width: '100%', overflow: 'hidden', borderRadius: 'var(--border-radius-lg)' }}>

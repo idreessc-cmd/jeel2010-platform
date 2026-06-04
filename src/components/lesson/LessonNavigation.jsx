@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ArrowRight, ArrowLeft, ClipboardList, Lock } from 'lucide-react';
 
 export const LessonNavigation = ({ 
     subjectId,
@@ -30,9 +31,10 @@ export const LessonNavigation = ({
                 <button 
                     onClick={() => navigate(`/subject/${subjectId}/lesson/${prevLesson.id}`)}
                     className="btn btn-outline"
-                    style={{ fontSize: '0.95rem', padding: '10px 20px' }}
+                    style={{ fontSize: '0.95rem', padding: '10px 20px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                 >
-                    ➡️ الدرس السابق: {prevLesson.title.split(':')[0]}
+                    <ArrowRight size={16} />
+                    <span>الدرس السابق: {prevLesson.title.split(':')[0]}</span>
                 </button>
             ) : (
                 <div style={{ width: '100px' }}></div>
@@ -45,10 +47,14 @@ export const LessonNavigation = ({
                 style={{ 
                     fontSize: '1rem', 
                     padding: '12px 28px',
-                    boxShadow: '0 4px 14px rgba(68, 46, 102, 0.2)'
+                    boxShadow: '0 4px 14px rgba(68, 46, 102, 0.2)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px'
                 }}
             >
-                📝 بدء اختبار الدرس التقييمي
+                <ClipboardList size={18} />
+                <span>بدء اختبار الدرس التقييمي</span>
             </button>
 
             {/* Next Lesson */}
@@ -68,11 +74,18 @@ export const LessonNavigation = ({
                     style={{ 
                         fontSize: '0.95rem', 
                         padding: '10px 20px',
-                        opacity: (!nextLesson.isFree && !(user && user.subscriptionStatus === 'active')) ? 0.7 : 1
+                        opacity: (!nextLesson.isFree && !(user && user.subscriptionStatus === 'active')) ? 0.7 : 1,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px'
                     }}
                 >
-                    الدرس التالي: {nextLesson.title.split(':')[0]} ⬅️
-                    {(!nextLesson.isFree && !(user && user.subscriptionStatus === 'active')) && ' 🔒'}
+                    <span>الدرس التالي: {nextLesson.title.split(':')[0]}</span>
+                    {(!nextLesson.isFree && !(user && user.subscriptionStatus === 'active')) ? (
+                        <Lock size={14} />
+                    ) : (
+                        <ArrowLeft size={16} />
+                    )}
                 </button>
             ) : (
                 <div style={{ width: '100px' }}></div>

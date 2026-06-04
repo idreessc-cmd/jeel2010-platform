@@ -10,6 +10,7 @@ import { VideoPlayerSection } from '../components/lesson/VideoPlayerSection';
 import { PdfSection } from '../components/lesson/PdfSection';
 import { LessonNavigation } from '../components/lesson/LessonNavigation';
 import { Badge } from '../components/ui/Badge';
+import { ArrowRight, Lock, MessageCircle, PartyPopper, Lightbulb, CheckCircle2, Circle } from 'lucide-react';
 
 export const Lesson = () => {
     const { subjectId, lessonId } = useParams();
@@ -39,8 +40,11 @@ export const Lesson = () => {
             const completed = progressService.isLessonComplete(currentUser.email, lessonId);
             setIsCompleted(completed);
             setCompletedLessonIds(progressService.getCompletedLessons(currentUser.email));
+            
+            // Phase B: Auto-save last viewed lesson
+            progressService.setLastViewedLesson(currentUser.email, subjectId, lessonId);
         }
-    }, [lessonId]);
+    }, [lessonId, subjectId]);
 
     if (!subject || !lesson) {
         return (
@@ -71,8 +75,9 @@ export const Lesson = () => {
             <div className="container">
                 {/* Back Link */}
                 <div style={{ marginBottom: '20px' }}>
-                    <Link to={`/subject/${subjectId}`} style={{ color: 'var(--primary-color)', fontWeight: 'bold', fontSize: '1.05rem', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-                        ➡️ العودة لقائمة دروس مادة {subject.title}
+                    <Link to={`/subject/${subjectId}`} style={{ color: 'var(--primary-color)', fontWeight: 'bold', fontSize: '1.05rem', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                        <ArrowRight size={18} />
+                        العودة لقائمة دروس مادة {subject.title}
                     </Link>
                 </div>
 
@@ -124,13 +129,14 @@ export const Lesson = () => {
                         {/* Lock Warning Overlay Card or Content Render */}
                         {!hasAccess ? (
                             <div className="locked-content-box">
-                                <span className="locked-icon">🔒</span>
+                                <Lock size={48} className="locked-icon" style={{ color: 'var(--secondary-color)', margin: '0 auto 20px auto', display: 'block' }} />
                                 <h3>هذا الدرس مغلق ويتطلب اشتراكاً</h3>
                                 <p>هذا الدرس جزء من باقة الوصول الكامل لمنهج الصف الأول الثانوي لجيل 2010. لتتمكن من المتابعة وحل الاختبارات وتحميل الملخصات، يرجى تفعيل اشتراكك.</p>
                                 
                                 <div className="locked-actions">
                                     <a href="https://wa.me/201012345678" target="_blank" rel="noreferrer" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-                                        💬 تواصل وتفعيل عبر واتساب
+                                        <MessageCircle size={18} />
+                                        تواصل وتفعيل عبر واتساب
                                     </a>
                                     <a href="#footer" className="btn btn-outline">
                                         معرفة تفاصيل الدفع
@@ -154,8 +160,9 @@ export const Lesson = () => {
                                     borderLeft: `5px solid ${isCompleted ? 'var(--accent-islamic)' : 'var(--primary-color)'}`
                                 }}>
                                     <div>
-                                        <h5 style={{ color: 'var(--secondary-color)', fontWeight: '800', margin: '0 0 4px 0' }}>
-                                            {isCompleted ? '🎉 لقد أكملت دراسة هذا الدرس!' : '💡 هل انتهيت من دراسة الدرس بالكامل؟'}
+                                        <h5 style={{ color: 'var(--secondary-color)', fontWeight: '800', margin: '0 0 4px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            {isCompleted ? <PartyPopper size={18} style={{ color: 'var(--accent-islamic)' }} /> : <Lightbulb size={18} style={{ color: 'var(--primary-color)' }} />}
+                                            {isCompleted ? 'لقد أكملت دراسة هذا الدرس!' : 'هل انتهيت من دراسة الدرس بالكامل؟'}
                                         </h5>
                                         <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0 }}>
                                             قم بتعليم الدرس كمكتمل لتسجيل تقدمك في المادة.
@@ -168,10 +175,14 @@ export const Lesson = () => {
                                             padding: '8px 18px', 
                                             fontSize: '0.9rem',
                                             borderColor: isCompleted ? 'var(--accent-islamic)' : 'var(--primary-color)',
-                                            color: isCompleted ? 'var(--accent-islamic)' : '#FFF'
+                                            color: isCompleted ? 'var(--accent-islamic)' : '#FFF',
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '6px'
                                         }}
                                     >
-                                        {isCompleted ? '✅ مكتمل (اضغط للإلغاء)' : '✓ تم الانتهاء والمذاكرة'}
+                                        {isCompleted ? <CheckCircle2 size={16} /> : <Circle size={16} />}
+                                        {isCompleted ? 'مكتمل (اضغط للإلغاء)' : 'تم الانتهاء والمذاكرة'}
                                     </button>
                                 </div>
 

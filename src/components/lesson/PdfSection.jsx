@@ -1,4 +1,5 @@
 import React from 'react';
+import { FileText, Download } from 'lucide-react';
 
 export const PdfSection = ({ pdfUrl, lessonTitle }) => {
     return (
@@ -19,7 +20,9 @@ export const PdfSection = ({ pdfUrl, lessonTitle }) => {
                 marginBottom: '20px'
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <span style={{ fontSize: '2.5rem' }}>📄</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <FileText size={40} style={{ color: 'var(--primary-color)' }} />
+                    </span>
                     <div>
                         <h4 style={{ color: 'var(--secondary-color)', fontWeight: '800', margin: 0 }}>ملخص ومذكرة الدرس (PDF)</h4>
                         <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0 }}>ملخص مركز وشامل لجميع عناصر الدرس بصيغة قابلة للطباعة</p>
@@ -34,9 +37,10 @@ export const PdfSection = ({ pdfUrl, lessonTitle }) => {
                         alert('تنبيه تجريبي: تم حفظ ملف الـ PDF بنجاح في مجلد التنزيلات!');
                     }}
                     className="btn btn-primary"
-                    style={{ fontSize: '0.95rem', padding: '10px 22px' }}
+                    style={{ fontSize: '0.95rem', padding: '10px 22px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                 >
-                    📥 تحميل الملخص الآن
+                    <Download size={16} />
+                    <span>تحميل الملخص الآن</span>
                 </a>
             </div>
             

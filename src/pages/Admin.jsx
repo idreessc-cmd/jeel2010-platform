@@ -6,6 +6,7 @@ import { mockLessons, addLessonToSubject } from '../data/lessons';
 import { addQuestionToQuiz } from '../data/quizzes';
 import { AdminStats } from '../components/admin/AdminStats';
 import { StudentsTable } from '../components/admin/StudentsTable';
+import { LogOut, PlusCircle, Save, UserPlus } from 'lucide-react';
 
 export const Admin = () => {
     const navigate = useNavigate();
@@ -176,8 +177,10 @@ export const Admin = () => {
                             navigate('/login');
                         }}
                         className="btn btn-outline"
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                     >
-                        🔒 خروج من لوحة الإدارة
+                        <LogOut size={16} />
+                        <span>خروج من لوحة الإدارة</span>
                     </button>
                 </div>
 
@@ -203,8 +206,9 @@ export const Admin = () => {
                         boxShadow: 'var(--shadow-sm)',
                         border: '1px solid var(--border-color)'
                     }}>
-                        <h3 style={{ color: 'var(--secondary-color)', fontWeight: '800', borderBottom: '1px dashed var(--border-color)', paddingBottom: '12px', marginBottom: '20px' }}>
-                            ➕ إضافة درس جديد (تجريبي)
+                        <h3 style={{ color: 'var(--secondary-color)', fontWeight: '800', borderBottom: '1px dashed var(--border-color)', paddingBottom: '12px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <PlusCircle size={20} style={{ color: 'var(--primary-color)' }} />
+                            <span>إضافة درس جديد (تجريبي)</span>
                         </h3>
                         
                         <form onSubmit={handleAddLessonMock}>
@@ -253,8 +257,9 @@ export const Admin = () => {
                                 </select>
                             </div>
 
-                            <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '10px' }}>
-                                📁 حفظ الدرس تجريبياً
+                             <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '10px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                                <Save size={16} />
+                                <span>حفظ الدرس تجريبياً</span>
                             </button>
                         </form>
                     </div>
@@ -267,8 +272,9 @@ export const Admin = () => {
                         boxShadow: 'var(--shadow-sm)',
                         border: '1px solid var(--border-color)'
                     }}>
-                        <h3 style={{ color: 'var(--secondary-color)', fontWeight: '800', borderBottom: '1px dashed var(--border-color)', paddingBottom: '12px', marginBottom: '20px' }}>
-                            ➕ إضافة سؤال اختبار (تجريبي)
+                        <h3 style={{ color: 'var(--secondary-color)', fontWeight: '800', borderBottom: '1px dashed var(--border-color)', paddingBottom: '12px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <PlusCircle size={20} style={{ color: 'var(--primary-color)' }} />
+                            <span>إضافة سؤال اختبار (تجريبي)</span>
                         </h3>
                         
                         <form onSubmit={handleAddQuestionMock}>
@@ -335,8 +341,9 @@ export const Admin = () => {
                                 </select>
                             </div>
 
-                            <button type="submit" className="btn btn-secondary" style={{ width: '100%', padding: '10px' }}>
-                                📝 حفظ السؤال تجريبياً
+                            <button type="submit" className="btn btn-secondary" style={{ width: '100%', padding: '10px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                                <Save size={16} />
+                                <span>حفظ السؤال تجريبياً</span>
                             </button>
                         </form>
                     </div>
@@ -349,8 +356,9 @@ export const Admin = () => {
                         boxShadow: 'var(--shadow-sm)',
                         border: '1px solid var(--border-color)'
                     }}>
-                        <h3 style={{ color: 'var(--secondary-color)', fontWeight: '800', borderBottom: '1px dashed var(--border-color)', paddingBottom: '12px', marginBottom: '20px' }}>
-                            👤 إضافة طالب تجريبي جديد
+                        <h3 style={{ color: 'var(--secondary-color)', fontWeight: '800', borderBottom: '1px dashed var(--border-color)', paddingBottom: '12px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <UserPlus size={20} style={{ color: 'var(--primary-color)' }} />
+                            <span>إضافة طالب تجريبي جديد</span>
                         </h3>
                         
                         <form onSubmit={handleAddStudent}>
@@ -388,8 +396,9 @@ export const Admin = () => {
                                 </select>
                             </div>
 
-                            <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '10px' }}>
-                                👤 إضافة وتنشيط الطالب
+                             <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '10px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                                <UserPlus size={16} />
+                                <span>إضافة وتنشيط الطالب</span>
                             </button>
                         </form>
                     </div>

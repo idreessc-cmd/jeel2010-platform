@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authService } from '../services/authService';
+import { AlertCircle, LogIn, Lightbulb, User, Gem } from 'lucide-react';
 
 export const Login = () => {
     const navigate = useNavigate();
@@ -9,9 +10,9 @@ export const Login = () => {
     const [error, setError] = useState('');
 
     useEffect(() => {
-        // If already logged in, redirect to home
+        // If already logged in, redirect to dashboard
         if (authService.getCurrentUser()) {
-            navigate('/subjects');
+            navigate('/dashboard');
         }
     }, []);
 
@@ -26,7 +27,7 @@ export const Login = () => {
 
         const res = authService.login(email, password);
         if (res.success) {
-            navigate('/subjects');
+            navigate('/dashboard');
         } else {
             setError(res.error);
         }
@@ -37,7 +38,7 @@ export const Login = () => {
         setError('');
         const res = authService.login(quickEmail, '123');
         if (res.success) {
-            navigate('/subjects');
+            navigate('/dashboard');
         } else {
             setError(res.error);
         }
@@ -69,9 +70,13 @@ export const Login = () => {
                             marginBottom: '20px',
                             fontWeight: 'bold',
                             fontSize: '0.9rem',
-                            borderRight: '4px solid var(--accent-arabic)'
+                            borderRight: '4px solid var(--accent-arabic)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px'
                         }}>
-                            ⚠️ {error}
+                            <AlertCircle size={18} />
+                            <span>{error}</span>
                         </div>
                     )}
 
@@ -121,9 +126,10 @@ export const Login = () => {
                         <button 
                             type="submit" 
                             className="btn btn-primary"
-                            style={{ width: '100%', padding: '12px', fontSize: '1.05rem', fontWeight: '800' }}
+                            style={{ width: '100%', padding: '12px', fontSize: '1.05rem', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                         >
-                            🔐 تسجيل الدخول
+                            <LogIn size={20} />
+                            <span>تسجيل الدخول</span>
                         </button>
                     </form>
 
@@ -134,24 +140,27 @@ export const Login = () => {
                         paddingTop: '25px',
                         textAlign: 'center'
                     }}>
-                        <h4 style={{ color: 'var(--secondary-color)', fontWeight: '800', fontSize: '0.95rem', marginBottom: '15px' }}>
-                            💡 اختصارات سريعة لتجربة المصحح:
+                        <h4 style={{ color: 'var(--secondary-color)', fontWeight: '800', fontSize: '0.95rem', marginBottom: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                            <Lightbulb size={18} style={{ color: 'var(--primary-color)' }} />
+                            <span>اختصارات سريعة لتجربة المصحح:</span>
                         </h4>
                         
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                             <button 
                                 onClick={() => handleQuickLogin('free@jeel2010.com')}
                                 className="btn btn-outline"
-                                style={{ padding: '8px 12px', fontSize: '0.85rem', width: '100%' }}
+                                style={{ padding: '8px 12px', fontSize: '0.85rem', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                             >
-                                👤 الدخول كطالب تجريبي (مجاني)
+                                <User size={16} />
+                                <span>الدخول كطالب تجريبي (مجاني)</span>
                             </button>
                             <button 
                                 onClick={() => handleQuickLogin('active@jeel2010.com')}
                                 className="btn btn-outline"
-                                style={{ padding: '8px 12px', fontSize: '0.85rem', width: '100%', color: 'var(--accent-islamic)', borderColor: 'var(--accent-islamic)' }}
+                                style={{ padding: '8px 12px', fontSize: '0.85rem', width: '100%', color: 'var(--accent-islamic)', borderColor: 'var(--accent-islamic)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                             >
-                                💎 الدخول كطالب مشترك (نشط بالكامل)
+                                <Gem size={16} />
+                                <span>الدخول كطالب مشترك (نشط بالكامل)</span>
                             </button>
                         </div>
                         

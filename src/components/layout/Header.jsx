@@ -57,6 +57,13 @@ export const Header = () => {
                     {user && (
                         <>
                             <Link 
+                                to="/dashboard" 
+                                className={`nav-link ${location.pathname === '/dashboard' ? 'active' : ''}`}
+                                onClick={handleLinkClick}
+                            >
+                                لوحة التحكم
+                            </Link>
+                            <Link 
                                 to="/admin" 
                                 className={`nav-link ${location.pathname === '/admin' ? 'active' : ''}`}
                                 onClick={handleLinkClick}

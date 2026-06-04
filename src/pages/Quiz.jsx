@@ -7,6 +7,7 @@ import { authService } from '../services/authService';
 import { quizService } from '../services/quizService';
 import { QuizQuestion } from '../components/quiz/QuizQuestion';
 import { QuizResult } from '../components/quiz/QuizResult';
+import { ArrowRight, ArrowLeft, BookOpen, Save } from 'lucide-react';
 
 export const Quiz = () => {
     const { subjectId, lessonId } = useParams();
@@ -123,8 +124,9 @@ export const Quiz = () => {
                 
                 {/* Back to Lesson Link */}
                 <div style={{ marginBottom: '25px' }}>
-                    <Link to={`/subject/${subjectId}/lesson/${lessonId}`} style={{ color: 'var(--text-muted)', fontWeight: 'bold', fontSize: '1rem' }}>
-                        ➡️ العودة لدرس: {lesson.title}
+                    <Link to={`/subject/${subjectId}/lesson/${lessonId}`} style={{ color: 'var(--text-muted)', fontWeight: 'bold', fontSize: '1rem', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                        <ArrowRight size={18} />
+                        العودة لدرس: {lesson.title}
                     </Link>
                 </div>
 
@@ -152,8 +154,9 @@ export const Quiz = () => {
                                     أجب عن الأسئلة بدقة لقياس مدى استيعابك
                                 </p>
                             </div>
-                            <span style={{ fontSize: '0.9rem', color: 'var(--primary-color)', fontWeight: 'bold' }}>
-                                📁 مادة {subject.title}
+                            <span style={{ fontSize: '0.9rem', color: 'var(--primary-color)', fontWeight: 'bold', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                                <BookOpen size={16} />
+                                مادة {subject.title}
                             </span>
                         </div>
 
@@ -179,26 +182,33 @@ export const Quiz = () => {
                                 className="btn btn-outline"
                                 style={{ 
                                     opacity: currentQuestionIndex === 0 ? 0.5 : 1,
-                                    cursor: currentQuestionIndex === 0 ? 'not-allowed' : 'pointer'
+                                    cursor: currentQuestionIndex === 0 ? 'not-allowed' : 'pointer',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '6px'
                                 }}
                             >
-                                ➡️ السؤال السابق
+                                <ArrowRight size={16} />
+                                السؤال السابق
                             </button>
 
                             {currentQuestionIndex < totalQuestions - 1 ? (
                                 <button 
                                     onClick={handleNext}
                                     className="btn btn-primary"
+                                    style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                                 >
-                                    السؤال التالي ⬅️
+                                    السؤال التالي
+                                    <ArrowLeft size={16} />
                                 </button>
                             ) : (
                                 <button 
                                     onClick={handleFinish}
                                     className="btn btn-secondary"
-                                    style={{ boxShadow: '0 4px 12px rgba(68, 46, 102, 0.2)' }}
+                                    style={{ boxShadow: '0 4px 12px rgba(68, 46, 102, 0.2)', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                                 >
-                                    💾 إنهاء الاختبار وإظهار النتيجة
+                                    <Save size={16} />
+                                    إنهاء الاختبار وإظهار النتيجة
                                 </button>
                             )}
                         </div>

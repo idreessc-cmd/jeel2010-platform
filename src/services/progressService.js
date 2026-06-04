@@ -43,5 +43,19 @@ export const progressService = {
         ).length;
         
         return Math.round((completedCount / lessonsList.length) * 100);
+    },
+    
+    // Set last viewed lesson
+    setLastViewedLesson: (email, subjectId, lessonId) => {
+        if (!email) return;
+        const key = `jeel2010_last_viewed_${email}`;
+        storage.set(key, { subjectId, lessonId, timestamp: Date.now() });
+    },
+    
+    // Get last viewed lesson
+    getLastViewedLesson: (email) => {
+        if (!email) return null;
+        const key = `jeel2010_last_viewed_${email}`;
+        return storage.get(key, null);
     }
 };

@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { mockSubjects } from '../data/subjects';
 import { SubjectCard } from '../components/subjects/SubjectCard';
 import { authService } from '../services/authService';
+import { Play, BookOpen, Check, X, Plus, Minus, ArrowLeft } from 'lucide-react';
 
 export const Home = () => {
     const navigate = useNavigate();
@@ -51,7 +52,7 @@ export const Home = () => {
                         <div className="hero-btns">
                             <Link to="/subjects" className="btn btn-primary">
                                 <span>ابدأ التعلم الآن</span>
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                <ArrowLeft size={20} />
                             </Link>
                             <Link to="/subjects" className="btn btn-outline">شاهد الدروس المجانية</Link>
                         </div>
@@ -63,8 +64,8 @@ export const Home = () => {
                         
                         {/* Floating Badge 1 */}
                         <div className="badge-floating badge-1">
-                            <div className="badge-icon" style={{ backgroundColor: 'var(--primary-light)', color: 'var(--primary-color)' }}>
-                                🎬
+                            <div className="badge-icon" style={{ backgroundColor: 'var(--primary-light)', color: 'var(--primary-color)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <Play size={20} fill="currentColor" />
                             </div>
                             <div className="badge-info">
                                 <h4>فيديوهات مسجلة</h4>
@@ -74,8 +75,8 @@ export const Home = () => {
                         
                         {/* Floating Badge 2 */}
                         <div className="badge-floating badge-2">
-                            <div className="badge-icon" style={{ backgroundColor: 'var(--bg-islamic)', color: 'var(--accent-islamic)' }}>
-                                📝
+                            <div className="badge-icon" style={{ backgroundColor: 'var(--bg-islamic)', color: 'var(--accent-islamic)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <BookOpen size={20} />
                             </div>
                             <div className="badge-info">
                                 <h4>ملخصات واختبارات</h4>
@@ -152,11 +153,11 @@ export const Home = () => {
                             </div>
                             
                             <ul className="pricing-features">
-                                <li className="available"><i>✓</i> مشاهدة أول درسين من كل مادة</li>
-                                <li className="available"><i>✓</i> خوض الاختبارات القصيرة لأول درسين</li>
-                                <li className="unavailable"><i>✗</i> الوصول لباقي المنهج والدروس</li>
-                                <li className="unavailable"><i>✗</i> تحميل ملخصات ومذكرات الـ PDF</li>
-                                <li className="unavailable"><i>✗</i> تقارير متابعة تقدم الطالب الدراسية</li>
+                                <li className="available"><i style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><Check size={12} /></i> مشاهدة أول درسين من كل مادة</li>
+                                <li className="available"><i style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><Check size={12} /></i> خوض الاختبارات القصيرة لأول درسين</li>
+                                <li className="unavailable"><i style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><X size={12} /></i> الوصول لباقي المنهج والدروس</li>
+                                <li className="unavailable"><i style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><X size={12} /></i> تحميل ملخصات ومذكرات الـ PDF</li>
+                                <li className="unavailable"><i style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><X size={12} /></i> تقارير متابعة تقدم الطالب الدراسية</li>
                             </ul>
                             
                             <Link to="/subjects" className="btn btn-outline" style={{ marginTop: 'auto', textAlign: 'center' }}>
@@ -173,11 +174,11 @@ export const Home = () => {
                             </div>
                             
                             <ul className="pricing-features">
-                                <li className="available"><i>✓</i> مشاهدة جميع دروس المنهج بلا استثناء</li>
-                                <li className="available"><i>✓</i> خوض كافة الاختبارات والواجبات الدورية</li>
-                                <li className="available"><i>✓</i> تحميل كافة ملخصات ومذكرات الـ PDF للطباعة</li>
-                                <li className="available"><i>✓</i> تقارير دورية متكاملة لمتابعة مستوى التقدم الدراسي</li>
-                                <li className="available"><i>✓</i> تواصل مباشر مع المدرسين لحل الأسئلة الصعبة</li>
+                                <li className="available"><i style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><Check size={12} /></i> مشاهدة جميع دروس المنهج بلا استثناء</li>
+                                <li className="available"><i style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><Check size={12} /></i> خوض كافة الاختبارات والواجبات الدورية</li>
+                                <li className="available"><i style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><Check size={12} /></i> تحميل كافة ملخصات ومذكرات الـ PDF للطباعة</li>
+                                <li className="available"><i style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><Check size={12} /></i> تقارير دورية متكاملة لمتابعة مستوى التقدم الدراسي</li>
+                                <li className="available"><i style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><Check size={12} /></i> تواصل مباشر مع المدرسين لحل الأسئلة الصعبة</li>
                             </ul>
                             
                             <a href="#footer" className="btn btn-primary" style={{ marginTop: 'auto', textAlign: 'center' }}>
@@ -203,7 +204,7 @@ export const Home = () => {
                                 <div key={idx} className={`faq-item ${isActive ? 'active' : ''}`}>
                                     <button className="faq-trigger" onClick={() => toggleFaq(idx)}>
                                         <span>{item.q}</span>
-                                        <span className="faq-icon">{isActive ? '×' : '+'}</span>
+                                        <span className="faq-icon" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>{isActive ? <Minus size={18} /> : <Plus size={18} />}</span>
                                     </button>
                                     {isActive && (
                                         <div className="faq-content" style={{ maxHeight: '500px' }}>
