@@ -59,7 +59,7 @@ export const Home = () => {
                     
                     <div className="hero-image-wrapper">
                         <div className="hero-image-bg"></div>
-                        <img src="./assets/images/girl.webp" alt="طالبة تدرس بتركيز" className="hero-image" />
+                        <img src="/jeel2010-logo.svg" alt="شعار منصة جيل 2010 التعليمية" className="hero-image hero-logo-image" />
                         
                         {/* Floating Badge 1 */}
                         <div className="badge-floating badge-1">

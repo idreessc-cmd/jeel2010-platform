@@ -337,6 +337,9 @@ header {
     display: flex;
     justify-content: center;
     align-items: center;
+    max-width: 420px;
+    width: 100%;
+    margin-inline: auto;
 }
 
 .hero-image-bg {
@@ -356,17 +359,24 @@ header {
     object-fit: cover;
 }
 
+.hero-logo-image {
+    width: min(100%, 320px);
+    height: auto;
+    object-fit: contain;
+}
+
 /* Floating Badges */
 .badge-floating {
     position: absolute;
     background-color: var(--card-bg);
     border-radius: var(--border-radius-lg);
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
-    padding: 15px 20px;
+    padding: 14px 16px;
     display: flex;
     align-items: center;
     gap: 12px;
     z-index: 3;
+    max-width: 240px;
 }
 
 .badge-1 {
@@ -950,5 +960,56 @@ footer {
     .footer-grid {
         grid-template-columns: 1fr;
         gap: 40px;
+    }
+}
+
+/* Responsive overrides for hero sections and badge boxes */
+@media (max-width: 768px) {
+    .hero-image-wrapper {
+        max-width: 340px !important;
+        margin-top: 30px !important;
+        margin-inline: auto !important;
+    }
+
+    .hero-logo-image {
+        width: min(100%, 240px) !important;
+        margin-inline: auto !important;
+    }
+
+    .badge-floating {
+        position: static !important;
+        transform: none !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        margin-top: 12px !important;
+        padding: 12px !important;
+        animation: none !important; /* disable floating animation on mobile */
+    }
+
+    .badge-floating .badge-icon {
+        width: 38px !important;
+        height: 38px !important;
+        font-size: 18px !important;
+        flex-shrink: 0 !important;
+    }
+
+    .badge-info h4 {
+        font-size: 14px !important;
+        margin: 0 !important;
+    }
+
+    .badge-info p {
+        font-size: 12px !important;
+        margin: 2px 0 0 !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-image-wrapper {
+        max-width: 100% !important;
+    }
+
+    .badge-floating {
+        font-size: 13px !important;
     }
 }

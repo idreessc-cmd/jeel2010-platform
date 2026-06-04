@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <!-- Background/Decorative Circles -->
+  <circle cx="200" cy="200" r="180" fill="#F7FAFC" stroke="#E2E8F0" stroke-width="2" />
+  <circle cx="200" cy="200" r="150" fill="none" stroke="#0171F1" stroke-width="8" stroke-dasharray="10 15" />
+  
+  <!-- Graduation Cap (Educational shape) -->
+  <path d="M200 80 L320 140 L200 200 L80 140 Z" fill="#442E66" />
+  <path d="M140 170 L140 230 C140 260, 260 260, 260 230 L260 170" fill="none" stroke="#442E66" stroke-width="8" stroke-linecap="round" />
+  <path d="M300 155 L300 240 C300 250, 290 260, 280 260" fill="none" stroke="#0171F1" stroke-width="4" stroke-linecap="round" />
+  <polygon points="280,250 280,270 265,260" fill="#0171F1" />
+  
+  <!-- Center circle for Text -->
+  <circle cx="200" cy="230" r="80" fill="#FFFFFF" stroke="#0171F1" stroke-width="6" />
+  
+  <!-- Logo Text -->
+  <text x="200" y="215" font-family="'Cairo', sans-serif" font-weight="900" font-size="28" fill="#442E66" text-anchor="middle">جيل</text>
+  <text x="200" y="265" font-family="'Cairo', sans-serif" font-weight="900" font-size="42" fill="#0171F1" text-anchor="middle">2010</text>
+</svg>
