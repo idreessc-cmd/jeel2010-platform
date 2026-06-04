@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 
 // Layout & Styling
+import './styles/style.css';
 import './styles/global.css';
 import { Header } from './components/layout/Header';
 import { Footer } from './components/layout/Footer';
@@ -29,7 +30,7 @@ const ScrollToTop = () => {
 
 function App() {
     return (
-        <Router>
+        <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <ScrollToTop />
             <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
                 <Header />

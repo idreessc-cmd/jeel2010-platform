@@ -46,7 +46,7 @@ export const Login = () => {
     return (
         <section className="section-padding" style={{ backgroundColor: '#F8FAFC', minHeight: 'calc(100vh - 350px)', display: 'flex', alignItems: 'center' }}>
             <div className="container" style={{ maxWidth: '450px' }}>
-                <div style={{
+                <div className="login-card" style={{
                     backgroundColor: '#FFFFFF',
                     borderRadius: 'var(--border-radius-lg)',
                     padding: '40px',
@@ -161,6 +161,14 @@ export const Login = () => {
                     </div>
                 </div>
             </div>
+            {/* Inline CSS Helper for Login page responsiveness */}
+            <style>{`
+                @media (max-width: 480px) {
+                    .login-card {
+                        padding: 25px 15px !important;
+                    }
+                }
+            `}</style>
         </section>
     );
 };

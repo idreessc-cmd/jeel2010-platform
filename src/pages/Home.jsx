@@ -51,7 +51,7 @@ export const Home = () => {
                         <div className="hero-btns">
                             <Link to="/subjects" className="btn btn-primary">
                                 <span>ابدأ التعلم الآن</span>
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                             </Link>
                             <Link to="/subjects" className="btn btn-outline">شاهد الدروس المجانية</Link>
                         </div>

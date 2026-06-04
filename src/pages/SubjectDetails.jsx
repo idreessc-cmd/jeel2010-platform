@@ -90,7 +90,8 @@ export const SubjectDetails = () => {
 
                     {/* Subscription & Call to Action Box */}
                     <div style={{
-                        width: '320px',
+                        width: '100%',
+                        maxWidth: '320px',
                         backgroundColor: 'var(--bg-color)',
                         borderRadius: 'var(--border-radius-md)',
                         padding: '25px',

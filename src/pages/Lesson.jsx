@@ -76,7 +76,7 @@ export const Lesson = () => {
                     </Link>
                 </div>
 
-                <div style={{
+                <div className="lesson-grid" style={{
                     display: 'grid',
                     gridTemplateColumns: '2.2fr 0.8fr',
                     gap: '40px',
@@ -84,7 +84,7 @@ export const Lesson = () => {
                 }}>
                     
                     {/* Main Lesson Content Area */}
-                    <div style={{
+                    <div className="lesson-content-card" style={{
                         backgroundColor: '#FFFFFF',
                         borderRadius: 'var(--border-radius-lg)',
                         padding: '35px',
@@ -191,7 +191,7 @@ export const Lesson = () => {
                     </div>
                     
                     {/* Sticky Sidebar Right */}
-                    <div style={{ position: 'sticky', top: '100px' }}>
+                    <div className="lesson-sidebar-wrapper" style={{ position: 'sticky', top: '100px' }}>
                         <CurriculumSidebar 
                             subject={subject}
                             units={units}
@@ -205,8 +205,17 @@ export const Lesson = () => {
             {/* Inject media queries style override */}
             <style>{`
                 @media (max-width: 1024px) {
-                    section > div > div {
+                    .lesson-grid {
                         grid-template-columns: 1fr !important;
+                        gap: 25px !important;
+                    }
+                    .lesson-sidebar-wrapper {
+                        position: static !important;
+                    }
+                }
+                @media (max-width: 768px) {
+                    .lesson-content-card {
+                        padding: 20px !important;
                     }
                 }
             `}</style>
