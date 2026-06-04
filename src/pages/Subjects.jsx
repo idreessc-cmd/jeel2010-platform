@@ -1,0 +1,42 @@
+import React from 'react';
+import { mockSubjects } from '../data/subjects';
+import { SubjectCard } from '../components/subjects/SubjectCard';
+
+export const Subjects = () => {
+    return (
+        <section className="section-padding" style={{ minHeight: 'calc(100vh - 350px)' }}>
+            <div className="container">
+                <div className="section-header">
+                    <h2>المواد الدراسية المتوفرة</h2>
+                    <p>اختر المادة التي ترغب في دراستها الآن وتصفح الوحدات والدروس والامتحانات المتاحة.</p>
+                </div>
+                
+                <div className="subjects-grid">
+                    {mockSubjects.map((subject) => (
+                        <SubjectCard key={subject.id} subject={subject} />
+                    ))}
+                </div>
+                
+                <div style={{
+                    marginTop: '60px',
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: 'var(--border-radius-lg)',
+                    padding: '40px',
+                    boxShadow: 'var(--shadow-sm)',
+                    border: '1px solid var(--border-color)',
+                    textAlign: 'center'
+                }}>
+                    <h3 style={{ color: 'var(--secondary-color)', fontWeight: '800', marginBottom: '15px' }}>
+                        💡 هل تبحث عن باقي مواد الصف الأول الثانوي؟
+                    </h3>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '1.05rem', maxWidth: '700px', margin: '0 auto 20px auto' }}>
+                        نحن نعمل حالياً على إضافة باقي المواد العلمية والأدبية (الفيزياء، الكيمياء، الأحياء، الفلسفة، والجغرافيا) لتوفير تجربة تعليمية متكاملة لجيل 2010 قريباً جداً.
+                    </p>
+                    <a href="#footer" className="btn btn-outline" style={{ display: 'inline-block' }}>
+                        ✉️ اتصل بنا للاقتراحات
+                    </a>
+                </div>
+            </div>
+        </section>
+    );
+};
