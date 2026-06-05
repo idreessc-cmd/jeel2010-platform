@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EduArabic - Mobile Learning</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed": "#001a42",
+                    "on-tertiary-container": "#a7acb6",
+                    "on-primary": "#ffffff",
+                    "surface-variant": "#d3e4fe",
+                    "secondary-fixed": "#d8e2ff",
+                    "secondary-container": "#2170e4",
+                    "primary": "#00236f",
+                    "background": "#f8f9ff",
+                    "inverse-primary": "#b6c4ff",
+                    "surface": "#f8f9ff",
+                    "on-tertiary": "#ffffff",
+                    "inverse-on-surface": "#eaf1ff",
+                    "outline-variant": "#c5c5d3",
+                    "on-error-container": "#93000a",
+                    "surface-container-highest": "#d3e4fe",
+                    "surface-container": "#e5eeff",
+                    "on-primary-container": "#90a8ff",
+                    "error": "#ba1a1a",
+                    "secondary-fixed-dim": "#adc6ff",
+                    "on-tertiary-fixed-variant": "#424750",
+                    "on-surface-variant": "#444651",
+                    "on-tertiary-fixed": "#171c23",
+                    "error-container": "#ffdad6",
+                    "surface-container-low": "#eff4ff",
+                    "secondary": "#0058be",
+                    "outline": "#757682",
+                    "inverse-surface": "#213145",
+                    "primary-fixed-dim": "#b6c4ff",
+                    "on-background": "#0b1c30",
+                    "on-primary-fixed-variant": "#264191",
+                    "surface-dim": "#cbdbf5",
+                    "on-error": "#ffffff",
+                    "on-secondary-fixed-variant": "#004395",
+                    "tertiary-fixed-dim": "#c2c6d1",
+                    "primary-fixed": "#dce1ff",
+                    "surface-container-high": "#dce9ff",
+                    "on-secondary-container": "#fefcff",
+                    "tertiary-container": "#3b4049",
+                    "surface-bright": "#f8f9ff",
+                    "primary-container": "#1e3a8a",
+                    "tertiary-fixed": "#dee2ed",
+                    "surface-tint": "#4059aa",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary": "#252a32",
+                    "on-surface": "#0b1c30",
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed": "#00164e"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "margin-mobile": "20px",
+                    "container-max": "1280px",
+                    "gutter": "24px",
+                    "margin-desktop": "64px",
+                    "unit": "8px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["IBM Plex Sans Arabic"],
+                    "label-sm": ["IBM Plex Sans Arabic"],
+                    "headline-md": ["IBM Plex Sans Arabic"],
+                    "display-lg-mobile": ["IBM Plex Sans Arabic"],
+                    "display-lg": ["IBM Plex Sans Arabic"],
+                    "body-md": ["IBM Plex Sans Arabic"],
+                    "label-lg": ["IBM Plex Sans Arabic"],
+                    "body-lg": ["IBM Plex Sans Arabic"]
+            },
+            "fontSize": {
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "display-lg-mobile": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                    "display-lg": ["48px", {"lineHeight": "60px", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+            background-color: #f8f9ff;
+            color: #0b1c30;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="antialiased overflow-x-hidden">
+<!-- TopNavBar -->
+<header class="w-full top-0 sticky z-50 bg-surface border-b border-outline-variant">
+<div class="flex justify-between items-center h-20 px-margin-mobile max-w-container-max mx-auto">
+<div class="flex items-center gap-4">
+<button class="flex items-center justify-center p-2 rounded-xl bg-surface-container-low text-primary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="font-headline-md text-headline-md font-bold text-primary">EduArabic</div>
+</div>
+<button class="bg-secondary text-on-secondary px-6 py-2.5 rounded-xl font-label-lg text-label-lg font-bold shadow-sm active:scale-95 transition-all">
+                Join Now
+            </button>
+</div>
+</header>
+<main>
+<!-- Hero Section -->
+<section class="relative pt-12 pb-16 px-margin-mobile">
+<div class="flex flex-col gap-8 max-w-md mx-auto">
+<!-- Content Area -->
+<div class="space-y-6 text-center">
+<div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-container-high text-primary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+                        المنصة العربية الأولى للتعليم المبتكر
+                    </div>
+<h1 class="font-display-lg-mobile text-display-lg-mobile text-on-background leading-tight">
+                        ابدأ رحلة التعلم والابتكار اليوم
+                    </h1>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                        استكشف مئات الدورات المتخصصة في البرمجة، التصميم، وريادة الأعمال مع أفضل المعلمين العرب في بيئة تعليمية تفاعلية.
+                    </p>
+<!-- CTAs -->
+<div class="flex flex-col gap-4 mt-8">
+<button class="w-full py-4 bg-secondary text-on-secondary font-headline-md text-headline-md rounded-xl shadow-lg active:opacity-90 transition-all">
+                            اشترك الآن مجاناً
+                        </button>
+<button class="w-full py-4 border-2 border-primary text-primary font-headline-md text-headline-md rounded-xl active:bg-surface-container-low transition-all">
+                            تصفح الدورات
+                        </button>
+</div>
+<!-- Social Proof -->
+<div class="flex flex-col items-center gap-3 pt-6">
+<div class="flex -space-x-3 space-x-reverse">
+<img alt="" class="w-10 h-10 rounded-full border-2 border-surface" data-alt="A portrait of a smiling young male student wearing a grey shirt, set against a clean studio background with soft directional lighting. The photo has a modern, professional academic aesthetic using a bright and clean color palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsTsYv7JcosFXTxTFqawaGOPYD8zH63zMDXqKLjO4GXLrlBxroDV_fq6oD72NFDY1AYhOzuAjndnIXr5TWZ_IGJI89_BCnK7kNIFWcLky5QP74f8sGBlDoWaRDZfjU1qeR_NDNzDlP4qNVDnHR9vT54Mzg_xos-gzlc-cYRFjqCuHlId9LYHerh9-yR7HH9U_0c9-WoGePRc3s6t3EQTLH-sVHeTCJtmvHCW-NnX3f1vEmVmbgeKOlYVyApzHdhQKUx3WtYxT1csUG"/>
+<img alt="" class="w-10 h-10 rounded-full border-2 border-surface" data-alt="A high-quality portrait of a professional female educator with a warm, encouraging smile. She is in a bright, modern office environment with soft bokeh in the background. The lighting is natural and flattering, reflecting an authoritative yet accessible brand personality." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjMuj9vGv-ykQ4UPE5YSspKb4kv5RKhqdHyUzIZlvlXtV6a5eb0RfbZ7FXONd4FT8QOU34JFpxSn-LKToauMB3Zvl6Pput77dgNWbuAb7y9pfrh6pOzlWjaXO9YKlrrzfawVptAqGMiBkk9GVNgj_D9od-lEs5Mvkdu8ayhv7DNo8Zj30yiyG47z4xTIu1OoS7dLMHOsSRNTFVejhvoQvrxSkzl5iX1TXc_Mt6VO39bDEVQz8P9dhro_8pGj9cJ5k1L3K5YJdY0118"/>
+<img alt="" class="w-10 h-10 rounded-full border-2 border-surface" data-alt="A close-up shot of an ambitious student looking forward with confidence. The background is a slightly blurred modern university campus hallway with cool blue tones and bright natural light. The visual style is crisp, clean, and corporate-minimalist." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBb_RVAeTUaEbGW_RidSzRbsZp4lwQ7DKYVQPKU5ZnCOW7gJYWv9RU03VsuI0aibBLazji7zP783g4qg4dFcvEKfHVI4WxSh5lRkw-hp3YVe_Zoe0zYTaUq4j1Pmk_j6utO29_Ec5LGF9x89-2r6BIvmT2fNNV26qc_T24EU_TumUI1rGSduaePgE5GI7YtBd6b_RNO2wGduTBogjwW3XTv2AkbZMmLPItGcZOTl1INVrE1BGJYUTEt3itK32TJ3tZD5h_5HOpUqsMr"/>
+<div class="w-10 h-10 rounded-full border-2 border-surface bg-surface-container-highest flex items-center justify-center font-label-sm text-label-sm text-primary">+25k</div>
+</div>
+<div class="flex flex-col items-center gap-1">
+<div class="flex text-[#FFD700]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<span class="text-on-surface-variant font-label-sm text-label-sm">أكثر من 25,000 طالب نشط شهرياً</span>
+</div>
+</div>
+</div>
+<!-- Hero Image Card -->
+<div class="relative mt-8 rounded-xl overflow-hidden shadow-2xl border border-outline-variant">
+<img alt="Collaborative Learning" class="w-full aspect-[4/3] object-cover" data-alt="A group of diverse university students collaborating in a bright, modern learning lounge. The room features large windows with soft daylight and a deep blue accent wall. Students are using laptops and tablets on white minimalist tables, creating a focused and intellectually empowering atmosphere. The scene is shot from a candid perspective with high-contrast, professional photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCH6SaNlzFnF-Fj-dkHEWG5ZS-ylVqmZdCPn0Th-R7OyBJZ5_WHR9dHY7SKXMwzHd_SRDBV0jKPgOdFThEYWh05EVN3hZBevdDJj_SSk2OidxjoN64mTWQ3WeqDIWghwLjuGuLmTV5puve5tWVPLfDZ4Dr_cYcugIQgL2qFdVfqqzYDkUAhPJnuyFHtFUPy0g2bhq_iXYUlj5rVRlpqYZLcZH--6ZYMdC2Sf-whfBxo4KpJReuyU55c6VAANmLDeaQUdAGSHwUBTSFa"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent"></div>
+</div>
+</div>
+</section>
+<!-- Features Grid -->
+<section class="bg-surface-container-low py-16 px-margin-mobile">
+<div class="max-w-md mx-auto grid grid-cols-1 gap-gutter">
+<!-- Feature 1 -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant flex gap-4 items-start shadow-sm">
+<div class="w-12 h-12 rounded-lg bg-secondary-container/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-secondary text-[28px]">movie_edit</span>
+</div>
+<div class="space-y-1">
+<h3 class="font-headline-md text-headline-md text-primary">High Quality Lessons</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">دروس مسجلة بجودة 4K مع محتوى تعليمي محدث ومبسط.</p>
+</div>
+</div>
+<!-- Feature 2 -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant flex gap-4 items-start shadow-sm">
+<div class="w-12 h-12 rounded-lg bg-secondary-container/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-secondary text-[28px]">groups</span>
+</div>
+<div class="space-y-1">
+<h3 class="font-headline-md text-headline-md text-primary">Interactive Learning</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">اختبارات دورية ومشاريع عملية لضمان ترسيخ المفاهيم.</p>
+</div>
+</div>
+<!-- Feature 3 -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant flex gap-4 items-start shadow-sm">
+<div class="w-12 h-12 rounded-lg bg-secondary-container/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-secondary text-[28px]">support_agent</span>
+</div>
+<div class="space-y-1">
+<h3 class="font-headline-md text-headline-md text-primary">Instructor Support</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">تواصل مباشر مع المحاضرين للإجابة على استفساراتك.</p>
+</div>
+</div>
+<!-- Feature 4 -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant flex gap-4 items-start shadow-sm">
+<div class="w-12 h-12 rounded-lg bg-secondary-container/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-secondary text-[28px]">update</span>
+</div>
+<div class="space-y-1">
+<h3 class="font-headline-md text-headline-md text-primary">Lifetime Updates</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">وصول دائم لجميع تحديثات الدورات التي تشترك بها.</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Mobile Navigation Bar -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-surface border-t border-outline-variant h-16 flex items-center justify-around px-4 z-50">
+<div class="flex flex-col items-center gap-1 text-secondary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-sm text-label-sm font-bold">الرئيسية</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">school</span>
+<span class="font-label-sm text-label-sm">دوراتي</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">explore</span>
+<span class="font-label-sm text-label-sm">استكشف</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm">حسابي</span>
+</div>
+</nav>
+<!-- Footer -->
+<footer class="bg-tertiary w-full pt-12 pb-24 px-margin-mobile">
+<div class="max-w-md mx-auto text-center space-y-8">
+<div class="font-headline-md text-headline-md text-on-tertiary font-bold">EduArabic</div>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="text-on-tertiary-container font-body-md text-body-md" href="#">Privacy Policy</a>
+<a class="text-on-tertiary-container font-body-md text-body-md" href="#">Terms of Service</a>
+<a class="text-on-tertiary-container font-body-md text-body-md" href="#">Contact Support</a>
+</div>
+<div class="text-on-tertiary-container font-label-sm text-label-sm opacity-60">
+                © 2024 EduArabic. All rights reserved.
+            </div>
+</div>
+</footer>
+<script>
+        // Micro-interaction for buttons
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('mousedown', () => {
+                button.classList.add('scale-95', 'opacity-90');
+            });
+            button.addEventListener('mouseup', () => {
+                button.classList.remove('scale-95', 'opacity-90');
+            });
+            button.addEventListener('mouseleave', () => {
+                button.classList.remove('scale-95', 'opacity-90');
+            });
+        });
+    </script>
+</body></html>

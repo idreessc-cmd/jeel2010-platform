@@ -82,49 +82,14 @@ export const Home = () => {
                         </div>
                     </div>
                     
-                    {/* Visual Card / Graphic Column */}
-                    <div className="hero-visual">
-                        <div className="visual-container">
-                            {/* Card 1: Progress Tracker */}
-                            <div className="visual-card">
-                                <div className="visual-progress">
-                                    <div className="progress-header">
-                                        <span>التقدم في مادة الرياضيات</span>
-                                        <span style={{ color: 'var(--secondary-color)' }}>75%</span>
-                                    </div>
-                                    <div className="progress-track">
-                                        <div className="progress-fill" style={{ width: '75%' }}></div>
-                                    </div>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                                        <span>12 درس مكتمل</span>
-                                        <span>4 دروس متبقية</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            {/* Card 2: Interactive Learning features */}
-                            <div className="visual-card">
-                                <div className="visual-features-mini">
-                                    <div className="feature-mini-item">
-                                        <div className="feature-mini-icon">
-                                            <Video size={16} />
-                                        </div>
-                                        <div className="feature-mini-text">
-                                            <h5>دروس مسجلة عالية الجودة</h5>
-                                            <p>شرح تفاعلي وبسيط ومباشر</p>
-                                        </div>
-                                    </div>
-                                    <div className="feature-mini-item">
-                                        <div className="feature-mini-icon" style={{ backgroundColor: 'var(--bg-islamic)', color: 'var(--accent-islamic)' }}>
-                                            <Award size={16} />
-                                        </div>
-                                        <div className="feature-mini-text">
-                                            <h5>اختبارات دورية تفاعلية</h5>
-                                            <p>بعد كل درس مباشرة لقياس الفهم</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                    {/* Visual Card / Logo Column */}
+                    <div className="hero-visual hero-logo-visual">
+                        <div className="hero-logo-card">
+                            <img
+                                src="/logo.webp"
+                                alt="شعار امتحان النجاح"
+                                className="hero-platform-logo"
+                            />
                         </div>
                     </div>
                 </div>
