@@ -134,7 +134,13 @@ export const Lesson = () => {
                                 <p>هذا الدرس جزء من باقة الوصول الكامل لمنهج الصف الأول الثانوي لجيل 2010. لتتمكن من المتابعة وحل الاختبارات وتحميل الملخصات، يرجى تفعيل اشتراكك.</p>
                                 
                                 <div className="locked-actions">
-                                    <a href="https://wa.me/201012345678" target="_blank" rel="noreferrer" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                                    <a 
+                                        href={`https://api.whatsapp.com/send?phone=962782496144&text=مرحباً، أريد تفعيل باقة الوصول الكامل لمشاهدة درس: ${lesson.title}`} 
+                                        target="_blank" 
+                                        rel="noreferrer" 
+                                        className="btn btn-primary" 
+                                        style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                                    >
                                         <MessageCircle size={18} />
                                         تواصل وتفعيل عبر واتساب
                                     </a>

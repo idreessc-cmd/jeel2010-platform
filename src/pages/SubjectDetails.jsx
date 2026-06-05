@@ -7,7 +7,7 @@ import { progressService } from '../services/progressService';
 import { subscriptionService } from '../services/subscriptionService';
 import { UnitAccordion } from '../components/subjects/UnitAccordion';
 import { Badge } from '../components/ui/Badge';
-import { BookOpen, Search, ClipboardList, Download, Award, Unlock, Gem, Key, Lock, Book, Compass, Landmark } from 'lucide-react';
+import { BookOpen, Search, ClipboardList, Download, Award, Unlock, Gem, Key, Lock, Book, Compass, Landmark, Check } from 'lucide-react';
 
 export const SubjectDetails = () => {
     const { id } = useParams();
@@ -71,8 +71,21 @@ export const SubjectDetails = () => {
                                 {getSubjectIcon(subject.id)}
                             </span>
                             <div>
-                                <h1 style={{ color: 'var(--secondary-color)', fontWeight: '800', margin: 0 }}>
+                                <h1 style={{ color: 'var(--secondary-color)', fontWeight: '800', margin: 0, display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
                                     منهج {subject.title}
+                                    {(subject.id === 'math' || subject.id === 'arabic') && (
+                                        <span style={{ 
+                                            fontSize: '0.75rem', 
+                                            padding: '4px 10px', 
+                                            backgroundColor: 'rgba(234, 60, 7, 0.1)', 
+                                            color: '#EA3C07', 
+                                            borderRadius: 'var(--border-radius-pill)', 
+                                            fontWeight: '700',
+                                            border: '1px solid rgba(234, 60, 7, 0.2)'
+                                        }}>
+                                            قسم التأسيس قريباً
+                                        </span>
+                                    )}
                                 </h1>
                                 <p style={{ color: 'var(--text-muted)', margin: 0 }}>المعلم: {subject.teacher}</p>
                             </div>
@@ -96,7 +109,7 @@ export const SubjectDetails = () => {
                     </div>
 
                     {/* Subscription & Call to Action Box */}
-                    <div className="subject-subscription-card">
+                    <div className="subject-subscription-card" style={{ maxWidth: '360px' }}>
                         {user ? (
                             <>
                                 <h4 style={{ color: 'var(--secondary-color)', fontWeight: '800', marginBottom: '10px' }}>حالة اشتراكك:</h4>
@@ -113,12 +126,33 @@ export const SubjectDetails = () => {
                                     </p>
                                 ) : (
                                     <>
-                                        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '20px' }}>
+                                        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '15px' }}>
                                             يمكنك مشاهدة أول درسين مجاناً، ويجب تفعيل الباقة لمشاهدة المنهج كاملاً.
                                         </p>
-                                        <a href="#footer" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                                        
+                                        <div style={{ textAlign: 'right', backgroundColor: '#f8fafc', padding: '15px', borderRadius: 'var(--border-radius-md)', marginBottom: '15px', border: '1px solid #e2e8f0' }}>
+                                            <h5 style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--secondary-color)', marginBottom: '10px' }}>ماذا تحصل عند الاشتراك؟</h5>
+                                            <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.8rem', display: 'flex', flexDirection: 'column', gap: '6px', color: 'var(--text-muted)' }}>
+                                                <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> شرح كامل ومفصل لجميع الدروس</li>
+                                                <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> تحميل الدوسية والمذكرات بصيغة PDF</li>
+                                                <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> متابعة VIP عبر قروبات المدرسين</li>
+                                                <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> حل كود تفعيل فوري ومباشر</li>
+                                            </ul>
+                                        </div>
+
+                                        <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginBottom: '15px', lineHeight: '1.4' }}>
+                                            يتم التنشيط يدويًا عن طريق إرسال رسالة إلى واتساب المنصة وتزويدنا برمز التفعيل الخاص بك.
+                                        </p>
+
+                                        <a 
+                                            href="https://api.whatsapp.com/send?phone=962782496144" 
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="btn btn-primary" 
+                                            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}
+                                        >
                                             <Gem size={16} />
-                                            اشترك لفتح المادة كاملة
+                                            تفعيل الاشتراك عبر واتساب
                                         </a>
                                     </>
                                 )}
@@ -129,7 +163,17 @@ export const SubjectDetails = () => {
                                 <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '20px' }}>
                                     سجل حسابك مجاناً لتسجيل تقدمك وحل الاختبارات ومشاهدة الشروحات.
                                 </p>
-                                <button onClick={() => navigate('/login')} className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                                
+                                <div style={{ textAlign: 'right', backgroundColor: '#f8fafc', padding: '15px', borderRadius: 'var(--border-radius-md)', marginBottom: '20px', border: '1px solid #e2e8f0' }}>
+                                    <h5 style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--secondary-color)', marginBottom: '10px' }}>ماذا تحصل عند الاشتراك؟</h5>
+                                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.8rem', display: 'flex', flexDirection: 'column', gap: '6px', color: 'var(--text-muted)' }}>
+                                        <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> شرح كامل ومفصل لجميع الدروس</li>
+                                        <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> تحميل الدوسية والمذكرات بصيغة PDF</li>
+                                        <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> متابعة VIP عبر قروبات المدرسين</li>
+                                    </ul>
+                                </div>
+
+                                <button onClick={() => navigate('/login')} className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}>
                                     <Key size={16} />
                                     تسجيل دخول تجريبي
                                 </button>

@@ -177,6 +177,85 @@ export const Dashboard = () => {
                     </div>
                 </div>
 
+                {/* VIP Groups Alert Box */}
+                <div style={{
+                    backgroundColor: isSubscribed ? '#ECFDF5' : '#FFFBEB',
+                    border: `1px solid ${isSubscribed ? '#10B981' : '#FBBF24'}`,
+                    borderRadius: 'var(--border-radius-lg)',
+                    padding: '25px 30px',
+                    marginBottom: '30px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    gap: '20px'
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px', minWidth: '280px', flex: 1 }}>
+                        <div style={{ 
+                            width: '50px', 
+                            height: '50px', 
+                            borderRadius: '50%', 
+                            backgroundColor: isSubscribed ? '#D1FAE5' : '#FEF3C7', 
+                            color: isSubscribed ? '#059669' : '#D97706',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0
+                        }}>
+                            <Users size={24} />
+                        </div>
+                        <div>
+                            <h3 style={{ color: 'var(--secondary-color)', fontWeight: '800', margin: '0 0 5px 0', fontSize: '1.15rem' }}>
+                                {isSubscribed ? 'قروبات المتابعة VIP نشطة' : 'قروبات المتابعة VIP غير نشطة لحسابك'}
+                            </h3>
+                            <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.9rem', lineHeight: '1.6' }}>
+                                {isSubscribed 
+                                    ? 'انضم الآن لقروبات الواتساب والتليغرام VIP للتواصل المباشر مع المعلمين وتلقي التنبيهات والملخصات أولاً بأول.'
+                                    : 'ميزة متابعة VIP تتيح لك طرح أسئلتك على المعلمين وتلقي ملخصات أسبوعية وتنبيهات الدروس الجديدة. اشترك لتفعيل الميزة.'
+                                }
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        {isSubscribed ? (
+                            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                                <a 
+                                    href="https://api.whatsapp.com/send?phone=962782496144&text=مرحباً، أنا مشترك وأريد الانضمام لقروب الواتساب VIP"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="btn btn-primary"
+                                    style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px', fontSize: '0.9rem' }}
+                                >
+                                    <MessageCircle size={16} />
+                                    <span>قروب الواتساب VIP</span>
+                                </a>
+                                <a 
+                                    href="https://t.me/Success_exam"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="btn btn-outline"
+                                    style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px', fontSize: '0.9rem', backgroundColor: '#FFFFFF' }}
+                                >
+                                    <Users size={16} />
+                                    <span>قناة التليغرام</span>
+                                </a>
+                            </div>
+                        ) : (
+                            <a 
+                                href={`https://api.whatsapp.com/send?phone=962782496144&text=مرحباً، أريد تفعيل باقة الوصول الكامل والجروبات VIP لحساب الطالب: ${user.studentName}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="btn btn-primary"
+                                style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px', fontSize: '0.9rem', backgroundColor: '#D97706', borderColor: '#D97706' }}
+                            >
+                                <Gem size={16} />
+                                <span>اشترك لتفعيل قروبات VIP</span>
+                            </a>
+                        )}
+                    </div>
+                </div>
+
                 {/* Main Dashboard Cards */}
                 <div className="dashboard-top-grid" style={{
                     display: 'grid',
@@ -286,7 +365,7 @@ export const Dashboard = () => {
                                     أنت تتصفح المنصة بالعضوية التجريبية المجانية (تفتح أول درسين فقط من كل مادة).
                                 </p>
                                 <a 
-                                    href="https://wa.me/201012345678?text=مرحباً، أريد تفعيل باقة الوصول الكامل لحساب الطالب: "
+                                    href={`https://api.whatsapp.com/send?phone=962782496144&text=مرحباً، أريد تفعيل باقة الوصول الكامل لحساب الطالب: ${user.studentName} (${user.email})`}
                                     target="_blank"
                                     rel="noreferrer"
                                     className="btn btn-primary"

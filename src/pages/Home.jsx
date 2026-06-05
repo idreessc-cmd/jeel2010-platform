@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { mockSubjects } from '../data/subjects';
 import { SubjectCard } from '../components/subjects/SubjectCard';
 import { authService } from '../services/authService';
-import { Play, BookOpen, Check, X, Plus, Minus, ArrowLeft, Star, Video, Award, TrendingUp, Unlock } from 'lucide-react';
+import { Play, BookOpen, Check, X, Plus, Minus, ArrowLeft, Star, Video, Award, TrendingUp, Unlock, MessageCircle, Users, Bell, ClipboardList } from 'lucide-react';
 
 export const Home = () => {
     const navigate = useNavigate();
@@ -49,20 +49,24 @@ export const Home = () => {
                     <div className="hero-content">
                         <div className="hero-badge">
                             <Star size={16} fill="currentColor" />
-                            <span>منصة تعليمية لطلاب الأول الثانوي</span>
+                            <span>امتحان النجاح – جيل 2010 -</span>
                         </div>
-                        <h1>ابدأ رحلة التفوق في مواد <span>جيل 2010</span></h1>
-                        <p>منصة تعليمية منظمة لطلاب الصف الأول الثانوي، تجمع بين الفيديوهات، الملخصات، الأنشطة، والاختبارات القصيرة لتساعدك على الدراسة بثقة ووضوح.</p>
+                        <h1>منصة امتحان النجاح لجيل <span>2010</span></h1>
+                        <p>منصة تعليمية أردنية لطلاب الصف الأول الثانوي، تجمع بين الدروس المصورة، الدوسيات الخاصة، الاختبارات القصيرة، والمتابعة المستمرة داخل قروبات VIP على واتساب وتيليغرام.</p>
                         <div className="hero-btns">
-                            <Link to="/subjects" className="btn btn-primary">
-                                <span>ابدأ التعلم الآن</span>
+                            <a 
+                                href="https://api.whatsapp.com/send?phone=962782496144"
+                                target="_blank"
+                                rel="noreferrer"
+                                className="btn btn-primary"
+                                style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                            >
+                                <span>اشترك عبر واتساب</span>
                                 <ArrowLeft size={20} />
-                            </Link>
+                            </a>
                             <Link to="/subjects" className="btn btn-outline">تصفح المواد</Link>
                         </div>
-
                     </div>
-
                 </div>
             </section>
 
@@ -86,7 +90,7 @@ export const Home = () => {
             <section id="features" className="features-section">
                 <div className="container">
                     <div className="section-header">
-                        <h2>ميزات منصة جيل 2010</h2>
+                        <h2>ميزات منصة امتحان النجاح</h2>
                         <p>كل ما تحتاجه للتميز والتفوق الدراسي في مكان واحد وبطريقة منظمة</p>
                     </div>
                     
@@ -97,41 +101,52 @@ export const Home = () => {
                                 <Video size={24} />
                             </div>
                             <div className="feature-info">
-                                <h3>دروس منظمة</h3>
-                                <p>فيديوهات وملخصات مرتبة حسب المادة والوحدة والدرس.</p>
+                                <h3>دروس منظمة حسب المادة</h3>
+                                <p>فيديوهات تعليمية مرتبة حسب المادة والوحدة والدرس، مع إمكانية متابعة التقدم.</p>
                             </div>
                         </div>
                         
                         {/* Feature 2 */}
                         <div className="feature-card">
                             <div className="feature-icon-wrapper" style={{ backgroundColor: '#E8F7E6', color: '#00AF45' }}>
-                                <Award size={24} />
+                                <BookOpen size={24} />
                             </div>
                             <div className="feature-info">
-                                <h3>اختبارات قصيرة</h3>
-                                <p>أسئلة بعد كل درس لقياس الفهم مباشرة.</p>
+                                <h3>دوسية خاصة لكل مادة</h3>
+                                <p>كل مادة مدفوعة تحتوي على دوسية خاصة للطالب تساعده على المراجعة والتركيز.</p>
                             </div>
                         </div>
                         
                         {/* Feature 3 */}
                         <div className="feature-card">
                             <div className="feature-icon-wrapper" style={{ backgroundColor: '#F4E9F8', color: '#A000EA' }}>
-                                <TrendingUp size={24} />
+                                <MessageCircle size={24} />
                             </div>
                             <div className="feature-info">
-                                <h3>متابعة التقدم</h3>
-                                <p>اعرف آخر درس شاهدته ونتائج اختباراتك.</p>
+                                <h3>متابعة VIP مع المعلمين</h3>
+                                <p>المشترك يحصل على متابعة داخل قروبات خاصة VIP على واتساب وتيليغرام، بإشراف المعلمين.</p>
                             </div>
                         </div>
                         
                         {/* Feature 4 */}
                         <div className="feature-card">
                             <div className="feature-icon-wrapper" style={{ backgroundColor: '#FAE8E8', color: '#EA3C07' }}>
-                                <Unlock size={24} />
+                                <ClipboardList size={24} />
                             </div>
                             <div className="feature-info">
-                                <h3>اشتراك بسيط</h3>
-                                <p>أول درسين مجانًا، وباقي المحتوى للمشتركين.</p>
+                                <h3>اختبارات قصيرة و Quizzes</h3>
+                                <p>اختبارات قصيرة داخل المنصة وداخل القروبات لمتابعة مستوى الطالب وقياس الفهم أولًا بأول.</p>
+                            </div>
+                        </div>
+
+                        {/* Feature 5 */}
+                        <div className="feature-card">
+                            <div className="feature-icon-wrapper" style={{ backgroundColor: 'var(--primary-light)', color: 'var(--primary-color)' }}>
+                                <Bell size={24} />
+                            </div>
+                            <div className="feature-info">
+                                <h3>تنبيهات المحتوى الجديد</h3>
+                                <p>يتم إعلام الطلاب داخل القروبات عند رفع أي درس أو اختبار أو محتوى جديد على المنصة.</p>
                             </div>
                         </div>
                     </div>
@@ -150,16 +165,16 @@ export const Home = () => {
                         <div className="pricing-card">
                             <div className="pricing-header">
                                 <h3>الباقة المجانية</h3>
-                                <div className="pricing-price">0 ج.م <span>/ دائماً</span></div>
+                                <div className="pricing-price">0 د.أ <span>/ دائماً</span></div>
                                 <p>مثالية لتجربة المنصة والتأكد من ملاءمة أسلوب الشرح لك قبل أي اشتراك.</p>
                             </div>
                             
                             <ul className="pricing-features">
                                 <li className="available"><i style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><Check size={12} /></i> مشاهدة أول درسين من كل مادة</li>
                                 <li className="available"><i style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><Check size={12} /></i> خوض الاختبارات القصيرة لأول درسين</li>
-                                <li className="unavailable"><i style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><X size={12} /></i> الوصول لباقي المنهج والدروس</li>
-                                <li className="unavailable"><i style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><X size={12} /></i> تحميل ملخصات ومذكرات الـ PDF</li>
-                                <li className="unavailable"><i style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><X size={12} /></i> تقارير متابعة تقدم الطالب الدراسية</li>
+                                <li className="unavailable"><i style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><X size={12} /></i> الدوسية الخاصة لكل مادة</li>
+                                <li className="unavailable"><i style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><X size={12} /></i> متابعة VIP مع المعلمين</li>
+                                <li className="unavailable"><i style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><X size={12} /></i> تنبيهات المحتوى الجديد</li>
                             </ul>
                             
                             <Link to="/subjects" className="btn btn-outline" style={{ marginTop: 'auto', textAlign: 'center' }}>
@@ -171,7 +186,7 @@ export const Home = () => {
                             <div className="popular-badge">الأكثر اختياراً</div>
                             <div className="pricing-header">
                                 <h3>باقة الوصول الكامل</h3>
-                                <div className="pricing-price">اشتراك شهري <span>/ رمزي</span></div>
+                                <div className="pricing-price" style={{ fontSize: '1.4rem', lineHeight: '1.4', minHeight: '60px', display: 'flex', alignItems: 'center' }}>تواصل معنا لمعرفة تفاصيل الاشتراك</div>
                                 <p>تفتح لك كامل المنهج والميزات وتضمن لك التفوق الدراسي الكامل ومتابعة حية.</p>
                             </div>
                             
@@ -179,13 +194,68 @@ export const Home = () => {
                                 <li className="available"><i style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><Check size={12} /></i> مشاهدة جميع دروس المنهج بلا استثناء</li>
                                 <li className="available"><i style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><Check size={12} /></i> خوض كافة الاختبارات والواجبات الدورية</li>
                                 <li className="available"><i style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><Check size={12} /></i> تحميل كافة ملخصات ومذكرات الـ PDF للطباعة</li>
-                                <li className="available"><i style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><Check size={12} /></i> تقارير دورية متكاملة لمتابعة مستوى التقدم الدراسي</li>
-                                <li className="available"><i style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><Check size={12} /></i> تواصل مباشر مع المدرسين لحل الأسئلة الصعبة</li>
+                                <li className="available"><i style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><Check size={12} /></i> متابعة VIP مع المعلمين وتواصل مباشر</li>
+                                <li className="available"><i style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><Check size={12} /></i> تنبيهات المحتوى الجديد فوراً</li>
                             </ul>
                             
-                            <a href="#footer" className="btn btn-primary" style={{ marginTop: 'auto', textAlign: 'center' }}>
-                                اشترك الآن بالكامل
+                            <a 
+                                href="https://api.whatsapp.com/send?phone=962782496144" 
+                                target="_blank"
+                                rel="noreferrer"
+                                className="btn btn-primary" 
+                                style={{ marginTop: 'auto', textAlign: 'center' }}
+                            >
+                                اشترك الآن عبر واتساب
                             </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Soon Section */}
+            <section id="soon" className="section-padding" style={{ backgroundColor: '#f8fafc' }}>
+                <div className="container">
+                    <div className="section-header">
+                        <h2>قريباً في منصتنا</h2>
+                        <p>نعمل باستمرار على إطلاق ميزات وأقسام جديدة لدعم رحلتك التعليمية</p>
+                    </div>
+                    
+                    <div style={{
+                        maxWidth: '800px',
+                        margin: '0 auto',
+                        background: 'linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%)',
+                        borderRadius: 'var(--border-radius-lg)',
+                        padding: '40px',
+                        boxShadow: 'var(--shadow-md)',
+                        border: '1px solid #e2e8f0',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '20px',
+                        alignItems: 'center',
+                        textAlign: 'center'
+                    }}>
+                        <div style={{
+                            backgroundColor: 'rgba(234, 60, 7, 0.1)',
+                            color: '#EA3C07',
+                            padding: '12px 24px',
+                            borderRadius: 'var(--border-radius-pill)',
+                            fontWeight: '700',
+                            fontSize: '0.9rem',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '8px'
+                        }}>
+                            <Award size={18} />
+                            <span>تأسيس اللغة العربية والرياضيات</span>
+                        </div>
+                        
+                        <h3 style={{ fontSize: '1.8rem', color: 'var(--secondary-color)', fontWeight: '800' }}>قسم التأسيس الشامل</h3>
+                        <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', maxWidth: '600px', lineHeight: '1.7' }}>
+                            نحضّر حالياً لقسم تأسيسي متكامل لمادتي الرياضيات واللغة العربية، لتمكين الطلاب من بناء أساس قوي يساعدهم على التفوق الدراسي بيسر وسهولة.
+                        </p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--primary-color)', fontWeight: '600' }}>
+                            <TrendingUp size={20} />
+                            <span>تابعونا لمعرفة موعد الإطلاق عبر قروباتنا</span>
                         </div>
                     </div>
                 </div>
