@@ -21,7 +21,7 @@ export const Login = () => {
         }
     }, [navigate]);
 
-    const handleFormSubmit = (e) => {
+    const handleFormSubmit = async (e) => {
         e.preventDefault();
         setError('');
         
@@ -30,30 +30,38 @@ export const Login = () => {
             return;
         }
 
-        const res = authService.login(email, password);
-        if (res.success) {
-            if (res.user.role === 'admin') {
-                navigate('/admin');
+        try {
+            const res = await authService.login(email, password);
+            if (res.success) {
+                if (res.user.role === 'admin') {
+                    navigate('/admin');
+                } else {
+                    navigate('/dashboard');
+                }
             } else {
-                navigate('/dashboard');
+                setError(res.error);
             }
-        } else {
-            setError(res.error);
+        } catch (err) {
+            setError(err.message || 'حدث خطأ أثناء تسجيل الدخول');
         }
     };
 
     // Quick Login Helper for easy testing
-    const handleQuickLogin = (quickEmail) => {
+    const handleQuickLogin = async (quickEmail) => {
         setError('');
-        const res = authService.login(quickEmail, '123');
-        if (res.success) {
-            if (res.user.role === 'admin') {
-                navigate('/admin');
+        try {
+            const res = await authService.login(quickEmail, '123');
+            if (res.success) {
+                if (res.user.role === 'admin') {
+                    navigate('/admin');
+                } else {
+                    navigate('/dashboard');
+                }
             } else {
-                navigate('/dashboard');
+                setError(res.error);
             }
-        } else {
-            setError(res.error);
+        } catch (err) {
+            setError(err.message || 'حدث خطأ أثناء تسجيل الدخول السريع');
         }
     };
 

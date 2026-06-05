@@ -45,38 +45,52 @@ export const Admin = () => {
 
         // Get student list if admin
         if (currentUser.role === 'admin') {
-            setStudents(authService.getStudents());
+            authService.getStudents()
+                .then(data => setStudents(data))
+                .catch(err => console.error("Failed to load students:", err));
         }
     }, []);
 
-    const handleToggleSubscription = (email, nextStatus) => {
-        const res = authService.updateStudentSubscription(email, nextStatus);
-        if (res.success) {
-            setStudents(authService.getStudents());
-            alert(`تم تغيير حالة اشتراك الطالب ${email} إلى: ${nextStatus === 'active' ? 'مشترك بالكامل' : 'تجريبي مجاني'} بنجاح!`);
+    const handleToggleSubscription = async (email, nextStatus) => {
+        try {
+            const res = await authService.updateStudentSubscription(email, nextStatus);
+            if (res.success) {
+                const freshStudents = await authService.getStudents();
+                setStudents(freshStudents);
+                alert(`تم تغيير حالة اشتراك الطالب ${email} إلى: ${nextStatus === 'active' ? 'مشترك بالكامل' : 'تجريبي مجاني'} بنجاح!`);
+            } else {
+                alert(res.error || 'فشلت عملية تحديث الاشتراك');
+            }
+        } catch (err) {
+            alert('حدث خطأ أثناء تغيير حالة الاشتراك');
         }
     };
 
-    const handleAddStudent = (e) => {
+    const handleAddStudent = async (e) => {
         e.preventDefault();
         if (!newStudentName || !newStudentEmail) {
             alert('يرجى ملء الاسم والبريد الإلكتروني للرمز التجريبي.');
             return;
         }
 
-        const res = authService.addStudentManual({
-            studentName: newStudentName,
-            email: newStudentEmail,
-            subscriptionStatus: newStudentSub
-        });
+        try {
+            const res = await authService.addStudentManual({
+                studentName: newStudentName,
+                email: newStudentEmail,
+                subscriptionStatus: newStudentSub
+            });
 
-        if (res.success) {
-            setStudents(authService.getStudents());
-            setNewStudentName('');
-            setNewStudentEmail('');
-            alert('تم إضافة الطالب التجريبي الجديد بنجاح في القائمة.');
-        } else {
-            alert(res.error);
+            if (res.success) {
+                const freshStudents = await authService.getStudents();
+                setStudents(freshStudents);
+                setNewStudentName('');
+                setNewStudentEmail('');
+                alert('تم إضافة الطالب التجريبي الجديد بنجاح في القائمة.');
+            } else {
+                alert(res.error || 'فشلت عملية إضافة الطالب');
+            }
+        } catch (err) {
+            alert('حدث خطأ أثناء إضافة الطالب الجديد');
         }
     };
 
