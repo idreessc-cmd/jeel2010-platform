@@ -60,26 +60,7 @@ export const Home = () => {
                             </Link>
                             <Link to="/subjects" className="btn btn-outline">تصفح المواد</Link>
                         </div>
-                        
-                        {/* Social Proof / Stats */}
-                        <div className="hero-stats">
-                            <div className="student-avatars">
-                                <div className="avatar-placeholder" style={{ backgroundColor: '#ffdad6', color: '#ba1a1a' }}>أ</div>
-                                <div className="avatar-placeholder" style={{ backgroundColor: '#dee2ed', color: '#252a32' }}>م</div>
-                                <div className="avatar-placeholder" style={{ backgroundColor: '#dce1ff', color: '#00236f' }}>س</div>
-                                <div className="avatar-placeholder" style={{ backgroundColor: '#d3e4fe', color: '#0058be' }}>+10k</div>
-                            </div>
-                            <div className="stats-text">
-                                <div className="stars-row">
-                                    <Star size={14} fill="currentColor" />
-                                    <Star size={14} fill="currentColor" />
-                                    <Star size={14} fill="currentColor" />
-                                    <Star size={14} fill="currentColor" />
-                                    <Star size={14} fill="currentColor" />
-                                </div>
-                                <span className="stats-label">4.9/5 من قبل الطلاب المتميزين</span>
-                            </div>
-                        </div>
+
                     </div>
                     
                     {/* Visual Card / Logo Column */}
