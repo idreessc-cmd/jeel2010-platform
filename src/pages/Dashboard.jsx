@@ -18,7 +18,7 @@ import {
     ChevronLeft, 
     MessageCircle,
     User,
-    Users
+    Users,
 } from 'lucide-react';
 
 export const Dashboard = () => {

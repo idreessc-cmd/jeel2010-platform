@@ -33,6 +33,7 @@ export const authService = {
                 
                 if (userDoc.exists()) {
                     const userData = userDoc.data();
+                    // Use role from Firestore directly; do not modify it.
                     userSession = {
                         uid: firebaseUser.uid,
                         studentName: userData.name || userData.studentName || 'مستخدم فايربيس',
@@ -41,23 +42,33 @@ export const authService = {
                         subscriptionStatus: userData.subscriptionStatus || 'free'
                     };
                 } else {
-                    // Fallback if doc doesn't exist in Firestore yet (create a basic profile)
+                    // Create a student profile in Firestore only
+                    const now = new Date().toISOString();
                     userSession = {
                         uid: firebaseUser.uid,
                         studentName: 'طالب جديد',
                         email: firebaseUser.email,
                         role: 'student',
-                        subscriptionStatus: 'free'
+                        subscriptionStatus: 'free',
+                        phone: '',
+                        subscriptionPlan: 'free',
+                        isActive: true,
+                        joinedVipGroups: false,
+                        createdAt: now,
+                        updatedAt: now
                     };
-                    
-                    // Seed Firestore document
                     await setDoc(userDocRef, {
                         uid: firebaseUser.uid,
                         name: userSession.studentName,
                         email: userSession.email,
                         role: userSession.role,
                         subscriptionStatus: userSession.subscriptionStatus,
-                        createdAt: new Date().toISOString()
+                        phone: '',
+                        subscriptionPlan: 'free',
+                        isActive: true,
+                        joinedVipGroups: false,
+                        createdAt: now,
+                        updatedAt: now
                     });
                 }
                 
