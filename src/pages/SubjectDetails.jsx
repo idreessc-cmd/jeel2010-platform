@@ -83,7 +83,7 @@ export const SubjectDetails = () => {
                                             fontWeight: '700',
                                             border: '1px solid rgba(234, 60, 7, 0.2)'
                                         }}>
-                                            قسم التأسيس قريباً
+                                            قسم التأسيس قريبًا
                                         </span>
                                     )}
                                 </h1>
@@ -131,12 +131,14 @@ export const SubjectDetails = () => {
                                         </p>
                                         
                                         <div style={{ textAlign: 'right', backgroundColor: '#f8fafc', padding: '15px', borderRadius: 'var(--border-radius-md)', marginBottom: '15px', border: '1px solid #e2e8f0' }}>
-                                            <h5 style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--secondary-color)', marginBottom: '10px' }}>ماذا تحصل عند الاشتراك؟</h5>
+                                            <h5 style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--secondary-color)', marginBottom: '10px' }}>ماذا يحصل الطالب عند الاشتراك في هذه المادة؟</h5>
                                             <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.8rem', display: 'flex', flexDirection: 'column', gap: '6px', color: 'var(--text-muted)' }}>
-                                                <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> شرح كامل ومفصل لجميع الدروس</li>
-                                                <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> تحميل الدوسية والمذكرات بصيغة PDF</li>
-                                                <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> متابعة VIP عبر قروبات المدرسين</li>
-                                                <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> حل كود تفعيل فوري ومباشر</li>
+                                                <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> جميع دروس المادة</li>
+                                                <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> دوسية خاصة للمادة</li>
+                                                <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> اختبارات قصيرة بعد الدروس</li>
+                                                <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> متابعة داخل قروبات VIP</li>
+                                                <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> تنبيهات عند رفع محتوى جديد</li>
+                                                <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> دعم من المعلمين</li>
                                             </ul>
                                         </div>
 
@@ -165,11 +167,14 @@ export const SubjectDetails = () => {
                                 </p>
                                 
                                 <div style={{ textAlign: 'right', backgroundColor: '#f8fafc', padding: '15px', borderRadius: 'var(--border-radius-md)', marginBottom: '20px', border: '1px solid #e2e8f0' }}>
-                                    <h5 style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--secondary-color)', marginBottom: '10px' }}>ماذا تحصل عند الاشتراك؟</h5>
+                                    <h5 style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--secondary-color)', marginBottom: '10px' }}>ماذا يحصل الطالب عند الاشتراك في هذه المادة؟</h5>
                                     <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.8rem', display: 'flex', flexDirection: 'column', gap: '6px', color: 'var(--text-muted)' }}>
-                                        <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> شرح كامل ومفصل لجميع الدروس</li>
-                                        <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> تحميل الدوسية والمذكرات بصيغة PDF</li>
-                                        <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> متابعة VIP عبر قروبات المدرسين</li>
+                                        <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> جميع دروس المادة</li>
+                                        <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> دوسية خاصة للمادة</li>
+                                        <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> اختبارات قصيرة بعد الدروس</li>
+                                        <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> متابعة داخل قروبات VIP</li>
+                                        <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> تنبيهات عند رفع محتوى جديد</li>
+                                        <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> دعم من المعلمين</li>
                                     </ul>
                                 </div>
 

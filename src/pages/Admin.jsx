@@ -38,13 +38,15 @@ export const Admin = () => {
         
         // If not logged in, redirect to login
         if (!currentUser) {
-            alert('يرجى تسجيل الدخول كطالب أولاً للوصول إلى لوحة الإدارة التجريبية.');
+            alert('يرجى تسجيل الدخول كمسؤول للوصول إلى لوحة الإدارة.');
             navigate('/login');
             return;
         }
 
-        // Get student list
-        setStudents(authService.getStudents());
+        // Get student list if admin
+        if (currentUser.role === 'admin') {
+            setStudents(authService.getStudents());
+        }
     }, []);
 
     const handleToggleSubscription = (email, nextStatus) => {
@@ -149,6 +151,30 @@ export const Admin = () => {
         }
     };
 
+    const currentUserSession = authService.getCurrentUser();
+    if (!currentUserSession || currentUserSession.role !== 'admin') {
+        return (
+            <div className="container" style={{ padding: '80px 0', textAlign: 'center', minHeight: 'calc(100vh - 350px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '20px' }}>
+                <div style={{
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    color: '#ef4444',
+                    padding: '20px',
+                    borderRadius: '50%',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                }}>
+                    <svg viewBox="0 0 24 24" width="48" height="48" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                </div>
+                <h2 style={{ color: 'var(--secondary-color)', fontWeight: '800' }}>هذه الصفحة مخصصة للإدارة فقط.</h2>
+                <p style={{ color: 'var(--text-muted)', maxWidth: '400px', fontSize: '1rem', lineHeight: '1.6' }}>ليست لديك الصلاحيات الكافية للوصول إلى لوحة الإدارة. إذا كنت طالباً، يمكنك العودة إلى لوحة الطالب الخاصة بك.</p>
+                <button onClick={() => navigate('/dashboard')} className="btn btn-primary">
+                    العودة إلى لوحة الطالب
+                </button>
+            </div>
+        );
+    }
+
     return (
         <section className="section-padding" style={{ backgroundColor: '#F8FAFC' }}>
             <div className="container">
@@ -164,10 +190,10 @@ export const Admin = () => {
                 }}>
                     <div>
                         <h2 style={{ color: 'var(--secondary-color)', fontWeight: '800', margin: 0 }}>
-                            لوحة إدارة منصة جيل 2010 (Mock Admin)
+                            لوحة الإدارة – منصة امتحان النجاح
                         </h2>
                         <p style={{ color: 'var(--text-muted)', margin: '4px 0 0 0', fontSize: '0.95rem' }}>
-                            لوحة محاكاة لإدارة الطلاب والاشتراكات والمناهج التدريسية
+                            لوحة إدارة الطلاب، والاشتراكات، والمناهج التدريسية
                         </p>
                     </div>
                     

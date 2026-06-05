@@ -144,9 +144,9 @@ export const Lesson = () => {
                                         <MessageCircle size={18} />
                                         تواصل وتفعيل عبر واتساب
                                     </a>
-                                    <a href="#footer" className="btn btn-outline">
+                                    <Link to="/subscription" className="btn btn-outline">
                                         معرفة تفاصيل الدفع
-                                    </a>
+                                    </Link>
                                 </div>
                             </div>
                         ) : (

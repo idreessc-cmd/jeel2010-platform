@@ -30,7 +30,23 @@ export const SubjectCard = ({ subject }) => {
             <div className="subject-icon-box" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
                 {getSubjectIcon(subject.id)}
             </div>
-            <h3>{subject.title}</h3>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                {subject.title}
+                {(subject.id === 'math' || subject.id === 'arabic') && (
+                    <span style={{ 
+                        fontSize: '0.65rem', 
+                        padding: '2px 8px', 
+                        backgroundColor: 'rgba(234, 60, 7, 0.1)', 
+                        color: '#EA3C07', 
+                        borderRadius: 'var(--border-radius-pill)', 
+                        fontWeight: '700',
+                        border: '1px solid rgba(234, 60, 7, 0.2)',
+                        whiteSpace: 'nowrap'
+                    }}>
+                        قسم التأسيس قريبًا
+                    </span>
+                )}
+            </h3>
             <p>{subject.description}</p>
             <div className="subject-meta">
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>

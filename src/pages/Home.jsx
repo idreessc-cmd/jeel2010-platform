@@ -249,9 +249,9 @@ export const Home = () => {
                             <span>تأسيس اللغة العربية والرياضيات</span>
                         </div>
                         
-                        <h3 style={{ fontSize: '1.8rem', color: 'var(--secondary-color)', fontWeight: '800' }}>قسم التأسيس الشامل</h3>
+                        <h3 style={{ fontSize: '1.8rem', color: 'var(--secondary-color)', fontWeight: '800' }}>قريبًا: قسم التأسيس</h3>
                         <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', maxWidth: '600px', lineHeight: '1.7' }}>
-                            نحضّر حالياً لقسم تأسيسي متكامل لمادتي الرياضيات واللغة العربية، لتمكين الطلاب من بناء أساس قوي يساعدهم على التفوق الدراسي بيسر وسهولة.
+                            نعمل قريبًا على توفير قسم تأسيس خاص لمادتي الرياضيات واللغة العربية، لمساعدة طلاب جيل 2010 على تقوية الأساس قبل متابعة دروس المنهاج.
                         </p>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--primary-color)', fontWeight: '600' }}>
                             <TrendingUp size={20} />

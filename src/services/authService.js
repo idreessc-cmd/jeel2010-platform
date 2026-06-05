@@ -23,6 +23,7 @@ export const authService = {
             const userSession = {
                 studentName: student.studentName,
                 email: student.email,
+                role: student.role || 'student',
                 subscriptionStatus: student.subscriptionStatus
             };
             storage.set(CURRENT_USER_KEY, userSession);
@@ -70,6 +71,7 @@ export const authService = {
             email: student.email,
             password: student.password || '123',
             studentName: student.studentName,
+            role: student.role || 'student',
             subscriptionStatus: student.subscriptionStatus || 'free',
             joinDate: new Date().toISOString().split('T')[0]
         });

@@ -33,6 +33,10 @@ export const Dashboard = () => {
             navigate('/login');
             return;
         }
+        if (currentUser.role === 'admin') {
+            navigate('/admin');
+            return;
+        }
         setUser(currentUser);
 
         // Load last viewed lesson
@@ -103,6 +107,10 @@ export const Dashboard = () => {
         });
         setQuizLogs(logs);
     }, [navigate]);
+
+    const currentUserSession = authService.getCurrentUser();
+    if (!currentUserSession) return null;
+    if (currentUserSession.role === 'admin') return null;
 
     if (!user) return null;
 
@@ -206,12 +214,12 @@ export const Dashboard = () => {
                         </div>
                         <div>
                             <h3 style={{ color: 'var(--secondary-color)', fontWeight: '800', margin: '0 0 5px 0', fontSize: '1.15rem' }}>
-                                {isSubscribed ? 'قروبات المتابعة VIP نشطة' : 'قروبات المتابعة VIP غير نشطة لحسابك'}
+                                قروبات VIP والمتابعة
                             </h3>
                             <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.9rem', lineHeight: '1.6' }}>
                                 {isSubscribed 
-                                    ? 'انضم الآن لقروبات الواتساب والتليغرام VIP للتواصل المباشر مع المعلمين وتلقي التنبيهات والملخصات أولاً بأول.'
-                                    : 'ميزة متابعة VIP تتيح لك طرح أسئلتك على المعلمين وتلقي ملخصات أسبوعية وتنبيهات الدروس الجديدة. اشترك لتفعيل الميزة.'
+                                    ? 'أنت مؤهل للانضمام إلى قروبات VIP الخاصة بالمتابعة.'
+                                    : 'اشترك للوصول إلى قروبات VIP والمتابعة مع المعلمين.'
                                 }
                             </p>
                         </div>
@@ -228,7 +236,7 @@ export const Dashboard = () => {
                                     style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px', fontSize: '0.9rem' }}
                                 >
                                     <MessageCircle size={16} />
-                                    <span>قروب الواتساب VIP</span>
+                                    <span>تواصل واتساب</span>
                                 </a>
                                 <a 
                                     href="https://t.me/Success_exam"
@@ -238,7 +246,7 @@ export const Dashboard = () => {
                                     style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px', fontSize: '0.9rem', backgroundColor: '#FFFFFF' }}
                                 >
                                     <Users size={16} />
-                                    <span>قناة التليغرام</span>
+                                    <span>دخول قروب تيليغرام</span>
                                 </a>
                             </div>
                         ) : (
@@ -250,7 +258,7 @@ export const Dashboard = () => {
                                 style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px', fontSize: '0.9rem', backgroundColor: '#D97706', borderColor: '#D97706' }}
                             >
                                 <Gem size={16} />
-                                <span>اشترك لتفعيل قروبات VIP</span>
+                                <span>اشترك عبر واتساب</span>
                             </a>
                         )}
                     </div>
@@ -382,7 +390,7 @@ export const Dashboard = () => {
                 {/* Progress Grid */}
                 <h3 style={{ color: 'var(--secondary-color)', fontWeight: '800', fontSize: '1.3rem', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <BookOpen size={22} style={{ color: 'var(--primary-color)' }} />
-                    <span>تقدمك الدراسي في المواد:</span>
+                    <span>دروسي وموادي الدراسية:</span>
                 </h3>
                 
                 <div className="subjects-grid" style={{ marginBottom: '40px' }}>
@@ -422,7 +430,7 @@ export const Dashboard = () => {
                 {/* Quizzes Logs Section */}
                 <h3 style={{ color: 'var(--secondary-color)', fontWeight: '800', fontSize: '1.3rem', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <ClipboardList size={22} style={{ color: 'var(--primary-color)' }} />
-                    <span>سجل الاختبارات الأخيرة:</span>
+                    <span>اختباراتِي الأخيرة:</span>
                 </h3>
 
                 <div style={{

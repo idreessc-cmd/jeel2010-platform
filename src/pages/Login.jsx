@@ -10,11 +10,16 @@ export const Login = () => {
     const [error, setError] = useState('');
 
     useEffect(() => {
-        // If already logged in, redirect to dashboard
-        if (authService.getCurrentUser()) {
-            navigate('/dashboard');
+        // If already logged in, redirect based on role
+        const currentUser = authService.getCurrentUser();
+        if (currentUser) {
+            if (currentUser.role === 'admin') {
+                navigate('/admin');
+            } else {
+                navigate('/dashboard');
+            }
         }
-    }, []);
+    }, [navigate]);
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
@@ -27,7 +32,11 @@ export const Login = () => {
 
         const res = authService.login(email, password);
         if (res.success) {
-            navigate('/dashboard');
+            if (res.user.role === 'admin') {
+                navigate('/admin');
+            } else {
+                navigate('/dashboard');
+            }
         } else {
             setError(res.error);
         }
@@ -38,7 +47,11 @@ export const Login = () => {
         setError('');
         const res = authService.login(quickEmail, '123');
         if (res.success) {
-            navigate('/dashboard');
+            if (res.user.role === 'admin') {
+                navigate('/admin');
+            } else {
+                navigate('/dashboard');
+            }
         } else {
             setError(res.error);
         }
@@ -142,31 +155,42 @@ export const Login = () => {
                     }}>
                         <h4 style={{ color: 'var(--secondary-color)', fontWeight: '800', fontSize: '0.95rem', marginBottom: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
                             <Lightbulb size={18} style={{ color: 'var(--primary-color)' }} />
-                            <span>اختصارات سريعة لتجربة المصحح:</span>
+                            <span>أزرار الدخول السريع للتجربة:</span>
                         </h4>
                         
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                             <button 
                                 onClick={() => handleQuickLogin('free@jeel2010.com')}
                                 className="btn btn-outline"
-                                style={{ padding: '8px 12px', fontSize: '0.85rem', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                                style={{ padding: '10px 12px', fontSize: '0.85rem', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                             >
                                 <User size={16} />
-                                <span>الدخول كطالب تجريبي (مجاني)</span>
+                                <span>دخول كطالب مجاني</span>
                             </button>
                             <button 
                                 onClick={() => handleQuickLogin('active@jeel2010.com')}
                                 className="btn btn-outline"
-                                style={{ padding: '8px 12px', fontSize: '0.85rem', width: '100%', color: 'var(--accent-islamic)', borderColor: 'var(--accent-islamic)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                                style={{ padding: '10px 12px', fontSize: '0.85rem', width: '100%', color: 'var(--accent-islamic)', borderColor: 'var(--accent-islamic)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                             >
                                 <Gem size={16} />
-                                <span>الدخول كطالب مشترك (نشط بالكامل)</span>
+                                <span>دخول كطالب مشترك</span>
                             </button>
                         </div>
-                        
-                        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '12px' }}>
-                            * كلمة المرور الافتراضية للحسابات هي <strong>123</strong>
-                        </p>
+
+                        <div style={{
+                            borderTop: '1px solid #edf2f7',
+                            paddingTop: '15px',
+                            marginTop: '15px'
+                        }}>
+                            <h5 style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: '800', marginBottom: '10px' }}>حسابات التجربة للإدارة</h5>
+                            <button 
+                                onClick={() => handleQuickLogin('admin@jeel2010.com')}
+                                className="btn btn-outline"
+                                style={{ padding: '8px 12px', fontSize: '0.8rem', width: '100%', color: 'var(--secondary-color)', borderColor: '#cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', backgroundColor: '#f8fafc' }}
+                            >
+                                <span>دخول كمسؤول</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

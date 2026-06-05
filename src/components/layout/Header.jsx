@@ -54,33 +54,38 @@ export const Header = () => {
                     >
                         المواد
                     </Link>
-                    <a 
-                        href="/#pricing" 
-                        className="nav-link"
-                        onClick={handleLinkClick}
-                    >
-                        الاشتراك
-                    </a>
                     
-                    {user && (
-                        <>
-                            <Link 
-                                to="/dashboard" 
-                                className={`nav-link ${location.pathname === '/dashboard' ? 'active' : ''}`}
-                                onClick={handleLinkClick}
-                            >
-                                لوحة الطالب
-                            </Link>
-                            {user.role === 'admin' && (
-                                <Link 
-                                    to="/admin" 
-                                    className={`nav-link ${location.pathname === '/admin' ? 'active' : ''}`}
-                                    onClick={handleLinkClick}
-                                >
-                                    لوحة الإدارة
-                                </Link>
-                            )}
-                        </>
+                    {/* Show subscription only for visitor or student */}
+                    {(!user || user.role === 'student') && (
+                        <Link 
+                            to="/subscription" 
+                            className={`nav-link ${location.pathname === '/subscription' ? 'active' : ''}`}
+                            onClick={handleLinkClick}
+                        >
+                            الاشتراك
+                        </Link>
+                    )}
+                    
+                    {/* Show student dashboard only for student */}
+                    {user && user.role === 'student' && (
+                        <Link 
+                            to="/dashboard" 
+                            className={`nav-link ${location.pathname === '/dashboard' ? 'active' : ''}`}
+                            onClick={handleLinkClick}
+                        >
+                            لوحة الطالب
+                        </Link>
+                    )}
+
+                    {/* Show admin panel only for admin */}
+                    {user && user.role === 'admin' && (
+                        <Link 
+                            to="/admin" 
+                            className={`nav-link ${location.pathname === '/admin' ? 'active' : ''}`}
+                            onClick={handleLinkClick}
+                        >
+                            لوحة الإدارة
+                        </Link>
                     )}
 
                     {/* Mobile Only Session Info & Actions */}
@@ -88,8 +93,8 @@ export const Header = () => {
                         <div className="mobile-user-box" style={{ display: 'none', width: '100%', borderTop: '1px solid var(--border-color)', paddingTop: '15px', marginTop: '15px' }}>
                             <div style={{ marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                 <span style={{ fontWeight: 'bold' }}>{user.studentName}</span>
-                                <Badge type={user.subscriptionStatus === 'active' ? 'success' : 'primary'}>
-                                    {user.subscriptionStatus === 'active' ? 'مشترك' : 'مجاني'}
+                                <Badge type={user.role === 'admin' ? 'success' : user.subscriptionStatus === 'active' ? 'success' : 'primary'}>
+                                    {user.role === 'admin' ? 'إدارة المنصة' : user.subscriptionStatus === 'active' ? 'مشترك' : 'مجاني'}
                                 </Badge>
                             </div>
                             <button 
@@ -117,8 +122,8 @@ export const Header = () => {
                         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                                 <span style={{ fontWeight: '700', fontSize: '0.95rem' }}>{user.studentName}</span>
-                                <Badge type={user.subscriptionStatus === 'active' ? 'success' : 'primary'}>
-                                    {user.subscriptionStatus === 'active' ? 'مشترك بالكامل' : 'حساب تجريبي مجاني'}
+                                <Badge type={user.role === 'admin' ? 'success' : user.subscriptionStatus === 'active' ? 'success' : 'primary'}>
+                                    {user.role === 'admin' ? 'إدارة المنصة' : user.subscriptionStatus === 'active' ? 'مشترك بالكامل' : 'حساب تجريبي مجاني'}
                                 </Badge>
                             </div>
                             <button 
