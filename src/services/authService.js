@@ -42,15 +42,12 @@ export const authService = {
                     };
                 } else {
                     // Fallback if doc doesn't exist in Firestore yet (create a basic profile)
-                    const isDefaultAdmin = email === 'admin@jeel2010.com';
-                    const isDefaultActive = email === 'active@jeel2010.com';
-                    
                     userSession = {
                         uid: firebaseUser.uid,
-                        studentName: isDefaultAdmin ? 'مسؤول المنصة' : isDefaultActive ? 'طالب مشترك' : 'طالب مجاني',
+                        studentName: 'طالب جديد',
                         email: firebaseUser.email,
-                        role: isDefaultAdmin ? 'admin' : 'student',
-                        subscriptionStatus: isDefaultActive ? 'active' : 'free'
+                        role: 'student',
+                        subscriptionStatus: 'free'
                     };
                     
                     // Seed Firestore document

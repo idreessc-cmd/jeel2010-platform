@@ -1,0 +1,108 @@
+rules_version = '2';
+
+// ==========================================
+// Cloud Firestore Security Rules (DRAFT RULES)
+// ==========================================
+// مسودة قواعد حماية قاعدة البيانات لمنصة امتحان النجاح - جيل 2010
+// تم تصميمها لتأمين وصول الطلاب والزوار، ومنع التلاعب بالأدوار أو الاشتراكات.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // دالات مساعدة (Helper Functions)
+    
+    // التحقق من تسجيل دخول المستخدم
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // التحقق من أن المستخدم يقرأ أو يكتب بياناته الخاصة فقط
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    // التحقق مما إذا كان المستخدم مسؤولاً (Admin) بقراءة وثيقة المستخدم الخاصة به
+    function isAdmin() {
+      return isSignedIn() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // 1. قواعد مستندات المستخدمين (users Collection)
+    match /users/{userId} {
+      // الطالب والمسؤول يستطيعان قراءة ملف المستخدم المعني
+      allow read: if isSignedIn() && (isOwner(userId) || isAdmin());
+      
+      // عند التسجيل الجديد: يُسمح للطلب فقط بالتسجيل كطالب عادي وباشتراك مجاني افتراضي
+      allow create: if isSignedIn() && isOwner(userId) && 
+        request.resource.data.role == 'student' && 
+        request.resource.data.subscriptionStatus == 'free';
+      
+      // التعديل: يُمنع الطالب تماماً من تعديل دوره 'role' أو حالة اشتراكه 'subscriptionStatus'، فقط الإدمن يفعل ذلك
+      allow update: if isSignedIn() && (
+        (isOwner(userId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'subscriptionStatus']))
+        || isAdmin()
+      );
+      
+      // الحذف للمسؤول فقط
+      allow delete: if isAdmin();
+    }
+
+    // 2. قواعد المواد والوحدات والدروس (المنهج الدراسي)
+    match /subjects/{subjectId} {
+      // القراءة للجميع إذا كانت المادة نشطة
+      allow read: if resource == null || resource.data.isActive == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /units/{unitId} {
+      // القراءة للجميع إذا كانت الوحدة نشطة
+      allow read: if resource == null || resource.data.isActive == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /lessons/{lessonId} {
+      // القراءة للجميع إذا كان الدرس نشطاً (التحقق من الاشتراك بالفيديوهات والملفات الحساسة يُعالج برمجياً)
+      allow read: if resource == null || resource.data.isActive == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // 3. قواعد الامتحانات القصيرة (quizzes Collection)
+    match /quizzes/{quizId} {
+      allow read: if isSignedIn() && (resource == null || resource.data.isActive == true || isAdmin());
+      allow write: if isAdmin();
+    }
+
+    // 4. قواعد محاولات الطلاب في حل الامتحانات (quizAttempts Collection)
+    match /quizAttempts/{attemptId} {
+      // الطالب يقرأ ويكتب محاولاته الخاصة فقط، والمسؤول يقرأ كل شيء
+      allow read: if isSignedIn() && (resource.data.studentId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && request.resource.data.studentId == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    // 5. قواعد تسجيل التقدم الدراسي للطلاب (studentProgress Collection)
+    match /studentProgress/{progressId} {
+      // الطالب يقرأ ويسجل تقدمه الدراسي الخاص، والمسؤول يقرأ كل شيء
+      allow read: if isSignedIn() && (resource.data.studentId == request.auth.uid || isAdmin());
+      allow write: if isSignedIn() && request.resource.data.studentId == request.auth.uid;
+    }
+
+    // 6. قواعد الاشتراكات والمدفوعات والإعلانات
+    match /subscriptions/{subId} {
+      allow read: if isSignedIn() && (resource.data.studentId == request.auth.uid || isAdmin());
+      allow write: if isAdmin();
+    }
+
+    match /payments/{payId} {
+      allow read: if isSignedIn() && (resource.data.studentId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && request.resource.data.studentId == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    match /announcements/{annId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+  }
+}
