@@ -62,17 +62,7 @@ export const Home = () => {
                         </div>
 
                     </div>
-                    
-                    {/* Visual Card / Logo Column */}
-                    <div className="hero-visual hero-logo-visual">
-                        <div className="hero-logo-card">
-                            <img
-                                src="/logo.webp"
-                                alt="شعار امتحان النجاح"
-                                className="hero-platform-logo"
-                            />
-                        </div>
-                    </div>
+
                 </div>
             </section>
 
