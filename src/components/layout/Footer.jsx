@@ -7,7 +7,12 @@ export const Footer = () => {
         <footer id="footer">
             <div className="container footer-grid">
                 <div className="footer-col footer-about">
-                    <h3>جيل <span>2010</span></h3>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '15px' }}>
+                        <img src="/logo.webp" alt="شعار امتحان النجاح" style={{ height: '32px', width: '32px', objectFit: 'contain', borderRadius: '6px' }} />
+                        <h3 style={{ margin: 0, fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-white)' }}>
+                            امتحان <span style={{ color: 'var(--primary-light)' }}>النجاح</span>
+                        </h3>
+                    </div>
                     <p>منصة تعليمية مبتكرة مصممة خصيصاً لطلاب الصف الأول الثانوي من جيل 2010. نسعى لتوفير بيئة تعليمية ذكية، ممتعة، وخالية من التعقيد لمساعدة الطلاب على التفوق والتميز الدراسي بأسهل الطرق الممكنة.</p>
                     <div className="social-links">
                         <a href="https://facebook.com" target="_blank" rel="noreferrer" className="social-link" aria-label="فيسبوك" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>

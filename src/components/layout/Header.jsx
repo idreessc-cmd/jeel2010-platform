@@ -34,8 +34,9 @@ export const Header = () => {
     return (
         <header>
             <div className="container header-container">
-                <Link to="/" className="logo" onClick={handleLinkClick}>
-                    جيل <span>2010</span>
+                <Link to="/" className="logo" onClick={handleLinkClick} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <img src="/logo.webp" alt="شعار امتحان النجاح" style={{ height: '32px', width: '32px', objectFit: 'contain', borderRadius: '6px' }} />
+                    <span>امتحان <span>النجاح</span></span>
                 </Link>
                 
                 <nav className={`nav-menu ${isOpen ? 'active' : ''}`}>
