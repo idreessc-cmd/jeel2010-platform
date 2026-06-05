@@ -17,7 +17,8 @@ import {
     BookOpen, 
     ChevronLeft, 
     MessageCircle,
-    User
+    User,
+    Users
 } from 'lucide-react';
 
 export const Dashboard = () => {
