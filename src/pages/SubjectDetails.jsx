@@ -110,6 +110,18 @@ export const SubjectDetails = () => {
 
                     {/* Subscription & Call to Action Box */}
                     <div className="subject-subscription-card" style={{ maxWidth: '360px' }}>
+                        <div style={{ textAlign: 'right', backgroundColor: '#f8fafc', padding: '15px', borderRadius: 'var(--border-radius-md)', marginBottom: '20px', border: '1px solid #e2e8f0' }}>
+                            <h5 style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--secondary-color)', marginBottom: '10px' }}>ماذا يحصل الطالب عند الاشتراك في هذه المادة؟</h5>
+                            <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.85rem', display: 'flex', flexDirection: 'column', gap: '8px', color: 'var(--text-muted)' }}>
+                                <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> جميع دروس المادة</li>
+                                <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> دوسية خاصة للمادة</li>
+                                <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> اختبارات قصيرة بعد الدروس</li>
+                                <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> متابعة داخل قروبات VIP</li>
+                                <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> تنبيهات عند رفع محتوى جديد</li>
+                                <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> دعم من المعلمين</li>
+                            </ul>
+                        </div>
+
                         {user ? (
                             <>
                                 <h4 style={{ color: 'var(--secondary-color)', fontWeight: '800', marginBottom: '10px' }}>حالة اشتراكك:</h4>
@@ -129,18 +141,6 @@ export const SubjectDetails = () => {
                                         <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '15px' }}>
                                             يمكنك مشاهدة أول درسين مجاناً، ويجب تفعيل الباقة لمشاهدة المنهج كاملاً.
                                         </p>
-                                        
-                                        <div style={{ textAlign: 'right', backgroundColor: '#f8fafc', padding: '15px', borderRadius: 'var(--border-radius-md)', marginBottom: '15px', border: '1px solid #e2e8f0' }}>
-                                            <h5 style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--secondary-color)', marginBottom: '10px' }}>ماذا يحصل الطالب عند الاشتراك في هذه المادة؟</h5>
-                                            <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.8rem', display: 'flex', flexDirection: 'column', gap: '6px', color: 'var(--text-muted)' }}>
-                                                <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> جميع دروس المادة</li>
-                                                <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> دوسية خاصة للمادة</li>
-                                                <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> اختبارات قصيرة بعد الدروس</li>
-                                                <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> متابعة داخل قروبات VIP</li>
-                                                <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> تنبيهات عند رفع محتوى جديد</li>
-                                                <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> دعم من المعلمين</li>
-                                            </ul>
-                                        </div>
 
                                         <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginBottom: '15px', lineHeight: '1.4' }}>
                                             يتم التنشيط يدويًا عن طريق إرسال رسالة إلى واتساب المنصة وتزويدنا برمز التفعيل الخاص بك.
@@ -151,7 +151,7 @@ export const SubjectDetails = () => {
                                             target="_blank"
                                             rel="noreferrer"
                                             className="btn btn-primary" 
-                                            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}
+                                            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', justifyContent: 'center', width: '100%' }}
                                         >
                                             <Gem size={16} />
                                             تفعيل الاشتراك عبر واتساب
@@ -165,20 +165,8 @@ export const SubjectDetails = () => {
                                 <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '20px' }}>
                                     سجل حسابك مجاناً لتسجيل تقدمك وحل الاختبارات ومشاهدة الشروحات.
                                 </p>
-                                
-                                <div style={{ textAlign: 'right', backgroundColor: '#f8fafc', padding: '15px', borderRadius: 'var(--border-radius-md)', marginBottom: '20px', border: '1px solid #e2e8f0' }}>
-                                    <h5 style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--secondary-color)', marginBottom: '10px' }}>ماذا يحصل الطالب عند الاشتراك في هذه المادة؟</h5>
-                                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.8rem', display: 'flex', flexDirection: 'column', gap: '6px', color: 'var(--text-muted)' }}>
-                                        <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> جميع دروس المادة</li>
-                                        <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> دوسية خاصة للمادة</li>
-                                        <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> اختبارات قصيرة بعد الدروس</li>
-                                        <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> متابعة داخل قروبات VIP</li>
-                                        <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> تنبيهات عند رفع محتوى جديد</li>
-                                        <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Check size={12} style={{ color: 'var(--success-color)' }} /> دعم من المعلمين</li>
-                                    </ul>
-                                </div>
 
-                                <button onClick={() => navigate('/login')} className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}>
+                                <button onClick={() => navigate('/login')} className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', justifyContent: 'center', width: '100%' }}>
                                     <Key size={16} />
                                     تسجيل دخول تجريبي
                                 </button>

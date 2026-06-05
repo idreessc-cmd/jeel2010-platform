@@ -47,11 +47,12 @@ export const Quiz = () => {
         setFinalScore(0);
     }, [lessonId]);
 
-    if (!subject || !lesson || !quiz) {
+    if (!subject || !lesson || !quiz || !quiz.questions || quiz.questions.length === 0) {
         return (
             <div className="container" style={{ padding: '80px 0', textAlign: 'center' }}>
-                <h2>الاختبار غير موجود</h2>
-                <Link to="/subjects" className="btn btn-primary">العودة للمواد</Link>
+                <h2 style={{ color: 'var(--secondary-color)', fontWeight: '800', marginBottom: '15px' }}>لا توجد أسئلة متوفرة حالياً</h2>
+                <p style={{ color: 'var(--text-muted)', marginBottom: '25px' }}>يرجى العودة في وقت لاحق عندما يتم رفع أسئلة هذا الدرس.</p>
+                <Link to={`/subject/${subjectId}/lesson/${lessonId}`} className="btn btn-primary">العودة للدرس</Link>
             </div>
         );
     }
