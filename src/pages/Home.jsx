@@ -3,15 +3,22 @@ import { useNavigate, Link } from 'react-router-dom';
 import { mockSubjects } from '../data/subjects';
 import { SubjectCard } from '../components/subjects/SubjectCard';
 import { authService } from '../services/authService';
+import { contentService } from '../services/contentService';
 import { Play, BookOpen, Check, X, Plus, Minus, ArrowLeft, Star, Video, Award, TrendingUp, Unlock, MessageCircle, Users, Bell, ClipboardList } from 'lucide-react';
 
 export const Home = () => {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [activeFaq, setActiveFaq] = useState(null);
+    const [subjects, setSubjects] = useState(mockSubjects);
 
     useEffect(() => {
         setUser(authService.getCurrentUser());
+        contentService.getSubjects().then(data => {
+            if (data && data.length > 0) {
+                setSubjects(data);
+            }
+        });
     }, []);
 
     const faqItems = [
@@ -79,7 +86,7 @@ export const Home = () => {
                     </div>
                     
                     <div className="subjects-grid">
-                        {mockSubjects.map(subject => (
+                        {subjects.map(subject => (
                             <SubjectCard key={subject.id} subject={subject} />
                         ))}
                     </div>

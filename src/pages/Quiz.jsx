@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getQuizForLesson } from '../data/quizzes';
-import { mockSubjects } from '../data/subjects';
-import { mockLessons } from '../data/lessons';
 import { authService } from '../services/authService';
 import { quizService } from '../services/quizService';
+import { contentService } from '../services/contentService';
 import { QuizQuestion } from '../components/quiz/QuizQuestion';
 import { QuizResult } from '../components/quiz/QuizResult';
 import { ArrowRight, ArrowLeft, BookOpen, Save } from 'lucide-react';
@@ -21,9 +19,9 @@ export const Quiz = () => {
     const [isFinished, setIsFinished] = useState(false);
     const [finalScore, setFinalScore] = useState(0);
 
-    const subject = mockSubjects.find(s => s.id === subjectId);
-    const units = mockLessons[subjectId] || [];
-    const lesson = units.flatMap(u => u.lessons).find(l => l.id === lessonId);
+    const [subject, setSubject] = useState(null);
+    const [lesson, setLesson] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const currentUser = authService.getCurrentUser();
@@ -36,16 +34,46 @@ export const Quiz = () => {
             return;
         }
 
-        // Load quiz data
-        const quizData = getQuizForLesson(lessonId);
-        setQuiz(quizData);
+        const loadData = async () => {
+            setLoading(true);
+            try {
+                const subData = await contentService.getSubject(subjectId);
+                const lessonsData = await contentService.getLessonsForSubject(subjectId);
+                const currentLesson = lessonsData.flatMap(u => u.lessons).find(l => l.id === lessonId);
+                const quizData = await contentService.getQuizForLesson(lessonId);
+                
+                setSubject(subData);
+                setLesson(currentLesson);
+                setQuiz(quizData);
+            } catch (err) {
+                console.error("Error loading quiz data:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadData();
 
         // Reset quiz state when lesson changes
         setCurrentQuestionIndex(0);
         setSelectedAnswers({});
         setIsFinished(false);
         setFinalScore(0);
-    }, [lessonId]);
+    }, [lessonId, subjectId]);
+
+    if (loading) {
+        return (
+            <div className="container" style={{ padding: '120px 0', textAlign: 'center', minHeight: 'calc(100vh - 350px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '15px' }}>
+                <div className="loading-spinner" style={{ border: '4px solid #f3f3f3', borderTop: '4px solid var(--primary-color)', borderRadius: '50%', width: '40px', height: '40px', animation: 'spin 1s linear infinite' }}></div>
+                <p style={{ color: 'var(--text-muted)' }}>جاري تحميل محتوى الاختبار...</p>
+                <style>{`
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                `}</style>
+            </div>
+        );
+    }
 
     if (!subject || !lesson || !quiz || !quiz.questions || quiz.questions.length === 0) {
         return (

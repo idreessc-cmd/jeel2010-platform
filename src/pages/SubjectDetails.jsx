@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { mockSubjects } from '../data/subjects';
-import { mockLessons } from '../data/lessons';
 import { authService } from '../services/authService';
 import { progressService } from '../services/progressService';
 import { subscriptionService } from '../services/subscriptionService';
+import { contentService } from '../services/contentService';
 import { UnitAccordion } from '../components/subjects/UnitAccordion';
 import { Badge } from '../components/ui/Badge';
 import { BookOpen, Search, ClipboardList, Download, Award, Unlock, Gem, Key, Lock, Book, Compass, Landmark, Check } from 'lucide-react';
@@ -16,9 +15,9 @@ export const SubjectDetails = () => {
     const [activeTab, setActiveTab] = useState('lessons'); // lessons, overview, quizzes, files
     const [completedLessons, setCompletedLessons] = useState([]);
     
-    // Find matching subject
-    const subject = mockSubjects.find(s => s.id === id);
-    const units = mockLessons[id] || [];
+    const [subject, setSubject] = useState(null);
+    const [units, setUnits] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const currentUser = authService.getCurrentUser();
@@ -26,7 +25,37 @@ export const SubjectDetails = () => {
         if (currentUser) {
             setCompletedLessons(progressService.getCompletedLessons(currentUser.email));
         }
+
+        const loadData = async () => {
+            setLoading(true);
+            try {
+                const subData = await contentService.getSubject(id);
+                const lessonsData = await contentService.getLessonsForSubject(id);
+                setSubject(subData);
+                setUnits(lessonsData);
+            } catch (err) {
+                console.error("Error loading subject data:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadData();
     }, [id]);
+
+    if (loading) {
+        return (
+            <div className="container" style={{ padding: '120px 0', textAlign: 'center', minHeight: 'calc(100vh - 350px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '15px' }}>
+                <div className="loading-spinner" style={{ border: '4px solid #f3f3f3', borderTop: '4px solid var(--primary-color)', borderRadius: '50%', width: '40px', height: '40px', animation: 'spin 1s linear infinite' }}></div>
+                <p style={{ color: 'var(--text-muted)' }}>جاري تحميل محتوى المادة...</p>
+                <style>{`
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                `}</style>
+            </div>
+        );
+    }
 
     if (!subject) {
         return (

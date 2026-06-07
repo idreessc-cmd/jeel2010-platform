@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { mockSubjects } from '../data/subjects';
-import { mockLessons } from '../data/lessons';
 import { authService } from '../services/authService';
 import { progressService } from '../services/progressService';
 import { subscriptionService } from '../services/subscriptionService';
+import { contentService } from '../services/contentService';
 import { CurriculumSidebar } from '../components/subjects/CurriculumSidebar';
 import { VideoPlayerSection } from '../components/lesson/VideoPlayerSection';
 import { PdfSection } from '../components/lesson/PdfSection';
@@ -18,19 +17,9 @@ export const Lesson = () => {
     const [user, setUser] = useState(null);
     const [isCompleted, setIsCompleted] = useState(false);
     const [completedLessonIds, setCompletedLessonIds] = useState([]);
-
-    // Find subject & lessons list
-    const subject = mockSubjects.find(s => s.id === subjectId);
-    const units = mockLessons[subjectId] || [];
-    const allLessons = units.flatMap(unit => unit.lessons);
-    
-    // Find current lesson
-    const lessonIndex = allLessons.findIndex(l => l.id === lessonId);
-    const lesson = allLessons[lessonIndex];
-
-    // Find prev/next lessons
-    const prevLesson = lessonIndex > 0 ? allLessons[lessonIndex - 1] : null;
-    const nextLesson = lessonIndex < allLessons.length - 1 ? allLessons[lessonIndex + 1] : null;
+    const [subject, setSubject] = useState(null);
+    const [units, setUnits] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const currentUser = authService.getCurrentUser();
@@ -40,11 +29,46 @@ export const Lesson = () => {
             const completed = progressService.isLessonComplete(currentUser.email, lessonId);
             setIsCompleted(completed);
             setCompletedLessonIds(progressService.getCompletedLessons(currentUser.email));
-            
-            // Phase B: Auto-save last viewed lesson
             progressService.setLastViewedLesson(currentUser.email, subjectId, lessonId);
         }
+
+        const loadData = async () => {
+            setLoading(true);
+            try {
+                const subData = await contentService.getSubject(subjectId);
+                const lessonsData = await contentService.getLessonsForSubject(subjectId);
+                setSubject(subData);
+                setUnits(lessonsData);
+            } catch (err) {
+                console.error("Error loading lesson details:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadData();
     }, [lessonId, subjectId]);
+
+    if (loading) {
+        return (
+            <div className="container" style={{ padding: '120px 0', textAlign: 'center', minHeight: 'calc(100vh - 350px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '15px' }}>
+                <div className="loading-spinner" style={{ border: '4px solid #f3f3f3', borderTop: '4px solid var(--primary-color)', borderRadius: '50%', width: '40px', height: '40px', animation: 'spin 1s linear infinite' }}></div>
+                <p style={{ color: 'var(--text-muted)' }}>جاري تحميل محتوى الدرس...</p>
+                <style>{`
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                `}</style>
+            </div>
+        );
+    }
+
+    const allLessons = units.flatMap(unit => unit.lessons);
+    const lessonIndex = allLessons.findIndex(l => l.id === lessonId);
+    const lesson = allLessons[lessonIndex];
+
+    const prevLesson = lessonIndex > 0 ? allLessons[lessonIndex - 1] : null;
+    const nextLesson = lessonIndex < allLessons.length - 1 ? allLessons[lessonIndex + 1] : null;
 
     if (!subject || !lesson) {
         return (

@@ -50,26 +50,26 @@ service cloud.firestore {
 
     // 2. قواعد المواد والوحدات والدروس (المنهج الدراسي)
     match /subjects/{subjectId} {
-      // القراءة للجميع إذا كانت المادة نشطة
-      allow read: if resource == null || resource.data.isActive == true || isAdmin();
+      // القراءة متاحة للجميع لتصفح المواد
+      allow read: if true;
       allow write: if isAdmin();
     }
 
     match /units/{unitId} {
-      // القراءة للجميع إذا كانت الوحدة نشطة
-      allow read: if resource == null || resource.data.isActive == true || isAdmin();
+      allow read: if true;
       allow write: if isAdmin();
     }
 
-    match /lessons/{lessonId} {
-      // القراءة للجميع إذا كان الدرس نشطاً (التحقق من الاشتراك بالفيديوهات والملفات الحساسة يُعالج برمجياً)
-      allow read: if resource == null || resource.data.isActive == true || isAdmin();
+    match /lessons/{subjectId} {
+      // القراءة متاحة للجميع لعرض المنهج وقائمة الدروس
+      allow read: if true;
       allow write: if isAdmin();
     }
 
     // 3. قواعد الامتحانات القصيرة (quizzes Collection)
     match /quizzes/{quizId} {
-      allow read: if isSignedIn() && (resource == null || resource.data.isActive == true || isAdmin());
+      // القراءة متاحة للمستخدمين المسجلين لحل الاختبارات
+      allow read: if isSignedIn();
       allow write: if isAdmin();
     }
 

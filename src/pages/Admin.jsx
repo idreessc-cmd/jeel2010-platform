@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
-import { mockSubjects } from '../data/subjects';
-import { mockLessons, addLessonToSubject } from '../data/lessons';
-import { addQuestionToQuiz } from '../data/quizzes';
+import { contentService } from '../services/contentService';
 import { AdminStats } from '../components/admin/AdminStats';
 import { StudentsTable } from '../components/admin/StudentsTable';
 import { LogOut, PlusCircle, Save, UserPlus } from 'lucide-react';
@@ -12,6 +10,7 @@ export const Admin = () => {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [students, setStudents] = useState([]);
+    const [subjectsList, setSubjectsList] = useState([]);
     
     // Form States
     const [lessonSubject, setLessonSubject] = useState('arabic');
@@ -48,6 +47,11 @@ export const Admin = () => {
             authService.getStudents()
                 .then(data => setStudents(data))
                 .catch(err => console.error("Failed to load students:", err));
+
+            // Load subjects list
+            contentService.getSubjects()
+                .then(data => setSubjectsList(data))
+                .catch(err => console.error("Failed to load subjects:", err));
         }
     }, []);
 
@@ -94,7 +98,7 @@ export const Admin = () => {
         }
     };
 
-    const handleAddLessonMock = (e) => {
+    const handleAddLessonMock = async (e) => {
         e.preventDefault();
         if (!lessonTitle || !lessonVideoId) {
             alert('يرجى تعبئة عنوان الدرس ومعرف فيديو اليوتيوب.');
@@ -116,10 +120,10 @@ export const Admin = () => {
             }
         };
 
-        const res = addLessonToSubject(lessonSubject, `${lessonSubject}-u1`, newLesson);
+        const res = await contentService.addLessonToSubject(lessonSubject, `${lessonSubject}-u1`, newLesson);
         
         if (res.success) {
-            alert(`تمت إضافة الدرس الجديد بنجاح وحفظه في LocalStorage!
+            alert(`تمت إضافة الدرس الجديد بنجاح!
 المادة: ${lessonSubject}
 العنوان: ${lessonTitle}
 الوصول: ${lessonIsFree ? 'مجاني' : 'مدفوع'}`);
@@ -128,10 +132,12 @@ export const Admin = () => {
             setLessonTitle('');
             setLessonDesc('');
             setLessonVideoId('');
+        } else {
+            alert(res.error || 'فشلت عملية إضافة الدرس');
         }
     };
 
-    const handleAddQuestionMock = (e) => {
+    const handleAddQuestionMock = async (e) => {
         e.preventDefault();
         if (!questionText || !optA || !optB) {
             alert('يرجى كتابة نص السؤال وخيارين على الأقل.');
@@ -148,10 +154,10 @@ export const Admin = () => {
             correctAnswer: correctOpt
         };
 
-        const res = addQuestionToQuiz(questionLesson, newQuestion);
+        const res = await contentService.addQuestionToQuiz(questionLesson, newQuestion);
         
         if (res.success) {
-            alert(`تمت إضافة السؤال الجديد للاختبار الخاص بالدرس [${questionLesson}] بنجاح وحفظه في LocalStorage!
+            alert(`تمت إضافة السؤال الجديد للاختبار الخاص بالدرس [${questionLesson}] بنجاح!
 السؤال: ${questionText}
 الخيارات: ${options.join(' | ')}
 الإجابة الصحيحة: الخيار رقم ${correctOpt + 1}`);
@@ -162,6 +168,8 @@ export const Admin = () => {
             setOptB('');
             setOptC('');
             setOptD('');
+        } else {
+            alert(res.error || 'فشلت عملية إضافة السؤال');
         }
     };
 
@@ -259,7 +267,7 @@ export const Admin = () => {
                                     onChange={(e) => setLessonSubject(e.target.value)}
                                     style={{ width: '100%', padding: '10px', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--border-color)', fontFamily: 'var(--font-family)' }}
                                 >
-                                    {mockSubjects.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
+                                    {subjectsList.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
                                 </select>
                             </div>
 

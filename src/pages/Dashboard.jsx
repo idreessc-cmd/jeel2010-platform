@@ -3,8 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { progressService } from '../services/progressService';
 import { quizService } from '../services/quizService';
-import { mockSubjects } from '../data/subjects';
-import { mockLessons } from '../data/lessons';
+import { contentService } from '../services/contentService';
 import { Badge } from '../components/ui/Badge';
 import { 
     GraduationCap, 
@@ -27,6 +26,7 @@ export const Dashboard = () => {
     const [lastViewed, setLastViewed] = useState(null);
     const [quizLogs, setQuizLogs] = useState([]);
     const [subjectProgress, setSubjectProgress] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const currentUser = authService.getCurrentUser();
@@ -40,74 +40,102 @@ export const Dashboard = () => {
         }
         setUser(currentUser);
 
-        // Load last viewed lesson
-        const lastViewedData = progressService.getLastViewedLesson(currentUser.email);
-        if (lastViewedData) {
-            // Find lesson details
-            const units = mockLessons[lastViewedData.subjectId] || [];
-            const lesson = units.flatMap(u => u.lessons).find(l => l.id === lastViewedData.lessonId);
-            const subject = mockSubjects.find(s => s.id === lastViewedData.subjectId);
-            
-            if (lesson && subject) {
-                setLastViewed({
-                    subjectId: lastViewedData.subjectId,
-                    lessonId: lastViewedData.lessonId,
-                    lessonTitle: lesson.title,
-                    subjectTitle: subject.title
-                });
-            }
-        }
+        const loadDashboardData = async () => {
+            setLoading(true);
+            try {
+                const subjects = await contentService.getSubjects();
+                
+                const lessonsMap = {};
+                await Promise.all(subjects.map(async (subject) => {
+                    lessonsMap[subject.id] = await contentService.getLessonsForSubject(subject.id);
+                }));
 
-        // Calculate progress for each subject
-        const progressList = mockSubjects.map(subject => {
-            const units = mockLessons[subject.id] || [];
-            const allLessons = units.flatMap(u => u.lessons);
-            const progress = progressService.getSubjectProgressPercentage(currentUser.email, allLessons);
-            const completedCount = allLessons.filter(l => 
-                progressService.isLessonComplete(currentUser.email, l.id)
-            ).length;
-
-            return {
-                id: subject.id,
-                title: subject.title,
-                themeClass: subject.themeClass,
-                totalLessons: allLessons.length,
-                completedCount,
-                percentage: progress
-            };
-        });
-        setSubjectProgress(progressList);
-
-        // Load quiz logs
-        const allQuizzes = quizService.getAllResults(currentUser.email);
-        const logs = [];
-        
-        // Loop through subjects to map quizzes
-        mockSubjects.forEach(sub => {
-            const units = mockLessons[sub.id] || [];
-            units.forEach(unit => {
-                unit.lessons.forEach(lesson => {
-                    const quizResult = allQuizzes[lesson.id];
-                    if (quizResult) {
-                        const history = quizResult.history || [quizResult];
-                        const latestAttempt = quizResult.latest || quizResult;
-                        logs.push({
-                            subjectId: sub.id,
-                            subjectTitle: sub.title,
-                            lessonId: lesson.id,
+                const lastViewedData = progressService.getLastViewedLesson(currentUser.email);
+                if (lastViewedData) {
+                    const units = lessonsMap[lastViewedData.subjectId] || [];
+                    const lesson = units.flatMap(u => u.lessons).find(l => l.id === lastViewedData.lessonId);
+                    const subject = subjects.find(s => s.id === lastViewedData.subjectId);
+                    
+                    if (lesson && subject) {
+                        setLastViewed({
+                            subjectId: lastViewedData.subjectId,
+                            lessonId: lastViewedData.lessonId,
                             lessonTitle: lesson.title,
-                            score: latestAttempt.score,
-                            total: latestAttempt.total,
-                            percentage: latestAttempt.percentage,
-                            date: latestAttempt.date,
-                            attemptsCount: history.length
+                            subjectTitle: subject.title
                         });
                     }
+                }
+
+                const progressList = subjects.map(subject => {
+                    const units = lessonsMap[subject.id] || [];
+                    const allLessons = units.flatMap(u => u.lessons);
+                    const progress = progressService.getSubjectProgressPercentage(currentUser.email, allLessons);
+                    const completedCount = allLessons.filter(l => 
+                        progressService.isLessonComplete(currentUser.email, l.id)
+                    ).length;
+
+                    return {
+                        id: subject.id,
+                        title: subject.title,
+                        themeClass: subject.themeClass,
+                        totalLessons: allLessons.length,
+                        completedCount,
+                        percentage: progress
+                    };
                 });
-            });
-        });
-        setQuizLogs(logs);
+                setSubjectProgress(progressList);
+
+                const allQuizzes = quizService.getAllResults(currentUser.email);
+                const logs = [];
+                
+                subjects.forEach(sub => {
+                    const units = lessonsMap[sub.id] || [];
+                    units.forEach(unit => {
+                        unit.lessons.forEach(lesson => {
+                            const quizResult = allQuizzes[lesson.id];
+                            if (quizResult) {
+                                const history = quizResult.history || [quizResult];
+                                const latestAttempt = quizResult.latest || quizResult;
+                                logs.push({
+                                    subjectId: sub.id,
+                                    subjectTitle: sub.title,
+                                    lessonId: lesson.id,
+                                    lessonTitle: lesson.title,
+                                    score: latestAttempt.score,
+                                    total: latestAttempt.total,
+                                    percentage: latestAttempt.percentage,
+                                    date: latestAttempt.date,
+                                    attemptsCount: history.length
+                                });
+                            }
+                        });
+                    });
+                });
+                setQuizLogs(logs);
+
+            } catch (err) {
+                console.error("Error loading dashboard data:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadDashboardData();
     }, [navigate]);
+
+    if (loading) {
+        return (
+            <div className="container" style={{ padding: '120px 0', textAlign: 'center', minHeight: 'calc(100vh - 350px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '15px' }}>
+                <div className="loading-spinner" style={{ border: '4px solid #f3f3f3', borderTop: '4px solid var(--primary-color)', borderRadius: '50%', width: '40px', height: '40px', animation: 'spin 1s linear infinite' }}></div>
+                <p style={{ color: 'var(--text-muted)' }}>جاري تحميل لوحة التحكم...</p>
+                <style>{`
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                `}</style>
+            </div>
+        );
+    }
 
     const currentUserSession = authService.getCurrentUser();
     if (!currentUserSession) return null;

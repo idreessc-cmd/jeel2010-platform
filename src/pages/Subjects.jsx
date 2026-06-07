@@ -1,9 +1,20 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { mockSubjects } from '../data/subjects';
 import { SubjectCard } from '../components/subjects/SubjectCard';
+import { contentService } from '../services/contentService';
 import { Lightbulb, Mail } from 'lucide-react';
 
 export const Subjects = () => {
+    const [subjects, setSubjects] = useState(mockSubjects);
+
+    useEffect(() => {
+        contentService.getSubjects().then(data => {
+            if (data && data.length > 0) {
+                setSubjects(data);
+            }
+        });
+    }, []);
+
     return (
         <section className="section-padding" style={{ minHeight: 'calc(100vh - 350px)' }}>
             <div className="container">
@@ -13,7 +24,7 @@ export const Subjects = () => {
                 </div>
                 
                 <div className="subjects-grid">
-                    {mockSubjects.map((subject) => (
+                    {subjects.map((subject) => (
                         <SubjectCard key={subject.id} subject={subject} />
                     ))}
                 </div>
