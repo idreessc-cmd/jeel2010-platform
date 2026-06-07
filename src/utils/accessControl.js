@@ -7,10 +7,10 @@ export const accessControl = {
         return !!authService.getCurrentUser();
     },
     
-    // Check if the current user is an Admin
+    // Check if the current user is an Admin based on role from Firestore
     isAdmin: () => {
         const user = authService.getCurrentUser();
-        return user && user.email === 'admin@jeel2010.com'; // Admin account simulation
+        return user && user.role === 'admin';
     },
     
     // Check if a lesson is locked for the current user

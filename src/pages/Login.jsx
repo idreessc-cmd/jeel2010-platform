@@ -1,16 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
-import { AlertCircle, LogIn, Lightbulb, User, Gem } from 'lucide-react';
+import { AlertCircle, LogIn, UserPlus, Phone, Mail, Lock, User, KeyRound } from 'lucide-react';
 
 export const Login = () => {
     const navigate = useNavigate();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [activeTab, setActiveTab] = useState('login'); // 'login' or 'register'
+    
+    // Login form state
+    const [loginEmail, setLoginEmail] = useState('');
+    const [loginPassword, setLoginPassword] = useState('');
+    
+    // Register form state
+    const [registerName, setRegisterName] = useState('');
+    const [registerPhone, setRegisterPhone] = useState('');
+    const [registerEmail, setRegisterEmail] = useState('');
+    const [registerPassword, setRegisterPassword] = useState('');
+    const [registerConfirmPassword, setRegisterConfirmPassword] = useState('');
+    
     const [error, setError] = useState('');
+    const [successMsg, setSuccessMsg] = useState('');
 
     useEffect(() => {
-        // If already logged in, redirect based on role
+        // Redirect if already logged in
         const currentUser = authService.getCurrentUser();
         if (currentUser) {
             if (currentUser.role === 'admin') {
@@ -21,17 +33,18 @@ export const Login = () => {
         }
     }, [navigate]);
 
-    const handleFormSubmit = async (e) => {
+    const handleLoginSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        setSuccessMsg('');
         
-        if (!email || !password) {
+        if (!loginEmail || !loginPassword) {
             setError('يرجى ملء جميع الحقول المطلوبة.');
             return;
         }
 
         try {
-            const res = await authService.login(email, password);
+            const res = await authService.loginWithEmail(loginEmail, loginPassword);
             if (res.success) {
                 if (res.user.role === 'admin') {
                     navigate('/admin');
@@ -46,52 +59,122 @@ export const Login = () => {
         }
     };
 
-    // Quick Login Helper for easy testing
-    const handleQuickLogin = async (quickEmail) => {
+    const handleRegisterSubmit = async (e) => {
+        e.preventDefault();
         setError('');
+        setSuccessMsg('');
+        
+        if (!registerName || !registerPhone || !registerEmail || !registerPassword || !registerConfirmPassword) {
+            setError('يرجى ملء جميع الحقول المطلوبة.');
+            return;
+        }
+
+        if (registerPassword !== registerConfirmPassword) {
+            setError('كلمتا المرور غير متطابقتين.');
+            return;
+        }
+
         try {
-            const res = await authService.login(quickEmail, '123');
+            const res = await authService.registerStudent({
+                name: registerName,
+                phone: registerPhone,
+                email: registerEmail,
+                password: registerPassword
+            });
             if (res.success) {
-                if (res.user.role === 'admin') {
-                    navigate('/admin');
-                } else {
+                setSuccessMsg('تم إنشاء الحساب بنجاح! يتم تحويلك الآن...');
+                setTimeout(() => {
                     navigate('/dashboard');
-                }
+                }, 1500);
             } else {
                 setError(res.error);
             }
         } catch (err) {
-            setError(err.message || 'حدث خطأ أثناء تسجيل الدخول السريع');
+            setError(err.message || 'حدث خطأ أثناء إنشاء الحساب');
         }
     };
 
+    const handleForgotPassword = (e) => {
+        e.preventDefault();
+        alert('يرجى التواصل مع إدارة المنصة أو الدعم الفني لإعادة تعيين كلمة المرور الخاصة بك.');
+    };
+
     return (
-        <section className="section-padding" style={{ backgroundColor: '#F8FAFC', minHeight: 'calc(100vh - 350px)', display: 'flex', alignItems: 'center' }}>
-            <div className="container" style={{ maxWidth: '450px' }}>
+        <section className="section-padding" style={{ backgroundColor: '#F8FAFC', minHeight: 'calc(100vh - 120px)', display: 'flex', alignItems: 'center' }}>
+            <div className="container" style={{ maxWidth: '500px' }}>
                 <div className="login-card" style={{
                     backgroundColor: '#FFFFFF',
                     borderRadius: 'var(--border-radius-lg)',
-                    padding: '40px',
+                    padding: '35px 30px',
                     boxShadow: 'var(--shadow-md)',
                     border: '1px solid var(--border-color)'
                 }}>
-                    <h2 style={{ color: 'var(--secondary-color)', fontWeight: '800', fontSize: '1.7rem', textAlign: 'center', marginBottom: '8px' }}>
-                        تسجيل الدخول للمنصة
-                    </h2>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', textAlign: 'center', marginBottom: '30px' }}>
-                        سجل دخولك لتسجيل تقدمك الدراسي وحل اختبارات جيل 2010
-                    </p>
+                    {/* Header */}
+                    <div style={{ textAlign: 'center', marginBottom: '25px' }}>
+                        <h2 style={{ color: 'var(--secondary-color)', fontWeight: '800', fontSize: '1.6rem', marginBottom: '8px' }}>
+                            أكاديمية جيل 2010 التعليمية
+                        </h2>
+                        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                            منصة النجاح والتميز للمرحلة الدراسية
+                        </p>
+                    </div>
 
+                    {/* Tab Navigation */}
+                    <div style={{
+                        display: 'flex',
+                        borderBottom: '2px solid #E2E8F0',
+                        marginBottom: '25px',
+                        gap: '15px'
+                    }}>
+                        <button
+                            onClick={() => { setActiveTab('login'); setError(''); setSuccessMsg(''); }}
+                            style={{
+                                flex: 1,
+                                padding: '12px',
+                                background: 'none',
+                                border: 'none',
+                                borderBottom: activeTab === 'login' ? '3px solid var(--primary-color)' : '3px solid transparent',
+                                color: activeTab === 'login' ? 'var(--primary-color)' : 'var(--text-muted)',
+                                fontWeight: '800',
+                                fontSize: '1rem',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                outline: 'none'
+                            }}
+                        >
+                            تسجيل الدخول
+                        </button>
+                        <button
+                            onClick={() => { setActiveTab('register'); setError(''); setSuccessMsg(''); }}
+                            style={{
+                                flex: 1,
+                                padding: '12px',
+                                background: 'none',
+                                border: 'none',
+                                borderBottom: activeTab === 'register' ? '3px solid var(--primary-color)' : '3px solid transparent',
+                                color: activeTab === 'register' ? 'var(--primary-color)' : 'var(--text-muted)',
+                                fontWeight: '800',
+                                fontSize: '1rem',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                outline: 'none'
+                            }}
+                        >
+                            إنشاء حساب جديد
+                        </button>
+                    </div>
+
+                    {/* Messages */}
                     {error && (
                         <div style={{
                             padding: '12px 15px',
-                            backgroundColor: 'var(--bg-arabic)',
-                            color: 'var(--accent-arabic)',
+                            backgroundColor: '#FEF2F2',
+                            color: '#EF4444',
                             borderRadius: 'var(--border-radius-sm)',
                             marginBottom: '20px',
                             fontWeight: 'bold',
                             fontSize: '0.9rem',
-                            borderRight: '4px solid var(--accent-arabic)',
+                            borderRight: '4px solid #EF4444',
                             display: 'flex',
                             alignItems: 'center',
                             gap: '8px'
@@ -101,112 +184,243 @@ export const Login = () => {
                         </div>
                     )}
 
-                    <form onSubmit={handleFormSubmit}>
-                        <div style={{ marginBottom: '20px' }}>
-                            <label style={{ display: 'block', fontWeight: '700', marginBottom: '8px', fontSize: '0.95rem', color: 'var(--secondary-color)' }}>
-                                البريد الإلكتروني:
-                            </label>
-                            <input 
-                                type="email" 
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder="name@example.com"
-                                style={{
-                                    width: '100%',
-                                    padding: '12px 15px',
-                                    border: '1px solid var(--border-color)',
-                                    borderRadius: 'var(--border-radius-md)',
-                                    fontSize: '1rem',
-                                    fontFamily: 'var(--font-family)',
-                                    outline: 'none'
-                                }}
-                            />
-                        </div>
-
-                        <div style={{ marginBottom: '25px' }}>
-                            <label style={{ display: 'block', fontWeight: '700', marginBottom: '8px', fontSize: '0.95rem', color: 'var(--secondary-color)' }}>
-                                كلمة المرور:
-                            </label>
-                            <input 
-                                type="password" 
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                placeholder="••••••••"
-                                style={{
-                                    width: '100%',
-                                    padding: '12px 15px',
-                                    border: '1px solid var(--border-color)',
-                                    borderRadius: 'var(--border-radius-md)',
-                                    fontSize: '1rem',
-                                    fontFamily: 'var(--font-family)',
-                                    outline: 'none'
-                                }}
-                            />
-                        </div>
-
-                        <button 
-                            type="submit" 
-                            className="btn btn-primary"
-                            style={{ width: '100%', padding: '12px', fontSize: '1.05rem', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                        >
-                            <LogIn size={20} />
-                            <span>تسجيل الدخول</span>
-                        </button>
-                    </form>
-
-                    {/* Quick Login Shortcuts for Verification */}
-                    <div style={{
-                        marginTop: '30px',
-                        borderTop: '1px dashed var(--border-color)',
-                        paddingTop: '25px',
-                        textAlign: 'center'
-                    }}>
-                        <h4 style={{ color: 'var(--secondary-color)', fontWeight: '800', fontSize: '0.95rem', marginBottom: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-                            <Lightbulb size={18} style={{ color: 'var(--primary-color)' }} />
-                            <span>أزرار الدخول السريع للتجربة:</span>
-                        </h4>
-                        
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                            <button 
-                                onClick={() => handleQuickLogin('free@jeel2010.com')}
-                                className="btn btn-outline"
-                                style={{ padding: '10px 12px', fontSize: '0.85rem', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
-                            >
-                                <User size={16} />
-                                <span>دخول كطالب مجاني</span>
-                            </button>
-                            <button 
-                                onClick={() => handleQuickLogin('active@jeel2010.com')}
-                                className="btn btn-outline"
-                                style={{ padding: '10px 12px', fontSize: '0.85rem', width: '100%', color: 'var(--accent-islamic)', borderColor: 'var(--accent-islamic)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
-                            >
-                                <Gem size={16} />
-                                <span>دخول كطالب مشترك</span>
-                            </button>
-                        </div>
-
+                    {successMsg && (
                         <div style={{
-                            borderTop: '1px solid #edf2f7',
-                            paddingTop: '15px',
-                            marginTop: '15px'
+                            padding: '12px 15px',
+                            backgroundColor: '#F0FDF4',
+                            color: '#16A34A',
+                            borderRadius: 'var(--border-radius-sm)',
+                            marginBottom: '20px',
+                            fontWeight: 'bold',
+                            fontSize: '0.9rem',
+                            borderRight: '4px solid #16A34A',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px'
                         }}>
-                            <h5 style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: '800', marginBottom: '10px' }}>حسابات التجربة للإدارة</h5>
-                            <button 
-                                onClick={() => handleQuickLogin('admin@jeel2010.com')}
-                                className="btn btn-outline"
-                                style={{ padding: '8px 12px', fontSize: '0.8rem', width: '100%', color: 'var(--secondary-color)', borderColor: '#cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', backgroundColor: '#f8fafc' }}
-                            >
-                                <span>دخول كمسؤول</span>
-                            </button>
+                            <AlertCircle size={18} style={{ color: '#16A34A' }} />
+                            <span>{successMsg}</span>
                         </div>
-                    </div>
+                    )}
+
+                    {/* Login Form */}
+                    {activeTab === 'login' && (
+                        <form onSubmit={handleLoginSubmit}>
+                            <div style={{ marginBottom: '18px' }}>
+                                <label style={{ display: 'block', fontWeight: '700', marginBottom: '8px', fontSize: '0.9rem', color: 'var(--secondary-color)' }}>
+                                    <Mail size={14} style={{ marginLeft: '6px', verticalAlign: 'middle' }} />
+                                    البريد الإلكتروني:
+                                </label>
+                                <input
+                                    type="email"
+                                    value={loginEmail}
+                                    onChange={(e) => setLoginEmail(e.target.value)}
+                                    placeholder="yourname@domain.com"
+                                    required
+                                    style={{
+                                        width: '100%',
+                                        padding: '12px 15px',
+                                        border: '1px solid var(--border-color)',
+                                        borderRadius: 'var(--border-radius-md)',
+                                        fontSize: '0.95rem',
+                                        fontFamily: 'var(--font-family)',
+                                        outline: 'none',
+                                        textAlign: 'left',
+                                        direction: 'ltr'
+                                    }}
+                                />
+                            </div>
+
+                            <div style={{ marginBottom: '20px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'between', alignItems: 'center', marginBottom: '8px' }}>
+                                    <label style={{ fontWeight: '700', fontSize: '0.9rem', color: 'var(--secondary-color)' }}>
+                                        <Lock size={14} style={{ marginLeft: '6px', verticalAlign: 'middle' }} />
+                                        كلمة المرور:
+                                    </label>
+                                </div>
+                                <input
+                                    type="password"
+                                    value={loginPassword}
+                                    onChange={(e) => setLoginPassword(e.target.value)}
+                                    placeholder="••••••••"
+                                    required
+                                    style={{
+                                        width: '100%',
+                                        padding: '12px 15px',
+                                        border: '1px solid var(--border-color)',
+                                        borderRadius: 'var(--border-radius-md)',
+                                        fontSize: '0.95rem',
+                                        fontFamily: 'var(--font-family)',
+                                        outline: 'none',
+                                        textAlign: 'left',
+                                        direction: 'ltr'
+                                    }}
+                                />
+                                <div style={{ marginTop: '8px', textAlign: 'left' }}>
+                                    <a
+                                        href="#forgot"
+                                        onClick={handleForgotPassword}
+                                        style={{ fontSize: '0.8rem', color: 'var(--primary-color)', fontWeight: '700', textDecoration: 'none' }}
+                                    >
+                                        نسيت كلمة المرور؟
+                                    </a>
+                                </div>
+                            </div>
+
+                            <button
+                                type="submit"
+                                className="btn btn-primary"
+                                style={{ width: '100%', padding: '12px', fontSize: '1rem', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '10px' }}
+                            >
+                                <LogIn size={18} />
+                                <span>تسجيل الدخول</span>
+                            </button>
+                        </form>
+                    )}
+
+                    {/* Register Form */}
+                    {activeTab === 'register' && (
+                        <form onSubmit={handleRegisterSubmit}>
+                            <div style={{ marginBottom: '16px' }}>
+                                <label style={{ display: 'block', fontWeight: '700', marginBottom: '6px', fontSize: '0.9rem', color: 'var(--secondary-color)' }}>
+                                    <User size={14} style={{ marginLeft: '6px', verticalAlign: 'middle' }} />
+                                    الاسم الكامل:
+                                </label>
+                                <input
+                                    type="text"
+                                    value={registerName}
+                                    onChange={(e) => setRegisterName(e.target.value)}
+                                    placeholder="مثال: محمد أحمد علي"
+                                    required
+                                    style={{
+                                        width: '100%',
+                                        padding: '10px 14px',
+                                        border: '1px solid var(--border-color)',
+                                        borderRadius: 'var(--border-radius-md)',
+                                        fontSize: '0.95rem',
+                                        fontFamily: 'var(--font-family)',
+                                        outline: 'none'
+                                    }}
+                                />
+                            </div>
+
+                            <div style={{ marginBottom: '16px' }}>
+                                <label style={{ display: 'block', fontWeight: '700', marginBottom: '6px', fontSize: '0.9rem', color: 'var(--secondary-color)' }}>
+                                    <Phone size={14} style={{ marginLeft: '6px', verticalAlign: 'middle' }} />
+                                    رقم الهاتف:
+                                </label>
+                                <input
+                                    type="tel"
+                                    value={registerPhone}
+                                    onChange={(e) => setRegisterPhone(e.target.value)}
+                                    placeholder="07xxxxxxxx"
+                                    required
+                                    style={{
+                                        width: '100%',
+                                        padding: '10px 14px',
+                                        border: '1px solid var(--border-color)',
+                                        borderRadius: 'var(--border-radius-md)',
+                                        fontSize: '0.95rem',
+                                        fontFamily: 'var(--font-family)',
+                                        outline: 'none',
+                                        textAlign: 'left',
+                                        direction: 'ltr'
+                                    }}
+                                />
+                            </div>
+
+                            <div style={{ marginBottom: '16px' }}>
+                                <label style={{ display: 'block', fontWeight: '700', marginBottom: '6px', fontSize: '0.9rem', color: 'var(--secondary-color)' }}>
+                                    <Mail size={14} style={{ marginLeft: '6px', verticalAlign: 'middle' }} />
+                                    البريد الإلكتروني:
+                                </label>
+                                <input
+                                    type="email"
+                                    value={registerEmail}
+                                    onChange={(e) => setRegisterEmail(e.target.value)}
+                                    placeholder="name@example.com"
+                                    required
+                                    style={{
+                                        width: '100%',
+                                        padding: '10px 14px',
+                                        border: '1px solid var(--border-color)',
+                                        borderRadius: 'var(--border-radius-md)',
+                                        fontSize: '0.95rem',
+                                        fontFamily: 'var(--font-family)',
+                                        outline: 'none',
+                                        textAlign: 'left',
+                                        direction: 'ltr'
+                                    }}
+                                />
+                            </div>
+
+                            <div style={{ marginBottom: '16px' }}>
+                                <label style={{ display: 'block', fontWeight: '700', marginBottom: '6px', fontSize: '0.9rem', color: 'var(--secondary-color)' }}>
+                                    <Lock size={14} style={{ marginLeft: '6px', verticalAlign: 'middle' }} />
+                                    كلمة المرور:
+                                </label>
+                                <input
+                                    type="password"
+                                    value={registerPassword}
+                                    onChange={(e) => setRegisterPassword(e.target.value)}
+                                    placeholder="••••••••"
+                                    required
+                                    style={{
+                                        width: '100%',
+                                        padding: '10px 14px',
+                                        border: '1px solid var(--border-color)',
+                                        borderRadius: 'var(--border-radius-md)',
+                                        fontSize: '0.95rem',
+                                        fontFamily: 'var(--font-family)',
+                                        outline: 'none',
+                                        textAlign: 'left',
+                                        direction: 'ltr'
+                                    }}
+                                />
+                            </div>
+
+                            <div style={{ marginBottom: '20px' }}>
+                                <label style={{ display: 'block', fontWeight: '700', marginBottom: '6px', fontSize: '0.9rem', color: 'var(--secondary-color)' }}>
+                                    <KeyRound size={14} style={{ marginLeft: '6px', verticalAlign: 'middle' }} />
+                                    تأكيد كلمة المرور:
+                                </label>
+                                <input
+                                    type="password"
+                                    value={registerConfirmPassword}
+                                    onChange={(e) => setRegisterConfirmPassword(e.target.value)}
+                                    placeholder="••••••••"
+                                    required
+                                    style={{
+                                        width: '100%',
+                                        padding: '10px 14px',
+                                        border: '1px solid var(--border-color)',
+                                        borderRadius: 'var(--border-radius-md)',
+                                        fontSize: '0.95rem',
+                                        fontFamily: 'var(--font-family)',
+                                        outline: 'none',
+                                        textAlign: 'left',
+                                        direction: 'ltr'
+                                    }}
+                                />
+                            </div>
+
+                            <button
+                                type="submit"
+                                className="btn btn-primary"
+                                style={{ width: '100%', padding: '12px', fontSize: '1rem', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                            >
+                                <UserPlus size={18} />
+                                <span>إنشاء حساب جديد</span>
+                            </button>
+                        </form>
+                    )}
                 </div>
             </div>
-            {/* Inline CSS Helper for Login page responsiveness */}
+            {/* Responsiveness style */}
             <style>{`
                 @media (max-width: 480px) {
                     .login-card {
-                        padding: 25px 15px !important;
+                        padding: 25px 20px !important;
                     }
                 }
             `}</style>

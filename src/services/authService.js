@@ -1,5 +1,5 @@
 import { auth, db, isFirebaseEnabled } from '../config/firebase';
-import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc, getDocs, collection, updateDoc, setDoc, query, where } from 'firebase/firestore';
 import { storage } from '../utils/storage';
 import { getDefaultStudents } from '../data/students';
@@ -18,10 +18,10 @@ export const initializeStudents = () => {
 };
 
 export const authService = {
-    login: async (email, password) => {
+    // 1. Login with Email
+    loginWithEmail: async (email, password) => {
         if (isFirebaseEnabled) {
             try {
-                // Firebase Auth Sign In
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const firebaseUser = userCredential.user;
                 
@@ -30,52 +30,30 @@ export const authService = {
                 const userDoc = await getDoc(userDocRef);
                 
                 let userSession;
-                
                 if (userDoc.exists()) {
                     const userData = userDoc.data();
-                    // Use role from Firestore directly; do not modify it.
                     userSession = {
                         uid: firebaseUser.uid,
-                        studentName: userData.name || userData.studentName || 'مستخدم فايربيس',
+                        studentName: userData.name || 'مستخدم فايربيس',
                         email: firebaseUser.email,
                         role: userData.role || 'student',
                         subscriptionStatus: userData.subscriptionStatus || 'free'
                     };
                 } else {
-                    // Create a student profile in Firestore only
-                    const now = new Date().toISOString();
+                    // Create student profile securely if missing
+                    const profile = await authService.createStudentProfileIfMissing(firebaseUser);
                     userSession = {
                         uid: firebaseUser.uid,
-                        studentName: 'طالب جديد',
+                        studentName: profile.name,
                         email: firebaseUser.email,
-                        role: 'student',
-                        subscriptionStatus: 'free',
-                        phone: '',
-                        subscriptionPlan: 'free',
-                        isActive: true,
-                        joinedVipGroups: false,
-                        createdAt: now,
-                        updatedAt: now
+                        role: profile.role,
+                        subscriptionStatus: profile.subscriptionStatus
                     };
-                    await setDoc(userDocRef, {
-                        uid: firebaseUser.uid,
-                        name: userSession.studentName,
-                        email: userSession.email,
-                        role: userSession.role,
-                        subscriptionStatus: userSession.subscriptionStatus,
-                        phone: '',
-                        subscriptionPlan: 'free',
-                        isActive: true,
-                        joinedVipGroups: false,
-                        createdAt: now,
-                        updatedAt: now
-                    });
                 }
                 
                 storage.set(CURRENT_USER_KEY, userSession);
                 return { success: true, user: userSession };
             } catch (error) {
-                console.error("Firebase Login Error:", error);
                 let errorMsg = 'حدث خطأ أثناء تسجيل الدخول';
                 if (
                     error.code === 'auth/user-not-found' || 
@@ -94,10 +72,11 @@ export const authService = {
             
             if (student) {
                 const userSession = {
+                    uid: `mock_${student.email}`,
                     studentName: student.studentName,
                     email: student.email,
                     role: student.role || 'student',
-                    subscriptionStatus: student.subscriptionStatus
+                    subscriptionStatus: student.subscriptionStatus || 'free'
                 };
                 storage.set(CURRENT_USER_KEY, userSession);
                 return { success: true, user: userSession };
@@ -105,18 +84,149 @@ export const authService = {
             return { success: false, error: 'البريد الإلكتروني أو كلمة المرور غير صحيحة' };
         }
     },
+
+    // Legacy login alias to prevent breakage in un-refactored code
+    login: async (email, password) => {
+        return authService.loginWithEmail(email, password);
+    },
     
-    logout: () => {
-        storage.remove(CURRENT_USER_KEY);
+    // 2. Register Student (Standard role: 'student')
+    registerStudent: async ({ name, phone, email, password }) => {
         if (isFirebaseEnabled) {
-            signOut(auth).catch(err => console.error("Firebase SignOut Error:", err));
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const firebaseUser = userCredential.user;
+                
+                const profile = await authService.createStudentProfileIfMissing(firebaseUser, { name, phone });
+                
+                const userSession = {
+                    uid: firebaseUser.uid,
+                    studentName: profile.name,
+                    email: firebaseUser.email,
+                    role: profile.role,
+                    subscriptionStatus: profile.subscriptionStatus
+                };
+                
+                storage.set(CURRENT_USER_KEY, userSession);
+                return { success: true, user: userSession };
+            } catch (error) {
+                let errorMsg = 'حدث خطأ أثناء إنشاء الحساب';
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMsg = 'البريد الإلكتروني مسجل بالفعل';
+                } else if (error.code === 'auth/weak-password') {
+                    errorMsg = 'كلمة المرور ضعيفة للغاية (يجب أن تكون 6 أحرف على الأقل)';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMsg = 'البريد الإلكتروني غير صالح';
+                }
+                return { success: false, error: errorMsg };
+            }
+        } else {
+            const students = initializeStudents();
+            if (students.some(s => s.email === email)) {
+                return { success: false, error: 'البريد الإلكتروني مسجل بالفعل' };
+            }
+            
+            const newStudent = {
+                studentName: name,
+                email: email,
+                password: password,
+                role: 'student',
+                subscriptionStatus: 'free',
+                joinDate: new Date().toISOString().split('T')[0]
+            };
+            students.push(newStudent);
+            storage.set(STUDENTS_LIST_KEY, students);
+            
+            const userSession = {
+                uid: `mock_${email}`,
+                studentName: name,
+                email: email,
+                role: 'student',
+                subscriptionStatus: 'free'
+            };
+            storage.set(CURRENT_USER_KEY, userSession);
+            return { success: true, user: userSession };
         }
     },
     
+    // 3. Logout
+    logout: () => {
+        storage.remove(CURRENT_USER_KEY);
+        if (isFirebaseEnabled) {
+            signOut(auth).catch(() => {});
+        }
+    },
+    
+    // 4. Get Current User Session
     getCurrentUser: () => {
         return storage.get(CURRENT_USER_KEY, null);
     },
+
+    // 5. Get Current User Full Profile from Firestore (or mock storage)
+    getCurrentUserProfile: async () => {
+        const currentUser = authService.getCurrentUser();
+        if (!currentUser) return null;
+        
+        if (isFirebaseEnabled) {
+            try {
+                const userDocRef = doc(db, 'users', currentUser.uid);
+                const userDoc = await getDoc(userDocRef);
+                if (userDoc.exists()) {
+                    return userDoc.data();
+                }
+                return null;
+            } catch (error) {
+                return null;
+            }
+        } else {
+            const students = initializeStudents();
+            const student = students.find(s => s.email === currentUser.email);
+            if (student) {
+                return {
+                    uid: `mock_${student.email}`,
+                    name: student.studentName,
+                    email: student.email,
+                    role: student.role || 'student',
+                    subscriptionStatus: student.subscriptionStatus || 'free',
+                    phone: '',
+                    subscriptionPlan: 'free',
+                    isActive: true,
+                    joinedVipGroups: false
+                };
+            }
+            return null;
+        }
+    },
+
+    // 6. Secure profile helper (strictly creates student profiles only)
+    createStudentProfileIfMissing: async (firebaseUser, extraData) => {
+        if (!isFirebaseEnabled) return null;
+        
+        const userDocRef = doc(db, 'users', firebaseUser.uid);
+        const userDoc = await getDoc(userDocRef);
+        
+        if (!userDoc.exists()) {
+            const now = new Date().toISOString();
+            const profile = {
+                uid: firebaseUser.uid,
+                name: extraData?.name || firebaseUser.displayName || 'طالب جديد',
+                email: firebaseUser.email,
+                phone: extraData?.phone || '',
+                role: 'student', // Strictly hardcoded student role
+                subscriptionStatus: 'free',
+                subscriptionPlan: 'free',
+                isActive: true,
+                joinedVipGroups: false,
+                createdAt: now,
+                updatedAt: now
+            };
+            await setDoc(userDocRef, profile);
+            return profile;
+        }
+        return userDoc.data();
+    },
     
+    // Admin features
     getStudents: async () => {
         if (isFirebaseEnabled) {
             try {
@@ -134,7 +244,6 @@ export const authService = {
                 });
                 return list;
             } catch (error) {
-                console.error("Firebase getStudents Error:", error);
                 return initializeStudents();
             }
         } else {
@@ -145,7 +254,6 @@ export const authService = {
     updateStudentSubscription: async (email, status) => {
         if (isFirebaseEnabled) {
             try {
-                // Find user by email in Firestore
                 const q = query(collection(db, 'users'), where('email', '==', email));
                 const querySnapshot = await getDocs(q);
                 
@@ -156,7 +264,6 @@ export const authService = {
                         updatedAt: new Date().toISOString()
                     });
                     
-                    // If the updated student is the currently logged-in user, update their session too
                     const currentUser = authService.getCurrentUser();
                     if (currentUser && currentUser.email === email) {
                         currentUser.subscriptionStatus = status;
@@ -166,7 +273,6 @@ export const authService = {
                 }
                 return { success: false, error: 'الطالب غير موجود' };
             } catch (error) {
-                console.error("Firebase updateStudentSubscription Error:", error);
                 return { success: false, error: error.message };
             }
         } else {
@@ -176,7 +282,6 @@ export const authService = {
                 students[index].subscriptionStatus = status;
                 storage.set(STUDENTS_LIST_KEY, students);
                 
-                // If the updated student is the currently logged-in user, update their session too
                 const currentUser = authService.getCurrentUser();
                 if (currentUser && currentUser.email === email) {
                     currentUser.subscriptionStatus = status;
@@ -198,7 +303,6 @@ export const authService = {
                     return { success: false, error: 'البريد الإلكتروني مسجل بالفعل' };
                 }
                 
-                // Write profile to Firestore
                 const tempId = `temp_${Date.now()}`;
                 const newDocRef = doc(db, 'users', tempId);
                 await setDoc(newDocRef, {
@@ -212,7 +316,6 @@ export const authService = {
                 
                 return { success: true };
             } catch (error) {
-                console.error("Firebase addStudentManual Error:", error);
                 return { success: false, error: error.message };
             }
         } else {

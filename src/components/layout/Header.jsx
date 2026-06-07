@@ -31,6 +31,10 @@ export const Header = () => {
         setIsOpen(false);
     };
 
+    const isAdmin = user && user.role === 'admin';
+    const isStudent = user && user.role === 'student';
+    const isVisitor = !user;
+
     return (
         <header>
             <div className="container header-container">
@@ -40,6 +44,7 @@ export const Header = () => {
                 </Link>
                 
                 <nav className={`nav-menu ${isOpen ? 'active' : ''}`}>
+                    {/* الرئيسية: shown to everyone */}
                     <Link 
                         to="/" 
                         className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}
@@ -47,27 +52,20 @@ export const Header = () => {
                     >
                         الرئيسية
                     </Link>
-                    <Link 
-                        to="/subjects" 
-                        className={`nav-link ${location.pathname.startsWith('/subjects') || location.pathname.startsWith('/subject/') ? 'active' : ''}`}
-                        onClick={handleLinkClick}
-                    >
-                        المواد
-                    </Link>
-                    
-                    {/* Show subscription only for visitor or student */}
-                    {(!user || user.role === 'student') && (
+
+                    {/* المواد: visitor & student only */}
+                    {(isVisitor || isStudent) && (
                         <Link 
-                            to="/subscription" 
-                            className={`nav-link ${location.pathname === '/subscription' ? 'active' : ''}`}
+                            to="/subjects" 
+                            className={`nav-link ${location.pathname.startsWith('/subjects') || location.pathname.startsWith('/subject/') ? 'active' : ''}`}
                             onClick={handleLinkClick}
                         >
-                            الاشتراك
+                            المواد
                         </Link>
                     )}
                     
-                    {/* Show student dashboard only for student */}
-                    {user && user.role === 'student' && (
+                    {/* لوحة الطالب: student only */}
+                    {isStudent && (
                         <Link 
                             to="/dashboard" 
                             className={`nav-link ${location.pathname === '/dashboard' ? 'active' : ''}`}
@@ -77,8 +75,8 @@ export const Header = () => {
                         </Link>
                     )}
 
-                    {/* Show admin panel only for admin */}
-                    {user && user.role === 'admin' && (
+                    {/* لوحة الإدارة: admin only */}
+                    {isAdmin && (
                         <Link 
                             to="/admin" 
                             className={`nav-link ${location.pathname === '/admin' ? 'active' : ''}`}
@@ -88,6 +86,28 @@ export const Header = () => {
                         </Link>
                     )}
 
+                    {/* الاشتراك: visitor & student only */}
+                    {(isVisitor || isStudent) && (
+                        <Link 
+                            to="/subscription" 
+                            className={`nav-link ${location.pathname === '/subscription' ? 'active' : ''}`}
+                            onClick={handleLinkClick}
+                        >
+                            الاشتراك
+                        </Link>
+                    )}
+
+                    {/* تواصل معنا: visitor & student only */}
+                    {(isVisitor || isStudent) && (
+                        <Link 
+                            to="/contact" 
+                            className={`nav-link ${location.pathname === '/contact' ? 'active' : ''}`}
+                            onClick={handleLinkClick}
+                        >
+                            تواصل معنا
+                        </Link>
+                    )}
+                    
                     {/* Mobile Only Session Info & Actions */}
                     {user ? (
                         <div className="mobile-user-box" style={{ display: 'none', width: '100%', borderTop: '1px solid var(--border-color)', paddingTop: '15px', marginTop: '15px' }}>
