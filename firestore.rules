@@ -101,5 +101,12 @@ service cloud.firestore {
       allow read: if isSignedIn();
       allow write: if isAdmin();
     }
+
+    // 7. قواعد الدعوات المسبقة للطلاب (studentInvites Collection)
+    match /studentInvites/{inviteId} {
+      allow read: if isAdmin()
+        || (isSignedIn() && request.auth.token.email == resource.data.email);
+      allow create, update, delete: if isAdmin();
+    }
   }
 }

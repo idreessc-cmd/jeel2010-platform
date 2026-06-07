@@ -3,18 +3,26 @@ import { Badge } from '../ui/Badge';
 import { 
     UserCheck, UserX, User, Mail, Calendar, Search, Filter, 
     KeyRound, Trash2, Settings, X, Info, ChevronDown, ChevronUp, 
-    Check, Lock, ShieldAlert, Award, RefreshCw, BookOpen, ClipboardList
+    Check, Lock, ShieldAlert, Award, RefreshCw, BookOpen, ClipboardList,
+    Send, Phone
 } from 'lucide-react';
 import { authService } from '../../services/authService';
 import { contentService } from '../../services/contentService';
 import { subscriptionService } from '../../services/subscriptionService';
 
 export const StudentsTable = ({ students = [], onToggleSubscription, onRefresh }) => {
+    // Sub Tab State
+    const [activeSubTab, setActiveSubTab] = useState('registered'); // 'registered' | 'invites'
+
     // Search & Filter State
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [sortBy, setSortBy] = useState('joinDate');
     const [sortOrder, setSortOrder] = useState('desc');
+
+    // Invitations State
+    const [invites, setInvites] = useState([]);
+    const [loadingInvites, setLoadingInvites] = useState(false);
 
     // Access Control Modal State
     const [selectedStudent, setSelectedStudent] = useState(null);
@@ -29,7 +37,7 @@ export const StudentsTable = ({ students = [], onToggleSubscription, onRefresh }
     const [allQuizzes, setAllQuizzes] = useState([]);
     const [loadingAccessData, setLoadingAccessData] = useState(false);
 
-    // Checked permissions lists for selected student
+    // Checked permissions lists for selected student/invite
     const [checkedSubjects, setCheckedSubjects] = useState([]);
     const [checkedUnits, setCheckedUnits] = useState([]);
     const [checkedLessons, setCheckedLessons] = useState([]);
@@ -72,6 +80,19 @@ export const StudentsTable = ({ students = [], onToggleSubscription, onRefresh }
         }
     };
 
+    // Load invites from Firestore/mock
+    const loadInvitesList = async () => {
+        setLoadingInvites(true);
+        try {
+            const data = await authService.getInvites();
+            setInvites(data);
+        } catch (err) {
+            console.error("Failed to load invites:", err);
+        } finally {
+            setLoadingInvites(false);
+        }
+    };
+
     // Keep checked states synced with selectedStudent
     useEffect(() => {
         if (selectedStudent) {
@@ -84,6 +105,21 @@ export const StudentsTable = ({ students = [], onToggleSubscription, onRefresh }
         }
     }, [selectedStudent]);
 
+    // Load invites when invites sub-tab is chosen
+    useEffect(() => {
+        if (activeSubTab === 'invites') {
+            loadInvitesList();
+        }
+    }, [activeSubTab]);
+
+    // Trigger double refresh helper
+    const handleRefreshData = async () => {
+        if (onRefresh) onRefresh();
+        if (activeSubTab === 'invites') {
+            loadInvitesList();
+        }
+    };
+
     // Sorting helper
     const handleSort = (field) => {
         if (sortBy === field) {
@@ -94,7 +130,7 @@ export const StudentsTable = ({ students = [], onToggleSubscription, onRefresh }
         }
     };
 
-    // Action handlers
+    // Action handlers for registered students
     const handleResetPassword = async (email) => {
         if (window.confirm(`هل أنت متأكد من إرسال رابط إعادة تعيين كلمة المرور للطالب: ${email}؟`)) {
             try {
@@ -116,7 +152,7 @@ export const StudentsTable = ({ students = [], onToggleSubscription, onRefresh }
                 const res = await authService.disableStudent(uid);
                 if (res.success) {
                     alert(`تم تعطيل الحساب بنجاح.`);
-                    if (onRefresh) onRefresh();
+                    handleRefreshData();
                 } else {
                     alert(`فشل التعطيل: ${res.error}`);
                 }
@@ -134,10 +170,37 @@ export const StudentsTable = ({ students = [], onToggleSubscription, onRefresh }
             const res = await authService.deleteStudentFirestore(student.uid);
             if (res.success) {
                 alert('تم الحذف بنجاح.');
-                if (onRefresh) onRefresh();
+                handleRefreshData();
             } else {
                 alert(`تنبيه أمني هام:\n${res.error}`);
             }
+        } catch (err) {
+            alert(`حدث خطأ: ${err.message}`);
+        }
+    };
+
+    // Action handlers for invites
+    const handleCancelInvite = async (email) => {
+        if (window.confirm(`هل أنت متأكد من إلغاء دعوة الطالب صاحب البريد الإلكتروني: ${email}؟`)) {
+            try {
+                const res = await authService.cancelInvite(email);
+                if (res.success) {
+                    alert('تم إلغاء الدعوة بنجاح.');
+                    loadInvitesList();
+                } else {
+                    alert(`فشل إلغاء الدعوة: ${res.error}`);
+                }
+            } catch (err) {
+                alert(`حدث خطأ: ${err.message}`);
+            }
+        }
+    };
+
+    const handleSendInviteInstructions = async (invite) => {
+        try {
+            await authService.sendPasswordReset(invite.email);
+            alert(`إذا كان لهذا البريد حساب مسجل، سيصله رابط إعادة التعيين مباشرةً.
+إن لم يكن مسجلاً، يرجى الطلب من الطالب الدخول إلى صفحة "إنشاء حساب جديد" والتسجيل باستخدام هذا البريد الإلكتروني (${invite.email})، وسيتم تفعيل حسابه وتطبيق صلاحياته تلقائياً.`);
         } catch (err) {
             alert(`حدث خطأ: ${err.message}`);
         }
@@ -156,7 +219,7 @@ export const StudentsTable = ({ students = [], onToggleSubscription, onRefresh }
                 alert('تم تحديث صلاحيات الوصول بنجاح.');
                 setIsAccessModalOpen(false);
                 setSelectedStudent(null);
-                if (onRefresh) onRefresh();
+                handleRefreshData();
             } else {
                 alert(`فشل التحديث: ${res.error}`);
             }
@@ -174,7 +237,7 @@ export const StudentsTable = ({ students = [], onToggleSubscription, onRefresh }
         }
     };
 
-    // Filter & Sort logic
+    // Filter & Sort registered students
     const filteredStudents = (students || []).filter(student => {
         const name = (student.studentName || '').toLowerCase();
         const email = (student.email || '').toLowerCase();
@@ -207,6 +270,50 @@ export const StudentsTable = ({ students = [], onToggleSubscription, onRefresh }
         if (sortBy === 'studentName') {
             valA = a.studentName || '';
             valB = b.studentName || '';
+        }
+        
+        if (sortOrder === 'asc') {
+            return valA.toString().localeCompare(valB.toString(), 'ar');
+        } else {
+            return valB.toString().localeCompare(valA.toString(), 'ar');
+        }
+    });
+
+    // Filter & Sort Invites
+    const filteredInvites = (invites || []).filter(invite => {
+        const name = (invite.name || '').toLowerCase();
+        const email = (invite.email || '').toLowerCase();
+        const term = searchTerm.toLowerCase();
+        
+        const matchesSearch = name.includes(term) || email.includes(term);
+        
+        let matchesStatus = true;
+        const status = invite.subscriptionStatus;
+        const plan = invite.subscriptionPlan;
+        
+        if (statusFilter === 'active') {
+            matchesStatus = status === 'active' && plan !== 'custom';
+        } else if (statusFilter === 'free') {
+            matchesStatus = status === 'free' && plan !== 'custom';
+        } else if (statusFilter === 'custom') {
+            matchesStatus = plan === 'custom' || status === 'custom';
+        } else if (statusFilter === 'disabled') {
+            matchesStatus = status === 'disabled';
+        }
+        
+        return matchesSearch && matchesStatus;
+    });
+
+    const sortedInvites = [...filteredInvites].sort((a, b) => {
+        let valA = a[sortBy] || '';
+        let valB = b[sortBy] || '';
+        
+        if (sortBy === 'studentName') {
+            valA = a.name || '';
+            valB = b.name || '';
+        } else if (sortBy === 'joinDate') {
+            valA = a.createdAt || '';
+            valB = b.createdAt || '';
         }
         
         if (sortOrder === 'asc') {
@@ -293,6 +400,50 @@ export const StudentsTable = ({ students = [], onToggleSubscription, onRefresh }
                 <h3 style={{ color: 'var(--secondary-color)', fontWeight: '800', margin: 0 }}>إدارة اشتراكات وصلاحيات الطلاب</h3>
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '4px 0 0 0' }}>ابحث، رتّب، وعطّل الحسابات، أو امنح صلاحيات مخصصة للمواد والدروس.</p>
             </div>
+
+            {/* Sub Tabs Bar */}
+            <div style={{
+                display: 'flex',
+                borderBottom: '1px solid var(--border-color)',
+                padding: '0 25px',
+                backgroundColor: '#FFFFFF',
+                gap: '15px'
+            }}>
+                <button
+                    onClick={() => { setActiveSubTab('registered'); setSearchTerm(''); }}
+                    style={{
+                        padding: '14px 15px',
+                        background: 'none',
+                        border: 'none',
+                        borderBottom: activeSubTab === 'registered' ? '3px solid var(--primary-color)' : '3px solid transparent',
+                        color: activeSubTab === 'registered' ? 'var(--primary-color)' : 'var(--text-muted)',
+                        fontWeight: '800',
+                        fontSize: '0.9rem',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                        outline: 'none'
+                    }}
+                >
+                    الطلاب المسجلون ({students.length})
+                </button>
+                <button
+                    onClick={() => { setActiveSubTab('invites'); setSearchTerm(''); }}
+                    style={{
+                        padding: '14px 15px',
+                        background: 'none',
+                        border: 'none',
+                        borderBottom: activeSubTab === 'invites' ? '3px solid var(--primary-color)' : '3px solid transparent',
+                        color: activeSubTab === 'invites' ? 'var(--primary-color)' : 'var(--text-muted)',
+                        fontWeight: '800',
+                        fontSize: '0.9rem',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                        outline: 'none'
+                    }}
+                >
+                    الدعوات المعلقة ({invites.filter(i => i.status === 'pending').length})
+                </button>
+            </div>
             
             {/* Control Panel (Search & Filters) */}
             <div style={{
@@ -309,7 +460,7 @@ export const StudentsTable = ({ students = [], onToggleSubscription, onRefresh }
                     <Search size={18} style={{ position: 'absolute', right: '12px', top: '12px', color: 'var(--text-muted)' }} />
                     <input
                         type="text"
-                        placeholder="ابحث عن طالب بالاسم أو الإيميل..."
+                        placeholder="ابحث عن اسم أو بريد إلكتروني..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         style={{
@@ -345,7 +496,7 @@ export const StudentsTable = ({ students = [], onToggleSubscription, onRefresh }
                             <option value="active">مشترك بالكامل</option>
                             <option value="free">تجريبي مجاني</option>
                             <option value="custom">صلاحيات مخصصة</option>
-                            <option value="disabled">حساب معطل</option>
+                            {activeSubTab === 'registered' && <option value="disabled">حساب معطل</option>}
                         </select>
                     </div>
 
@@ -380,351 +531,631 @@ export const StudentsTable = ({ students = [], onToggleSubscription, onRefresh }
                 </div>
             </div>
 
-            {/* Desktop Table View */}
-            <div className="desktop-students-view" style={{ overflowX: 'auto' }}>
-                <table style={{
-                    width: '100%',
-                    borderCollapse: 'collapse',
-                    textAlign: 'right',
-                    fontSize: '0.95rem'
-                }}>
-                    <thead>
-                        <tr style={{ backgroundColor: '#F8FAFC', borderBottom: '1px solid var(--border-color)' }}>
-                            {renderSortHeader('اسم الطالب', 'studentName')}
-                            {renderSortHeader('البريد الإلكتروني', 'email')}
-                            {renderSortHeader('تاريخ الانضمام', 'joinDate')}
-                            <th style={{ padding: '15px 20px', color: 'var(--text-muted)', fontWeight: '700' }}>حالة الاشتراك</th>
-                            <th style={{ padding: '15px 20px', color: 'var(--text-muted)', fontWeight: '700', textAlign: 'center' }}>التحكم وإدارة الحساب</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+            {/* REGISTERED STUDENTS SUB-TAB */}
+            {activeSubTab === 'registered' && (
+                <>
+                    {/* Desktop Table View */}
+                    <div className="desktop-students-view" style={{ overflowX: 'auto' }}>
+                        <table style={{
+                            width: '100%',
+                            borderCollapse: 'collapse',
+                            textAlign: 'right',
+                            fontSize: '0.95rem'
+                        }}>
+                            <thead>
+                                <tr style={{ backgroundColor: '#F8FAFC', borderBottom: '1px solid var(--border-color)' }}>
+                                    {renderSortHeader('اسم الطالب', 'studentName')}
+                                    {renderSortHeader('البريد الإلكتروني', 'email')}
+                                    {renderSortHeader('تاريخ الانضمام', 'joinDate')}
+                                    <th style={{ padding: '15px 20px', color: 'var(--text-muted)', fontWeight: '700' }}>حالة الاشتراك</th>
+                                    <th style={{ padding: '15px 20px', color: 'var(--text-muted)', fontWeight: '700', textAlign: 'center' }}>التحكم وإدارة الحساب</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {sortedStudents.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="5" style={{ textAlign: 'center', padding: '30px', color: 'var(--text-muted)' }}>
+                                            لم يتم العثور على طلاب مطابخين لخيارات البحث.
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    sortedStudents.map((student) => {
+                                        const label = subscriptionService.getSubscriptionLabel(student);
+                                        const isUserActive = student.isActive !== false;
+                                        return (
+                                            <tr key={student.email} style={{ borderBottom: '1px solid #EDF2F7', transition: 'var(--transition)' }} className="table-row-hover">
+                                                <td style={{ padding: '15px 20px', fontWeight: 'bold', color: 'var(--secondary-color)' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                        <User size={16} style={{ color: 'var(--text-muted)' }} />
+                                                        <span>{student.studentName}</span>
+                                                    </div>
+                                                </td>
+                                                <td style={{ padding: '15px 20px', color: 'var(--text-main)' }}>{student.email}</td>
+                                                <td style={{ padding: '15px 20px', color: 'var(--text-muted)' }}>{student.joinDate || '2026-06-01'}</td>
+                                                <td style={{ padding: '15px 20px' }}>
+                                                    <Badge type={!isUserActive ? 'danger' : (student.subscriptionPlan === 'custom' ? 'warning' : (student.subscriptionStatus === 'active' ? 'success' : 'primary'))}>
+                                                        {label}
+                                                    </Badge>
+                                                </td>
+                                                <td style={{ padding: '15px 20px', textAlign: 'center' }}>
+                                                    <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                                                        
+                                                        {/* Subscription Toggle */}
+                                                        <button 
+                                                            onClick={() => onToggleSubscription(
+                                                                student.email, 
+                                                                student.subscriptionStatus === 'active' ? 'free' : 'active'
+                                                            )}
+                                                            className={`btn ${student.subscriptionStatus === 'active' ? 'btn-outline' : 'btn-primary'}`}
+                                                            style={{ 
+                                                                padding: '6px 12px', 
+                                                                fontSize: '0.8rem', 
+                                                                borderRadius: 'var(--border-radius-sm)',
+                                                                display: 'inline-flex',
+                                                                alignItems: 'center',
+                                                                gap: '4px',
+                                                                borderWidth: '1px'
+                                                            }}
+                                                            title={student.subscriptionStatus === 'active' ? "التحويل للباقة المجانية" : "تفعيل باقة الوصول الكامل"}
+                                                        >
+                                                            {student.subscriptionStatus === 'active' ? <UserX size={13} /> : <UserCheck size={13} />}
+                                                            <span>{student.subscriptionStatus === 'active' ? 'تخفيض مجاني' : 'ترقية للكامل'}</span>
+                                                        </button>
+
+                                                        {/* Custom Access Dialog */}
+                                                        <button 
+                                                            onClick={() => {
+                                                                setSelectedStudent(student);
+                                                                setIsAccessModalOpen(true);
+                                                            }}
+                                                            className="btn btn-outline"
+                                                            style={{ 
+                                                                padding: '6px 12px', 
+                                                                fontSize: '0.8rem', 
+                                                                borderRadius: 'var(--border-radius-sm)',
+                                                                display: 'inline-flex',
+                                                                alignItems: 'center',
+                                                                gap: '4px',
+                                                                borderColor: 'var(--secondary-color)',
+                                                                color: 'var(--secondary-color)'
+                                                            }}
+                                                            title="إدارة الصلاحيات المخصصة"
+                                                        >
+                                                            <Settings size={13} />
+                                                            <span>الصلاحيات</span>
+                                                        </button>
+
+                                                        {/* Reset Password */}
+                                                        <button 
+                                                            onClick={() => handleResetPassword(student.email)}
+                                                            className="btn btn-outline"
+                                                            style={{ 
+                                                                padding: '6px 10px', 
+                                                                borderRadius: 'var(--border-radius-sm)',
+                                                                display: 'inline-flex',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center',
+                                                                color: '#64748B',
+                                                                borderColor: '#CBD5E1'
+                                                            }}
+                                                            title="إرسال رابط إعادة تعيين كلمة المرور"
+                                                        >
+                                                            <KeyRound size={13} />
+                                                        </button>
+
+                                                        {/* Account Block/Deactivate */}
+                                                        {isUserActive ? (
+                                                            <button 
+                                                                onClick={() => handleDisableStudent(student.uid, student.studentName)}
+                                                                className="btn btn-outline"
+                                                                style={{ 
+                                                                    padding: '6px 10px', 
+                                                                    borderRadius: 'var(--border-radius-sm)',
+                                                                    display: 'inline-flex',
+                                                                    alignItems: 'center',
+                                                                    justifyContent: 'center',
+                                                                    color: '#EF4444',
+                                                                    borderColor: '#FCA5A5'
+                                                                }}
+                                                                title="تعطيل وحظر الحساب الدراسي"
+                                                            >
+                                                                <UserX size={13} />
+                                                            </button>
+                                                        ) : (
+                                                            <button 
+                                                                onClick={() => onToggleSubscription(student.email, 'free')}
+                                                                className="btn btn-outline"
+                                                                style={{ 
+                                                                    padding: '6px 10px', 
+                                                                    borderRadius: 'var(--border-radius-sm)',
+                                                                    display: 'inline-flex',
+                                                                    alignItems: 'center',
+                                                                    justifyContent: 'center',
+                                                                    color: '#16A34A',
+                                                                    borderColor: '#86EFAC'
+                                                                }}
+                                                                title="تفعيل الحساب المعطل مجدداً"
+                                                            >
+                                                                <UserCheck size={13} />
+                                                            </button>
+                                                        )}
+
+                                                        {/* Permanent Delete */}
+                                                        <button 
+                                                            onClick={() => handleDeleteStudent(student)}
+                                                            className="btn btn-outline"
+                                                            style={{ 
+                                                                padding: '6px 10px', 
+                                                                borderRadius: 'var(--border-radius-sm)',
+                                                                display: 'inline-flex',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center',
+                                                                color: '#B91C1C',
+                                                                borderColor: '#FCA5A5'
+                                                            }}
+                                                            title="حذف الحساب نهائياً"
+                                                        >
+                                                            <Trash2 size={13} />
+                                                        </button>
+
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Mobile Cards View */}
+                    <div className="mobile-students-view" style={{ display: 'none', padding: '15px', flexDirection: 'column', gap: '15px' }}>
                         {sortedStudents.length === 0 ? (
-                            <tr>
-                                <td colSpan="5" style={{ textAlign: 'center', padding: '30px', color: 'var(--text-muted)' }}>
-                                    لم يتم العثور على طلاب مطابخين لخيارات البحث.
-                                </td>
-                            </tr>
+                            <div style={{ textAlign: 'center', padding: '30px', color: 'var(--text-muted)' }}>
+                                لم يتم العثور على طلاب مطابخين لخيارات البحث.
+                            </div>
                         ) : (
                             sortedStudents.map((student) => {
                                 const label = subscriptionService.getSubscriptionLabel(student);
                                 const isUserActive = student.isActive !== false;
                                 return (
-                                    <tr key={student.email} style={{ borderBottom: '1px solid #EDF2F7', transition: 'var(--transition)' }} className="table-row-hover">
-                                        <td style={{ padding: '15px 20px', fontWeight: 'bold', color: 'var(--secondary-color)' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                <User size={16} style={{ color: 'var(--text-muted)' }} />
-                                                <span>{student.studentName}</span>
+                                    <div key={student.email} style={{
+                                        backgroundColor: '#F8FAFC',
+                                        borderRadius: 'var(--border-radius-md)',
+                                        padding: '16px',
+                                        border: '1px solid var(--border-color)',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '12px'
+                                    }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '10px' }}>
+                                            <div>
+                                                <h4 style={{ color: 'var(--secondary-color)', fontWeight: '800', fontSize: '1rem', margin: 0 }}>
+                                                    {student.studentName}
+                                                </h4>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                                                    <Mail size={12} />
+                                                    <span style={{ wordBreak: 'break-all' }}>{student.email}</span>
+                                                </div>
                                             </div>
-                                        </td>
-                                        <td style={{ padding: '15px 20px', color: 'var(--text-main)' }}>{student.email}</td>
-                                        <td style={{ padding: '15px 20px', color: 'var(--text-muted)' }}>{student.joinDate || '2026-06-01'}</td>
-                                        <td style={{ padding: '15px 20px' }}>
                                             <Badge type={!isUserActive ? 'danger' : (student.subscriptionPlan === 'custom' ? 'warning' : (student.subscriptionStatus === 'active' ? 'success' : 'primary'))}>
-                                                {label}
+                                                {label.split(' ')[0]} {/* shortened for mobile */}
                                             </Badge>
-                                        </td>
-                                        <td style={{ padding: '15px 20px', textAlign: 'center' }}>
-                                            <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                                                
-                                                {/* Subscription Toggle */}
-                                                <button 
-                                                    onClick={() => onToggleSubscription(
-                                                        student.email, 
-                                                        student.subscriptionStatus === 'active' ? 'free' : 'active'
-                                                    )}
-                                                    className={`btn ${student.subscriptionStatus === 'active' ? 'btn-outline' : 'btn-primary'}`}
-                                                    style={{ 
-                                                        padding: '6px 12px', 
-                                                        fontSize: '0.8rem', 
-                                                        borderRadius: 'var(--border-radius-sm)',
-                                                        display: 'inline-flex',
-                                                        alignItems: 'center',
-                                                        gap: '4px',
-                                                        borderWidth: '1px'
-                                                    }}
-                                                    title={student.subscriptionStatus === 'active' ? "التحويل للباقة المجانية" : "تفعيل باقة الوصول الكامل"}
-                                                >
-                                                    {student.subscriptionStatus === 'active' ? <UserX size={13} /> : <UserCheck size={13} />}
-                                                    <span>{student.subscriptionStatus === 'active' ? 'تخفيض مجاني' : 'ترقية للكامل'}</span>
-                                                </button>
+                                        </div>
+                                        
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--text-muted)', borderTop: '1px dashed var(--border-color)', paddingTop: '10px' }}>
+                                            <Calendar size={12} />
+                                            <span>انضم في: {student.joinDate || '2026-06-01'}</span>
+                                        </div>
+                                        
+                                        {/* Action Buttons Grid on Mobile */}
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '4px' }}>
+                                            {/* Upgrade / Downgrade */}
+                                            <button 
+                                                onClick={() => onToggleSubscription(
+                                                    student.email, 
+                                                    student.subscriptionStatus === 'active' ? 'free' : 'active'
+                                                )}
+                                                className={`btn ${student.subscriptionStatus === 'active' ? 'btn-outline' : 'btn-primary'}`}
+                                                style={{ 
+                                                    padding: '8px', 
+                                                    fontSize: '0.8rem', 
+                                                    borderRadius: 'var(--border-radius-sm)',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    gap: '4px',
+                                                    borderWidth: '1px'
+                                                }}
+                                            >
+                                                {student.subscriptionStatus === 'active' ? <UserX size={14} /> : <UserCheck size={14} />}
+                                                <span>{student.subscriptionStatus === 'active' ? 'تخفيض مجاني' : 'ترقية كاملة'}</span>
+                                            </button>
 
-                                                {/* Custom Access Dialog */}
-                                                <button 
-                                                    onClick={() => {
-                                                        setSelectedStudent(student);
-                                                        setIsAccessModalOpen(true);
-                                                    }}
-                                                    className="btn btn-outline"
-                                                    style={{ 
-                                                        padding: '6px 12px', 
-                                                        fontSize: '0.8rem', 
-                                                        borderRadius: 'var(--border-radius-sm)',
-                                                        display: 'inline-flex',
-                                                        alignItems: 'center',
-                                                        gap: '4px',
-                                                        borderColor: 'var(--secondary-color)',
-                                                        color: 'var(--secondary-color)'
-                                                    }}
-                                                    title="إدارة الصلاحيات المخصصة"
-                                                >
-                                                    <Settings size={13} />
-                                                    <span>الصلاحيات</span>
-                                                </button>
+                                            {/* Permissions Modal trigger */}
+                                            <button 
+                                                onClick={() => {
+                                                    setSelectedStudent(student);
+                                                    setIsAccessModalOpen(true);
+                                                }}
+                                                className="btn btn-outline"
+                                                style={{ 
+                                                    padding: '8px', 
+                                                    fontSize: '0.8rem', 
+                                                    borderRadius: 'var(--border-radius-sm)',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    gap: '4px',
+                                                    borderColor: 'var(--secondary-color)',
+                                                    color: 'var(--secondary-color)'
+                                                }}
+                                            >
+                                                <Settings size={14} />
+                                                <span>تعديل الصلاحيات</span>
+                                            </button>
 
-                                                {/* Reset Password */}
-                                                <button 
-                                                    onClick={() => handleResetPassword(student.email)}
-                                                    className="btn btn-outline"
-                                                    style={{ 
-                                                        padding: '6px 10px', 
-                                                        borderRadius: 'var(--border-radius-sm)',
-                                                        display: 'inline-flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        color: '#64748B',
-                                                        borderColor: '#CBD5E1'
-                                                    }}
-                                                    title="إرسال رابط إعادة تعيين كلمة المرور"
-                                                >
-                                                    <KeyRound size={13} />
-                                                </button>
+                                            {/* Reset Password */}
+                                            <button 
+                                                onClick={() => handleResetPassword(student.email)}
+                                                className="btn btn-outline"
+                                                style={{ 
+                                                    padding: '8px', 
+                                                    fontSize: '0.8rem',
+                                                    borderRadius: 'var(--border-radius-sm)',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    gap: '4px',
+                                                    color: '#64748B',
+                                                    borderColor: '#CBD5E1'
+                                                }}
+                                            >
+                                                <KeyRound size={14} />
+                                                <span>كلمة المرور</span>
+                                            </button>
 
-                                                {/* Account Block/Deactivate */}
+                                            {/* Disable / Block / Delete options */}
+                                            <div style={{ display: 'flex', gap: '4px' }}>
                                                 {isUserActive ? (
                                                     <button 
                                                         onClick={() => handleDisableStudent(student.uid, student.studentName)}
                                                         className="btn btn-outline"
                                                         style={{ 
-                                                            padding: '6px 10px', 
+                                                            flex: '1',
+                                                            padding: '8px', 
                                                             borderRadius: 'var(--border-radius-sm)',
-                                                            display: 'inline-flex',
+                                                            display: 'flex',
                                                             alignItems: 'center',
                                                             justifyContent: 'center',
                                                             color: '#EF4444',
                                                             borderColor: '#FCA5A5'
                                                         }}
-                                                        title="تعطيل وحظر الحساب الدراسي"
+                                                        title="حظر الحساب"
                                                     >
-                                                        <UserX size={13} />
+                                                        <UserX size={14} />
                                                     </button>
                                                 ) : (
                                                     <button 
                                                         onClick={() => onToggleSubscription(student.email, 'free')}
                                                         className="btn btn-outline"
                                                         style={{ 
-                                                            padding: '6px 10px', 
+                                                            flex: '1',
+                                                            padding: '8px', 
                                                             borderRadius: 'var(--border-radius-sm)',
-                                                            display: 'inline-flex',
+                                                            display: 'flex',
                                                             alignItems: 'center',
                                                             justifyContent: 'center',
                                                             color: '#16A34A',
                                                             borderColor: '#86EFAC'
                                                         }}
-                                                        title="تفعيل الحساب المعطل مجدداً"
+                                                        title="إعادة التفعيل"
                                                     >
-                                                        <UserCheck size={13} />
+                                                        <UserCheck size={14} />
                                                     </button>
                                                 )}
 
-                                                {/* Permanent Delete */}
                                                 <button 
                                                     onClick={() => handleDeleteStudent(student)}
                                                     className="btn btn-outline"
                                                     style={{ 
-                                                        padding: '6px 10px', 
+                                                        flex: '1',
+                                                        padding: '8px', 
                                                         borderRadius: 'var(--border-radius-sm)',
-                                                        display: 'inline-flex',
+                                                        display: 'flex',
                                                         alignItems: 'center',
                                                         justifyContent: 'center',
                                                         color: '#B91C1C',
                                                         borderColor: '#FCA5A5'
                                                     }}
-                                                    title="حذف الحساب نهائياً"
+                                                    title="حذف نهائي"
                                                 >
-                                                    <Trash2 size={13} />
+                                                    <Trash2 size={14} />
                                                 </button>
-
                                             </div>
-                                        </td>
-                                    </tr>
+                                        </div>
+                                    </div>
                                 );
                             })
                         )}
-                    </tbody>
-                </table>
-            </div>
-
-            {/* Mobile Cards View */}
-            <div className="mobile-students-view" style={{ display: 'none', padding: '15px', flexDirection: 'column', gap: '15px' }}>
-                {sortedStudents.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '30px', color: 'var(--text-muted)' }}>
-                        لم يتم العثور على طلاب مطابخين لخيارات البحث.
                     </div>
-                ) : (
-                    sortedStudents.map((student) => {
-                        const label = subscriptionService.getSubscriptionLabel(student);
-                        const isUserActive = student.isActive !== false;
-                        return (
-                            <div key={student.email} style={{
-                                backgroundColor: '#F8FAFC',
-                                borderRadius: 'var(--border-radius-md)',
-                                padding: '16px',
-                                border: '1px solid var(--border-color)',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: '12px'
-                            }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '10px' }}>
-                                    <div>
-                                        <h4 style={{ color: 'var(--secondary-color)', fontWeight: '800', fontSize: '1rem', margin: 0 }}>
-                                            {student.studentName}
-                                        </h4>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                                            <Mail size={12} />
-                                            <span style={{ wordBreak: 'break-all' }}>{student.email}</span>
-                                        </div>
-                                    </div>
-                                    <Badge type={!isUserActive ? 'danger' : (student.subscriptionPlan === 'custom' ? 'warning' : (student.subscriptionStatus === 'active' ? 'success' : 'primary'))}>
-                                        {label.split(' ')[0]} {/* shortened for mobile */}
-                                    </Badge>
-                                </div>
-                                
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--text-muted)', borderTop: '1px dashed var(--border-color)', paddingTop: '10px' }}>
-                                    <Calendar size={12} />
-                                    <span>انضم في: {student.joinDate || '2026-06-01'}</span>
-                                </div>
-                                
-                                {/* Action Buttons Grid on Mobile */}
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '4px' }}>
-                                    {/* Upgrade / Downgrade */}
-                                    <button 
-                                        onClick={() => onToggleSubscription(
-                                            student.email, 
-                                            student.subscriptionStatus === 'active' ? 'free' : 'active'
-                                        )}
-                                        className={`btn ${student.subscriptionStatus === 'active' ? 'btn-outline' : 'btn-primary'}`}
-                                        style={{ 
-                                            padding: '8px', 
-                                            fontSize: '0.8rem', 
-                                            borderRadius: 'var(--border-radius-sm)',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            gap: '4px',
-                                            borderWidth: '1px'
-                                        }}
-                                    >
-                                        {student.subscriptionStatus === 'active' ? <UserX size={14} /> : <UserCheck size={14} />}
-                                        <span>{student.subscriptionStatus === 'active' ? 'تخفيض مجاني' : 'ترقية كاملة'}</span>
-                                    </button>
+                </>
+            )}
 
-                                    {/* Permissions Modal trigger */}
-                                    <button 
-                                        onClick={() => {
-                                            setSelectedStudent(student);
-                                            setIsAccessModalOpen(true);
-                                        }}
-                                        className="btn btn-outline"
-                                        style={{ 
-                                            padding: '8px', 
-                                            fontSize: '0.8rem', 
-                                            borderRadius: 'var(--border-radius-sm)',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            gap: '4px',
-                                            borderColor: 'var(--secondary-color)',
-                                            color: 'var(--secondary-color)'
-                                        }}
-                                    >
-                                        <Settings size={14} />
-                                        <span>تعديل الصلاحيات</span>
-                                    </button>
+            {/* STUDENT INVITATIONS SUB-TAB */}
+            {activeSubTab === 'invites' && (
+                <>
+                    {/* Desktop Table View */}
+                    <div className="desktop-students-view" style={{ overflowX: 'auto' }}>
+                        <table style={{
+                            width: '100%',
+                            borderCollapse: 'collapse',
+                            textAlign: 'right',
+                            fontSize: '0.95rem'
+                        }}>
+                            <thead>
+                                <tr style={{ backgroundColor: '#F8FAFC', borderBottom: '1px solid var(--border-color)' }}>
+                                    {renderSortHeader('اسم الطالب', 'studentName')}
+                                    {renderSortHeader('البريد الإلكتروني', 'email')}
+                                    {renderSortHeader('رقم الهاتف', 'phone')}
+                                    <th style={{ padding: '15px 20px', color: 'var(--text-muted)', fontWeight: '700' }}>الباقة المحددة</th>
+                                    <th style={{ padding: '15px 20px', color: 'var(--text-muted)', fontWeight: '700' }}>الحالة</th>
+                                    <th style={{ padding: '15px 20px', color: 'var(--text-muted)', fontWeight: '700', textAlign: 'center' }}>التحكم وإرسال الدعوة</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {loadingInvites ? (
+                                    <tr>
+                                        <td colSpan="6" style={{ textAlign: 'center', padding: '30px' }}>
+                                            <RefreshCw size={24} className="spin-animation" style={{ color: 'var(--primary-color)', margin: 'auto' }} />
+                                        </td>
+                                    </tr>
+                                ) : sortedInvites.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="6" style={{ textAlign: 'center', padding: '30px', color: 'var(--text-muted)' }}>
+                                            لا توجد دعوات معلقة مطابقة لخيارات البحث.
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    sortedInvites.map((invite) => {
+                                        let planLabel = 'تجريبي مجاني';
+                                        if (invite.subscriptionStatus === 'active') planLabel = 'مشترك بالكامل';
+                                        else if (invite.subscriptionPlan === 'custom') planLabel = 'صلاحيات مخصصة';
+                                        
+                                        return (
+                                            <tr key={invite.email} style={{ borderBottom: '1px solid #EDF2F7', transition: 'var(--transition)' }} className="table-row-hover">
+                                                <td style={{ padding: '15px 20px', fontWeight: 'bold', color: 'var(--secondary-color)' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                        <User size={16} style={{ color: 'var(--text-muted)' }} />
+                                                        <span>{invite.name}</span>
+                                                    </div>
+                                                </td>
+                                                <td style={{ padding: '15px 20px', color: 'var(--text-main)' }}>{invite.email}</td>
+                                                <td style={{ padding: '15px 20px', color: 'var(--text-muted)' }}>{invite.phone || '—'}</td>
+                                                <td style={{ padding: '15px 20px' }}>
+                                                    <Badge type={invite.subscriptionPlan === 'custom' ? 'warning' : (invite.subscriptionStatus === 'active' ? 'success' : 'primary')}>
+                                                        {planLabel}
+                                                    </Badge>
+                                                </td>
+                                                <td style={{ padding: '15px 20px' }}>
+                                                    <Badge type={invite.status === 'accepted' ? 'success' : (invite.status === 'cancelled' ? 'neutral' : 'warning')}>
+                                                        {invite.status === 'accepted' ? 'مقبولة' : (invite.status === 'cancelled' ? 'ملغاة' : 'معلقة (قيد الانتظار)')}
+                                                    </Badge>
+                                                </td>
+                                                <td style={{ padding: '15px 20px', textAlign: 'center' }}>
+                                                    <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                                                        {invite.status === 'pending' && (
+                                                            <>
+                                                                {/* Custom Access Dialog */}
+                                                                <button 
+                                                                    onClick={() => {
+                                                                        setSelectedStudent({
+                                                                            uid: invite.id,
+                                                                            studentName: invite.name,
+                                                                            email: invite.email,
+                                                                            access: invite.access
+                                                                        });
+                                                                        setIsAccessModalOpen(true);
+                                                                    }}
+                                                                    className="btn btn-outline"
+                                                                    style={{ 
+                                                                        padding: '6px 12px', 
+                                                                        fontSize: '0.8rem', 
+                                                                        borderRadius: 'var(--border-radius-sm)',
+                                                                        display: 'inline-flex',
+                                                                        alignItems: 'center',
+                                                                        gap: '4px',
+                                                                        borderColor: 'var(--secondary-color)',
+                                                                        color: 'var(--secondary-color)'
+                                                                    }}
+                                                                    title="تعديل الصلاحيات المحددة مسبقاً للدعوة"
+                                                                >
+                                                                    <Settings size={13} />
+                                                                    <span>تعديل الصلاحيات</span>
+                                                                </button>
 
-                                    {/* Reset Password */}
-                                    <button 
-                                        onClick={() => handleResetPassword(student.email)}
-                                        className="btn btn-outline"
-                                        style={{ 
-                                            padding: '8px', 
-                                            fontSize: '0.8rem',
-                                            borderRadius: 'var(--border-radius-sm)',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            gap: '4px',
-                                            color: '#64748B',
-                                            borderColor: '#CBD5E1'
-                                        }}
-                                    >
-                                        <KeyRound size={14} />
-                                        <span>كلمة المرور</span>
-                                    </button>
+                                                                {/* Send Registration Instructions */}
+                                                                <button 
+                                                                    onClick={() => handleSendInviteInstructions(invite)}
+                                                                    className="btn btn-primary"
+                                                                    style={{ 
+                                                                        padding: '6px 12px', 
+                                                                        fontSize: '0.8rem', 
+                                                                        borderRadius: 'var(--border-radius-sm)',
+                                                                        display: 'inline-flex',
+                                                                        alignItems: 'center',
+                                                                        gap: '4px',
+                                                                    }}
+                                                                    title="إرسال رابط للتسجيل وإعادة التعيين"
+                                                                >
+                                                                    <Send size={13} />
+                                                                    <span>إرسال الرابط</span>
+                                                                </button>
 
-                                    {/* Disable / Block / Delete options */}
-                                    <div style={{ display: 'flex', gap: '4px' }}>
-                                        {isUserActive ? (
-                                            <button 
-                                                onClick={() => handleDisableStudent(student.uid, student.studentName)}
-                                                className="btn btn-outline"
-                                                style={{ 
-                                                    flex: '1',
-                                                    padding: '8px', 
-                                                    borderRadius: 'var(--border-radius-sm)',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    color: '#EF4444',
-                                                    borderColor: '#FCA5A5'
-                                                }}
-                                                title="حظر الحساب"
-                                            >
-                                                <UserX size={14} />
-                                            </button>
-                                        ) : (
-                                            <button 
-                                                onClick={() => onToggleSubscription(student.email, 'free')}
-                                                className="btn btn-outline"
-                                                style={{ 
-                                                    flex: '1',
-                                                    padding: '8px', 
-                                                    borderRadius: 'var(--border-radius-sm)',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    color: '#16A34A',
-                                                    borderColor: '#86EFAC'
-                                                }}
-                                                title="إعادة التفعيل"
-                                            >
-                                                <UserCheck size={14} />
-                                            </button>
-                                        )}
+                                                                {/* Cancel Invite */}
+                                                                <button 
+                                                                    onClick={() => handleCancelInvite(invite.email)}
+                                                                    className="btn btn-outline"
+                                                                    style={{ 
+                                                                        padding: '6px 12px', 
+                                                                        fontSize: '0.8rem',
+                                                                        borderRadius: 'var(--border-radius-sm)',
+                                                                        color: '#EF4444',
+                                                                        borderColor: '#FCA5A5'
+                                                                    }}
+                                                                    title="إلغاء وتجميد الدعوة"
+                                                                >
+                                                                    <UserX size={13} />
+                                                                    <span>إلغاء</span>
+                                                                </button>
+                                                            </>
+                                                        )}
+                                                        {invite.status !== 'pending' && (
+                                                            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>مكتملة</span>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
 
-                                        <button 
-                                            onClick={() => handleDeleteStudent(student)}
-                                            className="btn btn-outline"
-                                            style={{ 
-                                                flex: '1',
-                                                padding: '8px', 
-                                                borderRadius: 'var(--border-radius-sm)',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                color: '#B91C1C',
-                                                borderColor: '#FCA5A5'
-                                            }}
-                                            title="حذف نهائي"
-                                        >
-                                            <Trash2 size={14} />
-                                        </button>
-                                    </div>
-                                </div>
+                    {/* Mobile Cards View */}
+                    <div className="mobile-students-view" style={{ display: 'none', padding: '15px', flexDirection: 'column', gap: '15px' }}>
+                        {loadingInvites ? (
+                            <div style={{ display: 'flex', justifyContent: 'center', padding: '30px' }}>
+                                <RefreshCw size={24} className="spin-animation" style={{ color: 'var(--primary-color)' }} />
                             </div>
-                        );
-                    })
-                )}
-            </div>
+                        ) : sortedInvites.length === 0 ? (
+                            <div style={{ textAlign: 'center', padding: '30px', color: 'var(--text-muted)' }}>
+                                لا توجد دعوات معلقة مطابقة لخيارات البحث.
+                            </div>
+                        ) : (
+                            sortedInvites.map((invite) => {
+                                let planLabel = 'مجاني';
+                                if (invite.subscriptionStatus === 'active') planLabel = 'مشترك';
+                                else if (invite.subscriptionPlan === 'custom') planLabel = 'مخصص';
+                                
+                                return (
+                                    <div key={invite.email} style={{
+                                        backgroundColor: '#F8FAFC',
+                                        borderRadius: 'var(--border-radius-md)',
+                                        padding: '16px',
+                                        border: '1px solid var(--border-color)',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '12px'
+                                    }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '10px' }}>
+                                            <div>
+                                                <h4 style={{ color: 'var(--secondary-color)', fontWeight: '800', fontSize: '1rem', margin: 0 }}>
+                                                    {invite.name}
+                                                </h4>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                                                    <Mail size={12} />
+                                                    <span style={{ wordBreak: 'break-all' }}>{invite.email}</span>
+                                                </div>
+                                                {invite.phone && (
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                                                        <Phone size={12} />
+                                                        <span>{invite.phone}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-end' }}>
+                                                <Badge type={invite.status === 'accepted' ? 'success' : (invite.status === 'cancelled' ? 'neutral' : 'warning')}>
+                                                    {invite.status === 'accepted' ? 'مقبولة' : (invite.status === 'cancelled' ? 'ملغاة' : 'معلقة')}
+                                                </Badge>
+                                                <Badge type={invite.subscriptionPlan === 'custom' ? 'warning' : (invite.subscriptionStatus === 'active' ? 'success' : 'primary')}>
+                                                    {planLabel}
+                                                </Badge>
+                                            </div>
+                                        </div>
+                                        
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--text-muted)', borderTop: '1px dashed var(--border-color)', paddingTop: '10px' }}>
+                                            <Calendar size={12} />
+                                            <span>أرسلت في: {(invite.createdAt || '2026-06-01').split('T')[0]}</span>
+                                        </div>
+
+                                        {invite.status === 'pending' && (
+                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '6px', marginTop: '4px' }}>
+                                                {/* Manage Access */}
+                                                <button 
+                                                    onClick={() => {
+                                                        setSelectedStudent({
+                                                            uid: invite.id,
+                                                            studentName: invite.name,
+                                                            email: invite.email,
+                                                            access: invite.access
+                                                        });
+                                                        setIsAccessModalOpen(true);
+                                                    }}
+                                                    className="btn btn-outline"
+                                                    style={{ 
+                                                        padding: '8px 4px', 
+                                                        fontSize: '0.75rem', 
+                                                        borderRadius: 'var(--border-radius-sm)',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        gap: '2px',
+                                                        borderColor: 'var(--secondary-color)',
+                                                        color: 'var(--secondary-color)'
+                                                    }}
+                                                >
+                                                    <Settings size={12} />
+                                                    <span>الصلاحيات</span>
+                                                </button>
+
+                                                {/* Send registration instructions */}
+                                                <button 
+                                                    onClick={() => handleSendInviteInstructions(invite)}
+                                                    className="btn btn-primary"
+                                                    style={{ 
+                                                        padding: '8px 4px', 
+                                                        fontSize: '0.75rem', 
+                                                        borderRadius: 'var(--border-radius-sm)',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        gap: '2px',
+                                                    }}
+                                                >
+                                                    <Send size={12} />
+                                                    <span>رابط الدعوة</span>
+                                                </button>
+
+                                                {/* Cancel Invite */}
+                                                <button 
+                                                    onClick={() => handleCancelInvite(invite.email)}
+                                                    className="btn btn-outline"
+                                                    style={{ 
+                                                        padding: '8px 4px', 
+                                                        fontSize: '0.75rem', 
+                                                        borderRadius: 'var(--border-radius-sm)',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        gap: '2px',
+                                                        color: '#EF4444',
+                                                        borderColor: '#FCA5A5'
+                                                    }}
+                                                >
+                                                    <UserX size={12} />
+                                                    <span>إلغاء</span>
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })
+                        )}
+                    </div>
+                </>
+            )}
 
             {/* ACCESS CONTROL MODAL (إدارة صلاحيات الوصول المخصصة) */}
             {isAccessModalOpen && selectedStudent && (

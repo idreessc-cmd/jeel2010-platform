@@ -122,27 +122,42 @@ export const authService = {
             }
         } else {
             const students = initializeStudents();
-            if (students.some(s => s.email === email)) {
+            if (students.some(s => s.email.toLowerCase() === email.trim().toLowerCase())) {
                 return { success: false, error: 'هذا البريد الإلكتروني مستخدم بالفعل، يمكنك تسجيل الدخول أو إعادة تعيين كلمة المرور.' };
             }
             
+            const normalizedEmail = email.trim().toLowerCase();
+            const invites = authService.getMockInvites();
+            const invite = invites.find(inv => inv.email.toLowerCase() === normalizedEmail && inv.status === 'pending');
+            
             const newStudent = {
-                studentName: name,
+                studentName: invite ? invite.name : name,
                 email: email,
                 password: password,
                 role: 'student',
-                subscriptionStatus: 'free',
+                subscriptionStatus: invite ? invite.subscriptionStatus : 'free',
+                subscriptionPlan: invite ? invite.subscriptionPlan : 'free',
+                isActive: true,
+                access: invite ? invite.access : { subjects: [], units: [], lessons: [], quizzes: [] },
                 joinDate: new Date().toISOString().split('T')[0]
             };
             students.push(newStudent);
             storage.set(STUDENTS_LIST_KEY, students);
             
+            if (invite) {
+                invite.status = 'accepted';
+                invite.acceptedByUid = `mock_${email}`;
+                invite.acceptedAt = new Date().toISOString();
+                invite.updatedAt = new Date().toISOString();
+                storage.set('jeel2010_student_invites', invites);
+            }
+            
             const userSession = {
                 uid: `mock_${email}`,
-                studentName: name,
+                studentName: newStudent.studentName,
                 email: email,
                 role: 'student',
-                subscriptionStatus: 'free'
+                subscriptionStatus: newStudent.subscriptionStatus
             };
             storage.set(CURRENT_USER_KEY, userSession);
             return { success: true, user: userSession };
@@ -221,20 +236,69 @@ export const authService = {
         
         if (!userDoc.exists()) {
             const now = new Date().toISOString();
-            const profile = {
-                uid: firebaseUser.uid,
-                name: extraData?.name || firebaseUser.displayName || 'طالب جديد',
-                email: firebaseUser.email,
-                phone: extraData?.phone || '',
-                role: 'student', // Strictly hardcoded student role
-                subscriptionStatus: 'free',
-                subscriptionPlan: 'free',
-                isActive: true,
-                joinedVipGroups: false,
-                createdAt: now,
-                updatedAt: now
-            };
-            await setDoc(userDocRef, profile);
+            const email = firebaseUser.email || '';
+            const normalizedEmail = email.trim().toLowerCase();
+            
+            // Check for pending student invitation
+            let invite = null;
+            try {
+                const inviteDocRef = doc(db, 'studentInvites', normalizedEmail);
+                const inviteDoc = await getDoc(inviteDocRef);
+                if (inviteDoc.exists() && inviteDoc.data().status === 'pending') {
+                    invite = inviteDoc.data();
+                }
+            } catch (err) {
+                console.error("Error checking student invites:", err);
+            }
+            
+            let profile;
+            if (invite) {
+                profile = {
+                    uid: firebaseUser.uid,
+                    name: invite.name || extraData?.name || 'طالب جديد',
+                    email: email,
+                    phone: invite.phone || extraData?.phone || '',
+                    role: 'student',
+                    subscriptionStatus: invite.subscriptionStatus || 'free',
+                    subscriptionPlan: invite.subscriptionPlan || 'free',
+                    isActive: true,
+                    joinedVipGroups: false,
+                    access: invite.access || { subjects: [], units: [], lessons: [], quizzes: [] },
+                    createdAt: now,
+                    updatedAt: now
+                };
+                
+                await setDoc(userDocRef, profile);
+                
+                // Update invitation status
+                try {
+                    const inviteDocRef = doc(db, 'studentInvites', normalizedEmail);
+                    await updateDoc(inviteDocRef, {
+                        status: 'accepted',
+                        acceptedByUid: firebaseUser.uid,
+                        acceptedAt: now,
+                        updatedAt: now
+                    });
+                } catch (err) {
+                    console.error("Error updating accepted invite:", err);
+                }
+            } else {
+                profile = {
+                    uid: firebaseUser.uid,
+                    name: extraData?.name || firebaseUser.displayName || 'طالب جديد',
+                    email: email,
+                    phone: extraData?.phone || '',
+                    role: 'student',
+                    subscriptionStatus: 'free',
+                    subscriptionPlan: 'free',
+                    isActive: true,
+                    joinedVipGroups: false,
+                    access: { subjects: [], units: [], lessons: [], quizzes: [] },
+                    createdAt: now,
+                    updatedAt: now
+                };
+                await setDoc(userDocRef, profile);
+            }
             return profile;
         }
         return userDoc.data();
@@ -322,6 +386,8 @@ export const authService = {
     },
     
     addStudentManual: async (student) => {
+        const normalizedEmail = student.email.trim().toLowerCase();
+        
         if (isFirebaseEnabled) {
             try {
                 const q = query(collection(db, 'users'), where('email', '==', student.email));
@@ -339,66 +405,88 @@ export const authService = {
                         isActive: true,
                         updatedAt: new Date().toISOString()
                     };
+                    if (student.access) {
+                        updateData.access = student.access;
+                    }
                     await updateDoc(docRef, updateData);
                     return { success: true, exists: true, uid: docId };
                 }
                 
-                const tempId = `temp_${Date.now()}`;
-                const newDocRef = doc(db, 'users', tempId);
-                const profile = {
-                    uid: tempId,
+                // Student does not exist in users collection. Create invitation.
+                const inviteRef = doc(db, 'studentInvites', normalizedEmail);
+                const inviteData = {
+                    id: normalizedEmail,
                     name: student.studentName,
                     email: student.email,
                     phone: student.phone || '',
-                    role: student.role || 'student',
+                    status: 'pending',
                     subscriptionStatus: student.subscriptionStatus || 'free',
                     subscriptionPlan: student.subscriptionStatus === 'active' ? 'full' : (student.subscriptionStatus === 'custom' ? 'custom' : 'free'),
-                    isActive: true,
-                    joinedVipGroups: false,
                     access: student.access || { subjects: [], units: [], lessons: [], quizzes: [] },
+                    createdBy: auth.currentUser ? auth.currentUser.uid : 'admin',
                     createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString()
+                    updatedAt: new Date().toISOString(),
+                    acceptedByUid: "",
+                    acceptedAt: null,
+                    note: ""
                 };
-                await setDoc(newDocRef, profile);
-                return { success: true, exists: false, uid: tempId };
+                await setDoc(inviteRef, inviteData, { merge: true });
+                return { success: true, exists: false, uid: normalizedEmail };
             } catch (error) {
                 return { success: false, error: error.message };
             }
         } else {
             const students = initializeStudents();
-            const existing = students.find(s => s.email === student.email);
+            const existing = students.find(s => s.email.toLowerCase() === normalizedEmail);
             if (existing) {
                 existing.studentName = student.studentName;
                 existing.phone = student.phone || '';
                 existing.subscriptionStatus = student.subscriptionStatus || 'free';
                 existing.subscriptionPlan = student.subscriptionStatus === 'active' ? 'full' : (student.subscriptionStatus === 'custom' ? 'custom' : 'free');
                 existing.isActive = true;
+                if (student.access) {
+                    existing.access = student.access;
+                }
                 storage.set(STUDENTS_LIST_KEY, students);
                 return { success: true, exists: true, uid: `mock_${student.email}` };
             }
-            students.push({
+            
+            // Create mock invitation
+            const invites = authService.getMockInvites();
+            const existingInviteIndex = invites.findIndex(inv => inv.email.toLowerCase() === normalizedEmail);
+            const inviteData = {
+                id: normalizedEmail,
+                name: student.studentName,
                 email: student.email,
-                password: student.password || '123',
-                studentName: student.studentName,
                 phone: student.phone || '',
-                role: student.role || 'student',
+                status: 'pending',
                 subscriptionStatus: student.subscriptionStatus || 'free',
                 subscriptionPlan: student.subscriptionStatus === 'active' ? 'full' : (student.subscriptionStatus === 'custom' ? 'custom' : 'free'),
-                isActive: true,
                 access: student.access || { subjects: [], units: [], lessons: [], quizzes: [] },
-                joinDate: new Date().toISOString().split('T')[0]
-            });
-            storage.set(STUDENTS_LIST_KEY, students);
-            return { success: true, exists: false, uid: `mock_${student.email}` };
+                createdBy: 'mock_admin',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                acceptedByUid: "",
+                acceptedAt: null,
+                note: ""
+            };
+            if (existingInviteIndex !== -1) {
+                invites[existingInviteIndex] = inviteData;
+            } else {
+                invites.push(inviteData);
+            }
+            storage.set('jeel2010_student_invites', invites);
+            return { success: true, exists: false, uid: normalizedEmail };
         }
     },
 
     updateStudentAccess: async (uid, access) => {
+        const hasCustom = (access.subjects?.length || 0) > 0 || (access.units?.length || 0) > 0 || (access.lessons?.length || 0) > 0 || (access.quizzes?.length || 0) > 0;
+        const isInvite = uid.includes('@');
+
         if (isFirebaseEnabled) {
             try {
-                const docRef = doc(db, 'users', uid);
-                const hasCustom = (access.subjects?.length || 0) > 0 || (access.units?.length || 0) > 0 || (access.lessons?.length || 0) > 0 || (access.quizzes?.length || 0) > 0;
-                
+                const docRef = isInvite ? doc(db, 'studentInvites', uid) : doc(db, 'users', uid);
                 await updateDoc(docRef, {
                     access: access,
                     subscriptionPlan: hasCustom ? 'custom' : 'free',
@@ -409,17 +497,27 @@ export const authService = {
                 return { success: false, error: error.message };
             }
         } else {
-            const students = initializeStudents();
-            const email = uid.replace('mock_', '');
-            const index = students.findIndex(s => s.email === email);
-            if (index !== -1) {
-                students[index].access = access;
-                const hasCustom = (access.subjects?.length || 0) > 0 || (access.units?.length || 0) > 0 || (access.lessons?.length || 0) > 0 || (access.quizzes?.length || 0) > 0;
-                students[index].subscriptionPlan = hasCustom ? 'custom' : 'free';
-                storage.set(STUDENTS_LIST_KEY, students);
-                return { success: true };
+            if (isInvite) {
+                const invites = authService.getMockInvites();
+                const invite = invites.find(inv => inv.email.toLowerCase() === uid.toLowerCase());
+                if (invite) {
+                    invite.access = access;
+                    invite.subscriptionPlan = hasCustom ? 'custom' : 'free';
+                    storage.set('jeel2010_student_invites', invites);
+                    return { success: true };
+                }
+            } else {
+                const students = initializeStudents();
+                const email = uid.replace('mock_', '');
+                const index = students.findIndex(s => s.email === email);
+                if (index !== -1) {
+                    students[index].access = access;
+                    students[index].subscriptionPlan = hasCustom ? 'custom' : 'free';
+                    storage.set(STUDENTS_LIST_KEY, students);
+                    return { success: true };
+                }
             }
-            return { success: false, error: 'الطالب غير موجود' };
+            return { success: false, error: 'المستهدف غير موجود' };
         }
     },
 
@@ -468,6 +566,59 @@ export const authService = {
                 return { success: true };
             }
             return { success: false, error: 'الطالب غير موجود' };
+        }
+    },
+
+    getMockInvites: () => {
+        let invites = storage.get('jeel2010_student_invites');
+        if (!invites) {
+            invites = [];
+            storage.set('jeel2010_student_invites', invites);
+        }
+        return invites;
+    },
+
+    getInvites: async () => {
+        if (isFirebaseEnabled) {
+            try {
+                const querySnapshot = await getDocs(collection(db, 'studentInvites'));
+                const list = [];
+                querySnapshot.forEach((doc) => {
+                    list.push({ id: doc.id, ...doc.data() });
+                });
+                return list;
+            } catch (error) {
+                console.error("Firebase getInvites error:", error);
+                return authService.getMockInvites();
+            }
+        } else {
+            return authService.getMockInvites();
+        }
+    },
+
+    cancelInvite: async (email) => {
+        const normalizedEmail = email.trim().toLowerCase();
+        if (isFirebaseEnabled) {
+            try {
+                const docRef = doc(db, 'studentInvites', normalizedEmail);
+                await updateDoc(docRef, {
+                    status: 'cancelled',
+                    updatedAt: new Date().toISOString()
+                });
+                return { success: true };
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        } else {
+            const invites = authService.getMockInvites();
+            const invite = invites.find(inv => inv.email.toLowerCase() === normalizedEmail);
+            if (invite) {
+                invite.status = 'cancelled';
+                invite.updatedAt = new Date().toISOString();
+                storage.set('jeel2010_student_invites', invites);
+                return { success: true };
+            }
+            return { success: false, error: 'الدعوة غير موجودة' };
         }
     }
 };

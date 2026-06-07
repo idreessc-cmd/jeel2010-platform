@@ -30,6 +30,7 @@ export const Admin = () => {
 
     const [newStudentName, setNewStudentName] = useState('');
     const [newStudentEmail, setNewStudentEmail] = useState('');
+    const [newStudentPhone, setNewStudentPhone] = useState('');
     const [newStudentSub, setNewStudentSub] = useState('free');
 
     const refreshStudentList = async () => {
@@ -88,6 +89,7 @@ export const Admin = () => {
             const res = await authService.addStudentManual({
                 studentName: newStudentName,
                 email: newStudentEmail,
+                phone: newStudentPhone,
                 subscriptionStatus: newStudentSub
             });
 
@@ -95,9 +97,15 @@ export const Admin = () => {
                 await refreshStudentList();
                 setNewStudentName('');
                 setNewStudentEmail('');
-                alert('تم إضافة الطالب الجديد بنجاح في القائمة.');
+                setNewStudentPhone('');
+                
+                if (res.exists) {
+                    alert('الحساب موجود مسبقًا، تم تحديث بيانات الطالب وصلاحياته بنجاح.');
+                } else {
+                    alert('تم إنشاء دعوة للطالب بنجاح. عندما يسجل الطالب بنفس البريد سيتم تطبيق الصلاحيات تلقائيًا.');
+                }
             } else {
-                alert(res.error || 'فشلت عملية إضافة الطالب');
+                alert(res.error || 'فشلت عملية إضافة الطالب/الدعوة');
             }
         } catch (err) {
             alert('حدث خطأ أثناء إضافة الطالب الجديد');
@@ -530,6 +538,17 @@ export const Admin = () => {
                                 </div>
 
                                 <div>
+                                    <label style={{ display: 'block', fontWeight: 'bold', fontSize: '0.85rem', marginBottom: '6px' }}>رقم الهاتف (اختياري):</label>
+                                    <input 
+                                        type="tel"
+                                        value={newStudentPhone}
+                                        onChange={(e) => setNewStudentPhone(e.target.value)}
+                                        placeholder="مثال: 0790000000"
+                                        style={{ width: '100%', padding: '12px', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--border-color)', fontFamily: 'var(--font-family)', backgroundColor: '#F8FAFC' }}
+                                    />
+                                </div>
+
+                                <div>
                                     <label style={{ display: 'block', fontWeight: 'bold', fontSize: '0.85rem', marginBottom: '6px' }}>حالة الاشتراك المبدئية:</label>
                                     <select 
                                         value={newStudentSub}
@@ -537,13 +556,14 @@ export const Admin = () => {
                                         style={{ width: '100%', padding: '12px', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--border-color)', fontFamily: 'var(--font-family)', backgroundColor: '#F8FAFC' }}
                                     >
                                         <option value="free">مجاني (أول درسين فقط)</option>
-                                        <option value="active">مشترك (كل المحتوى)</option>
+                                        <option value="active">مشترك بالكامل (كل المحتوى)</option>
+                                        <option value="custom">صلاحيات مخصصة (تحدد من جدول الطلاب)</option>
                                     </select>
                                 </div>
 
                                 <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '12px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginTop: '10px' }}>
                                     <UserPlus size={16} />
-                                    <span>إضافة الطالب</span>
+                                    <span>إضافة الطالب / إنشاء دعوة</span>
                                 </button>
                             </form>
                         </div>
