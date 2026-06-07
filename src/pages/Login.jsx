@@ -64,22 +64,44 @@ export const Login = () => {
         setError('');
         setSuccessMsg('');
         
-        if (!registerName || !registerPhone || !registerEmail || !registerPassword || !registerConfirmPassword) {
-            setError('يرجى ملء جميع الحقول المطلوبة.');
+        const name = registerName.trim();
+        const phone = registerPhone.trim();
+        const email = registerEmail.trim();
+        const password = registerPassword;
+        const confirmPassword = registerConfirmPassword;
+
+        if (!name) {
+            setError('يرجى إدخال الاسم الكامل.');
             return;
         }
 
-        if (registerPassword !== registerConfirmPassword) {
+        if (!phone) {
+            setError('يرجى إدخال رقم الهاتف.');
+            return;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email || !emailRegex.test(email)) {
+            setError('يرجى إدخال بريد إلكتروني صحيح.');
+            return;
+        }
+
+        if (!password || password.length < 6) {
+            setError('يجب أن تتكون كلمة المرور من 6 أحرف على الأقل.');
+            return;
+        }
+
+        if (password !== confirmPassword) {
             setError('كلمتا المرور غير متطابقتين.');
             return;
         }
 
         try {
             const res = await authService.registerStudent({
-                name: registerName,
-                phone: registerPhone,
-                email: registerEmail,
-                password: registerPassword
+                name: name,
+                phone: phone,
+                email: email,
+                password: password
             });
             if (res.success) {
                 setSuccessMsg('تم إنشاء الحساب بنجاح! يتم تحويلك الآن...');
@@ -167,7 +189,7 @@ export const Login = () => {
                     {/* Messages */}
                     {error && (
                         <div style={{
-                            padding: '12px 15px',
+                            padding: '15px',
                             backgroundColor: '#FEF2F2',
                             color: '#EF4444',
                             borderRadius: 'var(--border-radius-sm)',
@@ -176,11 +198,38 @@ export const Login = () => {
                             fontSize: '0.9rem',
                             borderRight: '4px solid #EF4444',
                             display: 'flex',
-                            alignItems: 'center',
+                            flexDirection: 'column',
                             gap: '8px'
                         }}>
-                            <AlertCircle size={18} />
-                            <span>{error}</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <AlertCircle size={18} style={{ flexShrink: 0 }} />
+                                <span>{error}</span>
+                            </div>
+                            {error.includes('تسجيل الدخول') && (
+                                <button
+                                    onClick={() => {
+                                        setLoginEmail(registerEmail);
+                                        setActiveTab('login');
+                                        setError('');
+                                    }}
+                                    type="button"
+                                    style={{
+                                        alignSelf: 'flex-start',
+                                        marginTop: '5px',
+                                        backgroundColor: 'transparent',
+                                        border: 'none',
+                                        color: 'var(--primary-color)',
+                                        textDecoration: 'underline',
+                                        cursor: 'pointer',
+                                        fontWeight: '800',
+                                        fontSize: '0.85rem',
+                                        padding: 0,
+                                        fontFamily: 'var(--font-family)'
+                                    }}
+                                >
+                                    الانتقال إلى تسجيل الدخول
+                                </button>
+                            )}
                         </div>
                     )}
 
@@ -217,6 +266,8 @@ export const Login = () => {
                                     onChange={(e) => setLoginEmail(e.target.value)}
                                     placeholder="yourname@domain.com"
                                     required
+                                    autoComplete="email"
+                                    name="email"
                                     style={{
                                         width: '100%',
                                         padding: '12px 15px',
@@ -244,6 +295,8 @@ export const Login = () => {
                                     onChange={(e) => setLoginPassword(e.target.value)}
                                     placeholder="••••••••"
                                     required
+                                    autoComplete="current-password"
+                                    name="password"
                                     style={{
                                         width: '100%',
                                         padding: '12px 15px',
@@ -292,6 +345,8 @@ export const Login = () => {
                                     onChange={(e) => setRegisterName(e.target.value)}
                                     placeholder="مثال: محمد أحمد علي"
                                     required
+                                    autoComplete="name"
+                                    name="fullName"
                                     style={{
                                         width: '100%',
                                         padding: '10px 14px',
@@ -315,6 +370,8 @@ export const Login = () => {
                                     onChange={(e) => setRegisterPhone(e.target.value)}
                                     placeholder="07xxxxxxxx"
                                     required
+                                    autoComplete="tel"
+                                    name="phone"
                                     style={{
                                         width: '100%',
                                         padding: '10px 14px',
@@ -340,6 +397,8 @@ export const Login = () => {
                                     onChange={(e) => setRegisterEmail(e.target.value)}
                                     placeholder="name@example.com"
                                     required
+                                    autoComplete="email"
+                                    name="email"
                                     style={{
                                         width: '100%',
                                         padding: '10px 14px',
@@ -365,6 +424,8 @@ export const Login = () => {
                                     onChange={(e) => setRegisterPassword(e.target.value)}
                                     placeholder="••••••••"
                                     required
+                                    autoComplete="new-password"
+                                    name="newPassword"
                                     style={{
                                         width: '100%',
                                         padding: '10px 14px',
@@ -390,6 +451,8 @@ export const Login = () => {
                                     onChange={(e) => setRegisterConfirmPassword(e.target.value)}
                                     placeholder="••••••••"
                                     required
+                                    autoComplete="new-password"
+                                    name="confirmPassword"
                                     style={{
                                         width: '100%',
                                         padding: '10px 14px',

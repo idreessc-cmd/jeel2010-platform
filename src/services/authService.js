@@ -111,8 +111,8 @@ export const authService = {
                 return { success: true, user: userSession };
             } catch (error) {
                 let errorMsg = 'حدث خطأ أثناء إنشاء الحساب';
-                if (error.code === 'auth/email-already-in-use') {
-                    errorMsg = 'البريد الإلكتروني مسجل بالفعل';
+                if (error.code === 'auth/email-already-in-use' || error.message?.includes('EMAIL_EXISTS')) {
+                    errorMsg = 'هذا البريد الإلكتروني مستخدم بالفعل، جرّب تسجيل الدخول بدل إنشاء حساب جديد.';
                 } else if (error.code === 'auth/weak-password') {
                     errorMsg = 'كلمة المرور ضعيفة للغاية (يجب أن تكون 6 أحرف على الأقل)';
                 } else if (error.code === 'auth/invalid-email') {
@@ -123,7 +123,7 @@ export const authService = {
         } else {
             const students = initializeStudents();
             if (students.some(s => s.email === email)) {
-                return { success: false, error: 'البريد الإلكتروني مسجل بالفعل' };
+                return { success: false, error: 'هذا البريد الإلكتروني مستخدم بالفعل، جرّب تسجيل الدخول بدل إنشاء حساب جديد.' };
             }
             
             const newStudent = {

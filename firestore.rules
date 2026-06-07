@@ -50,17 +50,17 @@ service cloud.firestore {
 
     // 2. قواعد المواد والوحدات والدروس (المنهج الدراسي)
     match /subjects/{subjectId} {
-      allow read: if resource.data.isActive == true || !('isActive' in resource.data) || isAdmin();
+      allow read: if resource == null || resource.data.isActive == true || isAdmin();
       allow write: if isAdmin();
     }
 
     match /units/{unitId} {
-      allow read: if resource.data.isActive == true || !('isActive' in resource.data) || isAdmin();
+      allow read: if resource == null || resource.data.isActive == true || isAdmin();
       allow write: if isAdmin();
     }
 
     match /lessons/{lessonId} {
-      allow read: if resource.data.isActive == true || !('isActive' in resource.data) || isAdmin();
+      allow read: if resource == null || resource.data.isActive == true || isAdmin();
       allow write: if isAdmin();
     }
 

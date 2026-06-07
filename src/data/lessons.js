@@ -1,4 +1,4 @@
-import { storage } from '../utils/storage';
+import { storage } from '../utils/storage.js';
 
 const LESSONS_KEY = 'jeel2010_lessons';
 
