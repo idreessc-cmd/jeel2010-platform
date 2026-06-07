@@ -4,7 +4,7 @@ import { doc, getDoc, getDocs, collection, updateDoc, setDoc, query, where } fro
 import { storage } from '../utils/storage';
 import { getDefaultStudents } from '../data/students';
 
-const CURRENT_USER_KEY = 'jeel2010_current_user';
+const CURRENT_USER_KEY = 'examSuccessUser';
 const STUDENTS_LIST_KEY = 'jeel2010_students';
 
 // Initialize students list in localStorage if it doesn't exist
