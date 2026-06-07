@@ -33,10 +33,16 @@ service cloud.firestore {
       // الطالب والمسؤول يستطيعان قراءة ملف المستخدم المعني
       allow read: if isSignedIn() && (isOwner(userId) || isAdmin());
       
-      // عند التسجيل الجديد: يُسمح للطلب فقط بالتسجيل كطالب عادي وباشتراك مجاني افتراضي
+      // عند التسجيل الجديد: يُسمح للطلب فقط بالتسجيل كطالب عادي وباشتراك مجاني افتراضي أو إذا كان لديه دعوة صالحة
       allow create: if isSignedIn() && isOwner(userId) && 
         request.resource.data.role == 'student' && 
-        request.resource.data.subscriptionStatus == 'free';
+        (
+          request.resource.data.subscriptionStatus == 'free' ||
+          (
+            request.auth.token.email != null &&
+            exists(/databases/$(database)/documents/studentInvites/$(request.auth.token.email))
+          )
+        );
       
       // التعديل: يُمنع الطالب تماماً من تعديل دوره 'role' أو حالة اشتراكه 'subscriptionStatus' أو صلاحياته 'access'، فقط الإدمن يفعل ذلك
       allow update: if isSignedIn() && (
@@ -110,15 +116,7 @@ service cloud.firestore {
           && request.auth.token.email != null
           && request.auth.token.email == resource.data.email
         );
-      allow update: if isAdmin()
-        || (
-          isSignedIn()
-          && request.auth.token.email == resource.data.email
-          && resource.data.status == "pending"
-          && request.resource.data.status == "accepted"
-          && request.resource.data.acceptedByUid == request.auth.uid
-        );
-      allow create, delete: if isAdmin();
+      allow create, update, delete: if isAdmin();
     }
   }
 }

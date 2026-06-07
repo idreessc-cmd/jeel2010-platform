@@ -55,8 +55,8 @@ export const authService = {
                 return { success: true, user: userSession };
             } catch (error) {
                 let errorMsg = 'حدث خطأ أثناء تسجيل الدخول';
-                if (error.message === 'INVITE_ACCEPTANCE_FAILED') {
-                    errorMsg = 'تم تسجيل الدخول، لكن تعذر تفعيل صلاحيات الدعوة. يرجى التواصل مع الدعم.';
+                if (error.message === 'USER_PROFILE_CREATION_FAILED') {
+                    errorMsg = 'تم تسجيل الدخول، لكن تعذر إنشاء ملف الطالب. يرجى التواصل مع الدعم.';
                 } else if (
                     error.code === 'auth/user-not-found' || 
                     error.code === 'auth/wrong-password' || 
@@ -113,8 +113,8 @@ export const authService = {
                 return { success: true, user: userSession };
             } catch (error) {
                 let errorMsg = 'حدث خطأ أثناء إنشاء الحساب';
-                if (error.message === 'INVITE_ACCEPTANCE_FAILED') {
-                    errorMsg = 'تم تسجيل الدخول، لكن تعذر تفعيل صلاحيات الدعوة. يرجى التواصل مع الدعم.';
+                if (error.message === 'USER_PROFILE_CREATION_FAILED') {
+                    errorMsg = 'تم تسجيل الدخول، لكن تعذر إنشاء ملف الطالب. يرجى التواصل مع الدعم.';
                 } else if (error.code === 'auth/email-already-in-use' || error.message?.includes('EMAIL_EXISTS')) {
                     errorMsg = 'هذا البريد الإلكتروني مستخدم بالفعل، يمكنك تسجيل الدخول أو إعادة تعيين كلمة المرور.';
                 } else if (error.code === 'auth/weak-password') {
@@ -240,74 +240,93 @@ export const authService = {
         
         if (!userDoc.exists()) {
             const now = new Date().toISOString();
-            const email = firebaseUser.email || '';
-            const normalizedEmail = email.trim().toLowerCase();
+            const email = firebaseUser.email?.trim().toLowerCase();
             
-            // Check for pending student invitation
+            // Read invite directly from studentInvites/{email}
             let invite = null;
-            try {
-                const inviteDocRef = doc(db, 'studentInvites', normalizedEmail);
-                const inviteDoc = await getDoc(inviteDocRef);
-                if (inviteDoc.exists() && inviteDoc.data().status === 'pending') {
-                    invite = inviteDoc.data();
+            let inviteDocRef = null;
+            if (email) {
+                try {
+                    inviteDocRef = doc(db, 'studentInvites', email);
+                    const inviteDoc = await getDoc(inviteDocRef);
+                    if (inviteDoc.exists() && inviteDoc.data().status === 'pending') {
+                        invite = inviteDoc.data();
+                    }
+                } catch (err) {
+                    console.error("Error checking student invites:", err);
                 }
-            } catch (err) {
-                console.error("Error checking student invites:", err);
             }
             
-            let profile;
+            let userProfile;
             if (invite) {
-                profile = {
+                userProfile = {
                     uid: firebaseUser.uid,
-                    name: invite.name || extraData?.name || 'طالب جديد',
-                    email: email,
-                    phone: invite.phone || extraData?.phone || '',
-                    role: 'student',
-                    subscriptionStatus: invite.subscriptionStatus || 'free',
-                    subscriptionPlan: invite.subscriptionPlan || 'free',
+                    name: invite.name || firebaseUser.displayName || "طالب جديد",
+                    email: email || "",
+                    phone: invite.phone || "",
+                    role: "student",
+                    subscriptionStatus: invite.subscriptionStatus || "free",
+                    subscriptionPlan: invite.subscriptionPlan || "free",
                     isActive: true,
                     joinedVipGroups: false,
-                    access: invite.access || { subjects: [], units: [], lessons: [], quizzes: [] },
+                    access: invite.access || {
+                        subjects: [],
+                        units: [],
+                        lessons: [],
+                        quizzes: []
+                    },
                     createdAt: now,
                     updatedAt: now
                 };
-                
-                await setDoc(userDocRef, profile);
-                
-                // Update invitation status
+            } else {
+                userProfile = {
+                    uid: firebaseUser.uid,
+                    name: extraData?.name || firebaseUser.displayName || "طالب جديد",
+                    email: email || "",
+                    phone: extraData?.phone || "",
+                    role: "student",
+                    subscriptionStatus: "free",
+                    subscriptionPlan: "free",
+                    isActive: true,
+                    joinedVipGroups: false,
+                    access: {
+                        subjects: [],
+                        units: [],
+                        lessons: [],
+                        quizzes: []
+                    },
+                    createdAt: now,
+                    updatedAt: now
+                };
+            }
+            
+            try {
+                await setDoc(userDocRef, userProfile, { merge: true });
+            } catch (err) {
+                if (import.meta.env.DEV) {
+                    console.error("User profile creation error:", err);
+                }
+                throw new Error('USER_PROFILE_CREATION_FAILED');
+            }
+            
+            if (invite && inviteDocRef) {
                 try {
-                    const inviteDocRef = doc(db, 'studentInvites', normalizedEmail);
                     await updateDoc(inviteDocRef, {
-                        status: 'accepted',
+                        status: "accepted",
                         acceptedByUid: firebaseUser.uid,
                         acceptedAt: now,
                         updatedAt: now
                     });
-                } catch (err) {
+                } catch (inviteUpdateError) {
                     if (import.meta.env.DEV) {
-                        console.warn("Invite acceptance error:", err.code || err.message, err);
+                        console.warn("Invite status update failed, but user profile was created:", inviteUpdateError.code || inviteUpdateError.message, inviteUpdateError);
                     }
-                    throw new Error('INVITE_ACCEPTANCE_FAILED');
                 }
-            } else {
-                profile = {
-                    uid: firebaseUser.uid,
-                    name: extraData?.name || firebaseUser.displayName || 'طالب جديد',
-                    email: email,
-                    phone: extraData?.phone || '',
-                    role: 'student',
-                    subscriptionStatus: 'free',
-                    subscriptionPlan: 'free',
-                    isActive: true,
-                    joinedVipGroups: false,
-                    access: { subjects: [], units: [], lessons: [], quizzes: [] },
-                    createdAt: now,
-                    updatedAt: now
-                };
-                await setDoc(userDocRef, profile);
             }
-            return profile;
+            
+            return userProfile;
         }
+        
         return userDoc.data();
     },
     
