@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { initializeFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
@@ -23,7 +23,10 @@ if (isFirebaseEnabled) {
   try {
     app = initializeApp(firebaseConfig);
     auth = getAuth(app);
-    db = getFirestore(app);
+    // Use initializeFirestore with long-polling to prevent ERR_BLOCKED_BY_CLIENT issues from browser extensions blocking WebChannel
+    db = initializeFirestore(app, {
+      experimentalAutoDetectLongPolling: true
+    });
     storage = getStorage(app);
   } catch (error) {
     console.error("Failed to initialize Firebase:", error);

@@ -387,7 +387,19 @@ export const authService = {
                 }
                 return { success: false, error: 'الطالب غير موجود' };
             } catch (error) {
-                return { success: false, error: error.message };
+                if (import.meta.env.DEV) {
+                    console.warn("updateStudentSubscription failed:", error.code, error.message);
+                }
+                if (error.code === "permission-denied") {
+                    return {
+                        success: false,
+                        error: "ليست لديك صلاحية لتعديل اشتراك الطالب. تأكد أنك داخل بحساب مسؤول."
+                    };
+                }
+                return {
+                    success: false,
+                    error: "تعذر تحديث اشتراك الطالب. جرّب تعطيل إضافات المتصفح أو استخدام نافذة خاصة."
+                };
             }
         } else {
             const students = initializeStudents();
@@ -459,7 +471,19 @@ export const authService = {
                 await setDoc(inviteRef, inviteData, { merge: true });
                 return { success: true, exists: false, uid: normalizedEmail };
             } catch (error) {
-                return { success: false, error: error.message };
+                if (import.meta.env.DEV) {
+                    console.warn("addStudentManual failed:", error.code, error.message);
+                }
+                if (error.code === "permission-denied") {
+                    return {
+                        success: false,
+                        error: "ليست لديك صلاحية لإضافة أو تعديل الطالب. تأكد أنك داخل بحساب مسؤول."
+                    };
+                }
+                return {
+                    success: false,
+                    error: "تعذر إضافة أو تحديث الطالب. جرّب تعطيل إضافات المتصفح أو استخدام نافذة خاصة."
+                };
             }
         } else {
             const students = initializeStudents();
@@ -520,7 +544,19 @@ export const authService = {
                 });
                 return { success: true };
             } catch (error) {
-                return { success: false, error: error.message };
+                if (import.meta.env.DEV) {
+                    console.warn("updateStudentAccess failed:", error.code, error.message);
+                }
+                if (error.code === "permission-denied") {
+                    return {
+                        success: false,
+                        error: "ليست لديك صلاحية لتعديل صلاحيات الطالب. تأكد أنك داخل بحساب مسؤول."
+                    };
+                }
+                return {
+                    success: false,
+                    error: "تعذر تحديث صلاحيات الطالب. جرّب تعطيل إضافات المتصفح أو استخدام نافذة خاصة."
+                };
             }
         } else {
             if (isInvite) {
@@ -558,7 +594,19 @@ export const authService = {
                 });
                 return { success: true };
             } catch (error) {
-                return { success: false, error: error.message };
+                if (import.meta.env.DEV) {
+                    console.warn("disableStudent failed:", error.code, error.message);
+                }
+                if (error.code === "permission-denied") {
+                    return {
+                        success: false,
+                        error: "ليست لديك صلاحية لتعطيل حساب الطالب. تأكد أنك داخل بحساب مسؤول."
+                    };
+                }
+                return {
+                    success: false,
+                    error: "تعذر تعطيل الطالب. جرّب تعطيل إضافات المتصفح أو استخدام نافذة خاصة."
+                };
             }
         } else {
             const students = initializeStudents();
@@ -633,7 +681,19 @@ export const authService = {
                 });
                 return { success: true };
             } catch (error) {
-                return { success: false, error: error.message };
+                if (import.meta.env.DEV) {
+                    console.warn("cancelInvite failed:", error.code, error.message);
+                }
+                if (error.code === "permission-denied") {
+                    return {
+                        success: false,
+                        error: "ليست لديك صلاحية لإلغاء هذه الدعوة. تأكد أنك داخل بحساب مسؤول."
+                    };
+                }
+                return {
+                    success: false,
+                    error: "تعذر إلغاء الدعوة. جرّب تعطيل إضافات المتصفح أو استخدام نافذة خاصة."
+                };
             }
         } else {
             const invites = authService.getMockInvites();

@@ -44,11 +44,16 @@ service cloud.firestore {
           )
         );
       
-      // التعديل: يُمنع الطالب تماماً من تعديل دوره 'role' أو حالة اشتراكه 'subscriptionStatus' أو صلاحياته 'access'، فقط الإدمن يفعل ذلك
-      allow update: if isSignedIn() && (
-        (isOwner(userId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'subscriptionStatus', 'access']))
-        || isAdmin()
-      );
+      allow update: if isAdmin()
+        || (
+          isSignedIn()
+          && isOwner(userId)
+          && request.resource.data.role == resource.data.role
+          && request.resource.data.subscriptionStatus == resource.data.subscriptionStatus
+          && request.resource.data.subscriptionPlan == resource.data.subscriptionPlan
+          && request.resource.data.access == resource.data.access
+          && request.resource.data.isActive == resource.data.isActive
+        );
       
       // الحذف للمسؤول فقط
       allow delete: if isAdmin();
