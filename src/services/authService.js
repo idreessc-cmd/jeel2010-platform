@@ -55,7 +55,9 @@ export const authService = {
                 return { success: true, user: userSession };
             } catch (error) {
                 let errorMsg = 'حدث خطأ أثناء تسجيل الدخول';
-                if (
+                if (error.message === 'INVITE_ACCEPTANCE_FAILED') {
+                    errorMsg = 'تم تسجيل الدخول، لكن تعذر تفعيل صلاحيات الدعوة. يرجى التواصل مع الدعم.';
+                } else if (
                     error.code === 'auth/user-not-found' || 
                     error.code === 'auth/wrong-password' || 
                     error.code === 'auth/invalid-credential' ||
@@ -111,7 +113,9 @@ export const authService = {
                 return { success: true, user: userSession };
             } catch (error) {
                 let errorMsg = 'حدث خطأ أثناء إنشاء الحساب';
-                if (error.code === 'auth/email-already-in-use' || error.message?.includes('EMAIL_EXISTS')) {
+                if (error.message === 'INVITE_ACCEPTANCE_FAILED') {
+                    errorMsg = 'تم تسجيل الدخول، لكن تعذر تفعيل صلاحيات الدعوة. يرجى التواصل مع الدعم.';
+                } else if (error.code === 'auth/email-already-in-use' || error.message?.includes('EMAIL_EXISTS')) {
                     errorMsg = 'هذا البريد الإلكتروني مستخدم بالفعل، يمكنك تسجيل الدخول أو إعادة تعيين كلمة المرور.';
                 } else if (error.code === 'auth/weak-password') {
                     errorMsg = 'كلمة المرور ضعيفة للغاية (يجب أن تكون 6 أحرف على الأقل)';
@@ -280,7 +284,10 @@ export const authService = {
                         updatedAt: now
                     });
                 } catch (err) {
-                    console.error("Error updating accepted invite:", err);
+                    if (import.meta.env.DEV) {
+                        console.warn("Invite acceptance error:", err.code || err.message, err);
+                    }
+                    throw new Error('INVITE_ACCEPTANCE_FAILED');
                 }
             } else {
                 profile = {
@@ -417,7 +424,7 @@ export const authService = {
                 const inviteData = {
                     id: normalizedEmail,
                     name: student.studentName,
-                    email: student.email,
+                    email: student.email.trim().toLowerCase(),
                     phone: student.phone || '',
                     status: 'pending',
                     subscriptionStatus: student.subscriptionStatus || 'free',
@@ -457,7 +464,7 @@ export const authService = {
             const inviteData = {
                 id: normalizedEmail,
                 name: student.studentName,
-                email: student.email,
+                email: student.email.trim().toLowerCase(),
                 phone: student.phone || '',
                 status: 'pending',
                 subscriptionStatus: student.subscriptionStatus || 'free',
