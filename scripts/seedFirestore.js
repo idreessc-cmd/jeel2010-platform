@@ -27,7 +27,7 @@ async function seedData() {
   // 1. Seed Subjects
   console.log("Seeding subjects...");
   for (const subject of mockSubjects) {
-    await db.collection("subjects").doc(subject.id).set(subject);
+    await db.collection("subjects").doc(subject.id).set({ ...subject, isActive: true });
     console.log(`- Seeded subject: ${subject.id}`);
   }
 
@@ -36,7 +36,7 @@ async function seedData() {
   const subjectIds = mockSubjects.map(s => s.id);
   for (const subjectId of subjectIds) {
     const units = mockLessons[subjectId] || [];
-    await db.collection("lessons").doc(subjectId).set({ units });
+    await db.collection("lessons").doc(subjectId).set({ units, isActive: true });
     console.log(`- Seeded lessons for subject: ${subjectId}`);
     
     // 3. Seed Quizzes for each lesson inside the units
@@ -44,7 +44,7 @@ async function seedData() {
       for (const lesson of unit.lessons) {
         const quiz = getQuizForLesson(lesson.id);
         if (quiz) {
-          await db.collection("quizzes").doc(lesson.id).set(quiz);
+          await db.collection("quizzes").doc(lesson.id).set({ ...quiz, isActive: true });
           console.log(`  * Seeded quiz for lesson: ${lesson.id}`);
         }
       }

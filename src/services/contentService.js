@@ -19,7 +19,9 @@ export const contentService = {
                     return list;
                 }
             } catch (error) {
-                console.error("Firebase getSubjects error, falling back to mock:", error);
+                if (import.meta.env.DEV) {
+                    console.warn("Firestore getSubjects failed. Falling back to mock data.");
+                }
             }
         }
         return mockSubjects;
@@ -35,7 +37,9 @@ export const contentService = {
                     return { id: subjectDoc.id, ...subjectDoc.data() };
                 }
             } catch (error) {
-                console.error(`Firebase getSubject(${subjectId}) error, falling back to mock:`, error);
+                if (import.meta.env.DEV) {
+                    console.warn(`Firestore getSubject(${subjectId}) failed. Falling back to mock data.`);
+                }
             }
         }
         return mockSubjects.find(s => s.id === subjectId) || null;
@@ -51,7 +55,9 @@ export const contentService = {
                     return lessonsDoc.data().units || [];
                 }
             } catch (error) {
-                console.error(`Firebase getLessonsForSubject(${subjectId}) error, falling back to mock:`, error);
+                if (import.meta.env.DEV) {
+                    console.warn(`Firestore getLessonsForSubject(${subjectId}) failed. Falling back to mock data.`);
+                }
             }
         }
         return mockLessons[subjectId] || [];
@@ -67,7 +73,9 @@ export const contentService = {
                     return quizDoc.data();
                 }
             } catch (error) {
-                console.error(`Firebase getQuizForLesson(${lessonId}) error, falling back to mock:`, error);
+                if (import.meta.env.DEV) {
+                    console.warn(`Firestore getQuizForLesson(${lessonId}) failed. Falling back to mock data.`);
+                }
             }
         }
         return localGetQuiz(lessonId);
@@ -95,7 +103,8 @@ export const contentService = {
                     });
                 }
                 
-                await setDoc(lessonsDocRef, { units });
+                // Write with isActive: true so visitor rules allow reading it
+                await setDoc(lessonsDocRef, { units, isActive: true });
                 return { success: true };
             } catch (error) {
                 console.error("Firebase addLessonToSubject error:", error);
@@ -116,7 +125,8 @@ export const contentService = {
                 let quizData = {
                     lessonId: lessonId,
                     title: `اختبار تقييمي مخصص للدرس`,
-                    questions: []
+                    questions: [],
+                    isActive: true
                 };
                 
                 if (quizDoc.exists()) {
@@ -134,6 +144,7 @@ export const contentService = {
                 });
                 
                 quizData.questions = questionsList;
+                quizData.isActive = true;
                 await setDoc(quizDocRef, quizData);
                 return { success: true };
             } catch (error) {
