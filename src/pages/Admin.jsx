@@ -4,7 +4,7 @@ import { authService } from '../services/authService';
 import { contentService } from '../services/contentService';
 import { AdminStats } from '../components/admin/AdminStats';
 import { StudentsTable } from '../components/admin/StudentsTable';
-import { LogOut, PlusCircle, Save, UserPlus } from 'lucide-react';
+import { LogOut, PlusCircle, Save, UserPlus, BookOpen, ClipboardList, Users } from 'lucide-react';
 
 export const Admin = () => {
     const navigate = useNavigate();
@@ -13,6 +13,7 @@ export const Admin = () => {
     const [subjectsList, setSubjectsList] = useState([]);
     
     // Form States
+    const [activeTab, setActiveTab] = useState('students');
     const [lessonSubject, setLessonSubject] = useState('arabic');
     const [lessonTitle, setLessonTitle] = useState('');
     const [lessonDesc, setLessonDesc] = useState('');
@@ -73,7 +74,7 @@ export const Admin = () => {
     const handleAddStudent = async (e) => {
         e.preventDefault();
         if (!newStudentName || !newStudentEmail) {
-            alert('يرجى ملء الاسم والبريد الإلكتروني للرمز التجريبي.');
+            alert('يرجى ملء الاسم والبريد الإلكتروني.');
             return;
         }
 
@@ -89,7 +90,7 @@ export const Admin = () => {
                 setStudents(freshStudents);
                 setNewStudentName('');
                 setNewStudentEmail('');
-                alert('تم إضافة الطالب التجريبي الجديد بنجاح في القائمة.');
+                alert('تم إضافة الطالب الجديد بنجاح في القائمة.');
             } else {
                 alert(res.error || 'فشلت عملية إضافة الطالب');
             }
@@ -108,15 +109,15 @@ export const Admin = () => {
         const newLessonId = `${lessonSubject}-l${Date.now()}`;
         const newLesson = {
             id: newLessonId,
-            title: `الدرس الجديد: ${lessonTitle}`,
+            title: lessonTitle,
             isFree: lessonIsFree,
-            description: lessonDesc || 'تمت إضافة هذا الدرس حديثاً من لوحة الإدارة التجريبية.',
+            description: lessonDesc || 'تمت إضافة هذا الدرس حديثاً من لوحة الإدارة.',
             pdfUrl: '#',
             lessonVideo: {
                 provider: "youtube",
                 videoId: lessonVideoId,
                 isProtected: false,
-                protectionNote: "MVP only"
+                protectionNote: "VIP only"
             }
         };
 
@@ -173,6 +174,24 @@ export const Admin = () => {
         }
     };
 
+    const tabStyle = (tabId) => ({
+        padding: '10px 18px',
+        borderRadius: 'var(--border-radius-pill)',
+        fontWeight: 'bold',
+        fontSize: '0.9rem',
+        cursor: 'pointer',
+        transition: 'var(--transition)',
+        border: activeTab === tabId ? '1px solid var(--primary-color)' : '1px solid transparent',
+        backgroundColor: activeTab === tabId ? 'var(--primary-light)' : 'transparent',
+        color: activeTab === tabId ? 'var(--primary-color)' : 'var(--text-muted)',
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '6px',
+        flexGrow: 1,
+        justifyContent: 'center',
+        minWidth: '120px'
+    });
+
     const currentUserSession = authService.getCurrentUser();
     if (!currentUserSession || currentUserSession.role !== 'admin') {
         return (
@@ -198,260 +217,331 @@ export const Admin = () => {
     }
 
     return (
-        <section className="section-padding" style={{ backgroundColor: '#F8FAFC' }}>
-            <div className="container">
+        <section className="section-padding" style={{ backgroundColor: '#F8FAFC', minHeight: '100vh', padding: '40px 0' }}>
+            <div className="container" style={{ maxWidth: '1000px' }}>
+                
+                {/* Hero Section */}
                 <div style={{
+                    backgroundColor: 'var(--primary-color)',
+                    color: '#FFFFFF',
+                    borderRadius: 'var(--border-radius-lg)',
+                    padding: '30px 24px',
+                    marginBottom: '30px',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    boxShadow: 'var(--shadow-md)',
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    borderBottom: '1px solid var(--border-color)',
-                    paddingBottom: '20px',
-                    marginBottom: '35px',
                     flexWrap: 'wrap',
-                    gap: '15px'
+                    gap: '20px'
                 }}>
-                    <div>
-                        <h2 style={{ color: 'var(--secondary-color)', fontWeight: '800', margin: 0 }}>
+                    {/* Decorative blurred circles */}
+                    <div style={{ position: 'absolute', width: '200px', height: '200px', borderRadius: '50%', background: 'rgba(255,255,255,0.08)', top: '-100px', left: '-50px', filter: 'blur(20px)' }}></div>
+                    <div style={{ position: 'absolute', width: '150px', height: '150px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', bottom: '-50px', right: '-50px', filter: 'blur(10px)' }}></div>
+                    
+                    <div style={{ zIndex: 1, position: 'relative' }}>
+                        <h1 style={{ fontSize: '1.6rem', fontWeight: '800', margin: '0 0 8px 0', color: '#FFFFFF' }}>
                             لوحة الإدارة – منصة امتحان النجاح
-                        </h2>
-                        <p style={{ color: 'var(--text-muted)', margin: '4px 0 0 0', fontSize: '0.95rem' }}>
-                            لوحة إدارة الطلاب، والاشتراكات، والمناهج التدريسية
+                        </h1>
+                        <p style={{ margin: 0, opacity: 0.9, fontSize: '0.95rem', lineHeight: '1.6' }}>
+                            إدارة الطلاب، الاشتراكات، الدروس، والاختبارات من مكان واحد.
                         </p>
                     </div>
-                    
                     <button 
                         onClick={() => {
                             authService.logout();
                             navigate('/login');
                         }}
-                        className="btn btn-outline"
-                        style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                        className="btn"
+                        style={{ 
+                            backgroundColor: '#FFFFFF', 
+                            color: 'var(--primary-color)', 
+                            border: 'none',
+                            zIndex: 1,
+                            position: 'relative',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            padding: '10px 20px',
+                            fontSize: '0.9rem',
+                            borderRadius: 'var(--border-radius-pill)',
+                            boxShadow: 'var(--shadow-sm)'
+                        }}
                     >
                         <LogOut size={16} />
                         <span>خروج من لوحة الإدارة</span>
                     </button>
                 </div>
 
-                {/* Dashboard Stats Grid */}
+                {/* Stats Grid */}
                 <AdminStats students={students} />
 
-                {/* Students Management Table */}
-                <StudentsTable students={students} onToggleSubscription={handleToggleSubscription} />
-
-                {/* Add dynamic items forms */}
+                {/* Tabs Navigation */}
                 <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-                    gap: '30px',
-                    marginTop: '40px'
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '8px',
+                    marginBottom: '30px',
+                    borderBottom: '1px solid var(--border-color)',
+                    paddingBottom: '12px',
+                    width: '100%'
                 }}>
+                    <button 
+                        onClick={() => setActiveTab('students')}
+                        style={tabStyle('students')}
+                    >
+                        <Users size={18} />
+                        <span>الطلاب والاشتراكات</span>
+                    </button>
+                    <button 
+                        onClick={() => setActiveTab('add-lesson')}
+                        style={tabStyle('add-lesson')}
+                    >
+                        <BookOpen size={18} />
+                        <span>إضافة درس</span>
+                    </button>
+                    <button 
+                        onClick={() => setActiveTab('add-quiz')}
+                        style={tabStyle('add-quiz')}
+                    >
+                        <ClipboardList size={18} />
+                        <span>إضافة سؤال</span>
+                    </button>
+                    <button 
+                        onClick={() => setActiveTab('add-student')}
+                        style={tabStyle('add-student')}
+                    >
+                        <UserPlus size={18} />
+                        <span>إضافة طالب</span>
+                    </button>
+                </div>
+
+                {/* Tab Panels */}
+                <div style={{ width: '100%' }}>
                     
-                    {/* Add Lesson Form */}
-                    <div style={{
-                        backgroundColor: '#FFFFFF',
-                        borderRadius: 'var(--border-radius-lg)',
-                        padding: '30px',
-                        boxShadow: 'var(--shadow-sm)',
-                        border: '1px solid var(--border-color)'
-                    }}>
-                        <h3 style={{ color: 'var(--secondary-color)', fontWeight: '800', borderBottom: '1px dashed var(--border-color)', paddingBottom: '12px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <PlusCircle size={20} style={{ color: 'var(--primary-color)' }} />
-                            <span>إضافة درس جديد (تجريبي)</span>
-                        </h3>
-                        
-                        <form onSubmit={handleAddLessonMock}>
-                            <div style={{ marginBottom: '15px' }}>
-                                <label style={{ display: 'block', fontWeight: 'bold', fontSize: '0.85rem', marginBottom: '6px' }}>اختر المادة:</label>
-                                <select 
-                                    value={lessonSubject}
-                                    onChange={(e) => setLessonSubject(e.target.value)}
-                                    style={{ width: '100%', padding: '10px', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--border-color)', fontFamily: 'var(--font-family)' }}
-                                >
-                                    {subjectsList.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
-                                </select>
-                            </div>
+                    {/* Tab: Students & Subscriptions */}
+                    {activeTab === 'students' && (
+                        <div>
+                            <StudentsTable students={students} onToggleSubscription={handleToggleSubscription} />
+                        </div>
+                    )}
 
-                            <div style={{ marginBottom: '15px' }}>
-                                <label style={{ display: 'block', fontWeight: 'bold', fontSize: '0.85rem', marginBottom: '6px' }}>عنوان الدرس:</label>
-                                <input 
-                                    type="text"
-                                    value={lessonTitle}
-                                    onChange={(e) => setLessonTitle(e.target.value)}
-                                    placeholder="مثال: كان وأخواتها التامة"
-                                    style={{ width: '100%', padding: '10px', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--border-color)', fontFamily: 'var(--font-family)' }}
-                                />
-                            </div>
-
-                            <div style={{ marginBottom: '15px' }}>
-                                <label style={{ display: 'block', fontWeight: 'bold', fontSize: '0.85rem', marginBottom: '6px' }}>معرف فيديو يوتيوب (Video ID):</label>
-                                <input 
-                                    type="text"
-                                    value={lessonVideoId}
-                                    onChange={(e) => setLessonVideoId(e.target.value)}
-                                    placeholder="مثال: JgV10L1w6zM"
-                                    style={{ width: '100%', padding: '10px', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--border-color)', fontFamily: 'var(--font-family)', direction: 'ltr', textAlign: 'right' }}
-                                />
-                            </div>
-
-                            <div style={{ marginBottom: '20px' }}>
-                                <label style={{ display: 'block', fontWeight: 'bold', fontSize: '0.85rem', marginBottom: '6px' }}>حالة الدرس الحالية:</label>
-                                <select 
-                                    value={lessonIsFree ? 'true' : 'false'}
-                                    onChange={(e) => setLessonIsFree(e.target.value === 'true')}
-                                    style={{ width: '100%', padding: '10px', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--border-color)', fontFamily: 'var(--font-family)' }}
-                                >
-                                    <option value="true">درس مجاني للجميع</option>
-                                    <option value="false">درس مدفوع (يطلب اشتراك)</option>
-                                </select>
-                            </div>
-
-                             <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '10px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-                                <Save size={16} />
-                                <span>حفظ الدرس تجريبياً</span>
-                            </button>
-                        </form>
-                    </div>
-
-                    {/* Add MCQ Question Form */}
-                    <div style={{
-                        backgroundColor: '#FFFFFF',
-                        borderRadius: 'var(--border-radius-lg)',
-                        padding: '30px',
-                        boxShadow: 'var(--shadow-sm)',
-                        border: '1px solid var(--border-color)'
-                    }}>
-                        <h3 style={{ color: 'var(--secondary-color)', fontWeight: '800', borderBottom: '1px dashed var(--border-color)', paddingBottom: '12px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <PlusCircle size={20} style={{ color: 'var(--primary-color)' }} />
-                            <span>إضافة سؤال اختبار (تجريبي)</span>
-                        </h3>
-                        
-                        <form onSubmit={handleAddQuestionMock}>
-                            <div style={{ marginBottom: '15px' }}>
-                                <label style={{ display: 'block', fontWeight: 'bold', fontSize: '0.85rem', marginBottom: '6px' }}>اختر الدرس المستهدف:</label>
-                                <select 
-                                    value={questionLesson}
-                                    onChange={(e) => setQuestionLesson(e.target.value)}
-                                    style={{ width: '100%', padding: '10px', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--border-color)', fontFamily: 'var(--font-family)' }}
-                                >
-                                    <option value="arabic-l1">اللغة العربية - الدرس الأول</option>
-                                    <option value="math-l1">الرياضيات - الدرس الأول</option>
-                                    <option value="history-l1">التاريخ - الدرس الأول</option>
-                                    <option value="islamic-l1">التربية الإسلامية - الدرس الأول</option>
-                                </select>
-                            </div>
-
-                            <div style={{ marginBottom: '15px' }}>
-                                <label style={{ display: 'block', fontWeight: 'bold', fontSize: '0.85rem', marginBottom: '6px' }}>نص السؤال:</label>
-                                <input 
-                                    type="text"
-                                    value={questionText}
-                                    onChange={(e) => setQuestionText(e.target.value)}
-                                    placeholder="مثال: من هو كاتب معلقة الحوليات؟"
-                                    style={{ width: '100%', padding: '10px', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--border-color)', fontFamily: 'var(--font-family)' }}
-                                />
-                            </div>
-
-                            <div style={{
-                                display: 'grid',
-                                gridTemplateColumns: '1fr 1fr',
-                                gap: '10px',
-                                marginBottom: '15px'
-                            }}>
+                    {/* Tab: Add Lesson */}
+                    {activeTab === 'add-lesson' && (
+                        <div style={{
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: 'var(--border-radius-lg)',
+                            padding: '24px',
+                            boxShadow: 'var(--shadow-sm)',
+                            border: '1px solid var(--border-color)',
+                            width: '100%'
+                        }}>
+                            <h3 style={{ color: 'var(--secondary-color)', fontWeight: '800', borderBottom: '1px dashed var(--border-color)', paddingBottom: '12px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <PlusCircle size={20} style={{ color: 'var(--primary-color)' }} />
+                                <span>إضافة درس جديد</span>
+                            </h3>
+                            
+                            <form onSubmit={handleAddLessonMock} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                                 <div>
-                                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold' }}>خيار أ:</label>
-                                    <input type="text" value={optA} onChange={(e) => setOptA(e.target.value)} style={{ width: '100%', padding: '8px', border: '1px solid var(--border-color)', borderRadius: '4px', fontFamily: 'var(--font-family)' }} />
+                                    <label style={{ display: 'block', fontWeight: 'bold', fontSize: '0.85rem', marginBottom: '6px' }}>اختر المادة:</label>
+                                    <select 
+                                        value={lessonSubject}
+                                        onChange={(e) => setLessonSubject(e.target.value)}
+                                        style={{ width: '100%', padding: '12px', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--border-color)', fontFamily: 'var(--font-family)', backgroundColor: '#F8FAFC' }}
+                                    >
+                                        {subjectsList.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
+                                    </select>
                                 </div>
+
                                 <div>
-                                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold' }}>خيار ب:</label>
-                                    <input type="text" value={optB} onChange={(e) => setOptB(e.target.value)} style={{ width: '100%', padding: '8px', border: '1px solid var(--border-color)', borderRadius: '4px', fontFamily: 'var(--font-family)' }} />
+                                    <label style={{ display: 'block', fontWeight: 'bold', fontSize: '0.85rem', marginBottom: '6px' }}>عنوان الدرس:</label>
+                                    <input 
+                                        type="text"
+                                        value={lessonTitle}
+                                        onChange={(e) => setLessonTitle(e.target.value)}
+                                        placeholder="مثال: مقدمة في الحركة الدائرية"
+                                        style={{ width: '100%', padding: '12px', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--border-color)', fontFamily: 'var(--font-family)', backgroundColor: '#F8FAFC' }}
+                                    />
                                 </div>
+
                                 <div>
-                                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold' }}>خيار جـ (اختياري):</label>
-                                    <input type="text" value={optC} onChange={(e) => setOptC(e.target.value)} style={{ width: '100%', padding: '8px', border: '1px solid var(--border-color)', borderRadius: '4px', fontFamily: 'var(--font-family)' }} />
+                                    <label style={{ display: 'block', fontWeight: 'bold', fontSize: '0.85rem', marginBottom: '6px' }}>معرف فيديو يوتيوب (Video ID):</label>
+                                    <input 
+                                        type="text"
+                                        value={lessonVideoId}
+                                        onChange={(e) => setLessonVideoId(e.target.value)}
+                                        placeholder="مثال: dQw4w9WgXcQ"
+                                        style={{ width: '100%', padding: '12px', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--border-color)', fontFamily: 'var(--font-family)', direction: 'ltr', textAlign: 'right', backgroundColor: '#F8FAFC' }}
+                                    />
                                 </div>
+
                                 <div>
-                                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold' }}>خيار د (اختياري):</label>
-                                    <input type="text" value={optD} onChange={(e) => setOptD(e.target.value)} style={{ width: '100%', padding: '8px', border: '1px solid var(--border-color)', borderRadius: '4px', fontFamily: 'var(--font-family)' }} />
+                                    <label style={{ display: 'block', fontWeight: 'bold', fontSize: '0.85rem', marginBottom: '6px' }}>حالة الدرس:</label>
+                                    <select 
+                                        value={lessonIsFree ? 'true' : 'false'}
+                                        onChange={(e) => setLessonIsFree(e.target.value === 'true')}
+                                        style={{ width: '100%', padding: '12px', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--border-color)', fontFamily: 'var(--font-family)', backgroundColor: '#F8FAFC' }}
+                                    >
+                                        <option value="true">درس مجاني للجميع</option>
+                                        <option value="false">درس للمشتركين فقط</option>
+                                    </select>
                                 </div>
-                            </div>
 
-                            <div style={{ marginBottom: '20px' }}>
-                                <label style={{ display: 'block', fontWeight: 'bold', fontSize: '0.85rem', marginBottom: '6px' }}>الإجابة الصحيحة:</label>
-                                <select 
-                                    value={correctOpt}
-                                    onChange={(e) => setCorrectOpt(parseInt(e.target.value))}
-                                    style={{ width: '100%', padding: '10px', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--border-color)', fontFamily: 'var(--font-family)' }}
-                                >
-                                    <option value="0">خيار أ</option>
-                                    <option value="1">خيار ب</option>
-                                    <option value="2">خيار جـ</option>
-                                    <option value="3">خيار د</option>
-                                </select>
-                            </div>
+                                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+                                    سيتم حفظ الدرس حسب نظام التخزين الحالي.
+                                </div>
 
-                            <button type="submit" className="btn btn-secondary" style={{ width: '100%', padding: '10px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-                                <Save size={16} />
-                                <span>حفظ السؤال تجريبياً</span>
-                            </button>
-                        </form>
-                    </div>
+                                <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '12px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginTop: '10px' }}>
+                                    <Save size={16} />
+                                    <span>حفظ الدرس</span>
+                                </button>
+                            </form>
+                        </div>
+                    )}
 
-                    {/* Add Dummy Student Form */}
-                    <div style={{
-                        backgroundColor: '#FFFFFF',
-                        borderRadius: 'var(--border-radius-lg)',
-                        padding: '30px',
-                        boxShadow: 'var(--shadow-sm)',
-                        border: '1px solid var(--border-color)'
-                    }}>
-                        <h3 style={{ color: 'var(--secondary-color)', fontWeight: '800', borderBottom: '1px dashed var(--border-color)', paddingBottom: '12px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <UserPlus size={20} style={{ color: 'var(--primary-color)' }} />
-                            <span>إضافة طالب تجريبي جديد</span>
-                        </h3>
-                        
-                        <form onSubmit={handleAddStudent}>
-                            <div style={{ marginBottom: '15px' }}>
-                                <label style={{ display: 'block', fontWeight: 'bold', fontSize: '0.85rem', marginBottom: '6px' }}>اسم الطالب:</label>
-                                <input 
-                                    type="text"
-                                    value={newStudentName}
-                                    onChange={(e) => setNewStudentName(e.target.value)}
-                                    placeholder="مثال: سيف الدين طارق"
-                                    style={{ width: '100%', padding: '10px', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--border-color)', fontFamily: 'var(--font-family)' }}
-                                />
-                            </div>
+                    {/* Tab: Add Question */}
+                    {activeTab === 'add-quiz' && (
+                        <div style={{
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: 'var(--border-radius-lg)',
+                            padding: '24px',
+                            boxShadow: 'var(--shadow-sm)',
+                            border: '1px solid var(--border-color)',
+                            width: '100%'
+                        }}>
+                            <h3 style={{ color: 'var(--secondary-color)', fontWeight: '800', borderBottom: '1px dashed var(--border-color)', paddingBottom: '12px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <PlusCircle size={20} style={{ color: 'var(--primary-color)' }} />
+                                <span>إضافة سؤال اختبار</span>
+                            </h3>
+                            
+                            <form onSubmit={handleAddQuestionMock} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                <div>
+                                    <label style={{ display: 'block', fontWeight: 'bold', fontSize: '0.85rem', marginBottom: '6px' }}>اختر الدرس المستهدف:</label>
+                                    <select 
+                                        value={questionLesson}
+                                        onChange={(e) => setQuestionLesson(e.target.value)}
+                                        style={{ width: '100%', padding: '12px', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--border-color)', fontFamily: 'var(--font-family)', backgroundColor: '#F8FAFC' }}
+                                    >
+                                        <option value="arabic-l1">اللغة العربية - الدرس الأول</option>
+                                        <option value="math-l1">الرياضيات - الدرس الأول</option>
+                                        <option value="history-l1">التاريخ - الدرس الأول</option>
+                                        <option value="islamic-l1">التربية الإسلامية - الدرس الأول</option>
+                                    </select>
+                                </div>
 
-                            <div style={{ marginBottom: '15px' }}>
-                                <label style={{ display: 'block', fontWeight: 'bold', fontSize: '0.85rem', marginBottom: '6px' }}>البريد الإلكتروني:</label>
-                                <input 
-                                    type="email"
-                                    value={newStudentEmail}
-                                    onChange={(e) => setNewStudentEmail(e.target.value)}
-                                    placeholder="مثال: seif@example.com"
-                                    style={{ width: '100%', padding: '10px', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--border-color)', fontFamily: 'var(--font-family)' }}
-                                />
-                            </div>
+                                <div>
+                                    <label style={{ display: 'block', fontWeight: 'bold', fontSize: '0.85rem', marginBottom: '6px' }}>نص السؤال:</label>
+                                    <input 
+                                        type="text"
+                                        value={questionText}
+                                        onChange={(e) => setQuestionText(e.target.value)}
+                                        placeholder="اكتب نص السؤال هنا..."
+                                        style={{ width: '100%', padding: '12px', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--border-color)', fontFamily: 'var(--font-family)', backgroundColor: '#F8FAFC' }}
+                                    />
+                                </div>
 
-                            <div style={{ marginBottom: '20px' }}>
-                                <label style={{ display: 'block', fontWeight: 'bold', fontSize: '0.85rem', marginBottom: '6px' }}>حالة الاشتراك المبدئية:</label>
-                                <select 
-                                    value={newStudentSub}
-                                    onChange={(e) => setNewStudentSub(e.target.value)}
-                                    style={{ width: '100%', padding: '10px', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--border-color)', fontFamily: 'var(--font-family)' }}
-                                >
-                                    <option value="free">تجريبي مجاني (أول درسين فقط)</option>
-                                    <option value="active">مشترك بالكامل (كل المحتوى)</option>
-                                </select>
-                            </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                    <div>
+                                        <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '4px' }}>خيار أ:</label>
+                                        <input type="text" value={optA} onChange={(e) => setOptA(e.target.value)} placeholder="الخيار الأول" style={{ width: '100%', padding: '10px', border: '1px solid var(--border-color)', borderRadius: 'var(--border-radius-sm)', fontFamily: 'var(--font-family)', backgroundColor: '#F8FAFC' }} />
+                                    </div>
+                                    <div>
+                                        <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '4px' }}>خيار ب:</label>
+                                        <input type="text" value={optB} onChange={(e) => setOptB(e.target.value)} placeholder="الخيار الثاني" style={{ width: '100%', padding: '10px', border: '1px solid var(--border-color)', borderRadius: 'var(--border-radius-sm)', fontFamily: 'var(--font-family)', backgroundColor: '#F8FAFC' }} />
+                                    </div>
+                                    <div>
+                                        <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '4px' }}>خيار جـ (اختياري):</label>
+                                        <input type="text" value={optC} onChange={(e) => setOptC(e.target.value)} placeholder="الخيار الثالث" style={{ width: '100%', padding: '10px', border: '1px solid var(--border-color)', borderRadius: 'var(--border-radius-sm)', fontFamily: 'var(--font-family)', backgroundColor: '#F8FAFC' }} />
+                                    </div>
+                                    <div>
+                                        <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '4px' }}>خيار د (اختياري):</label>
+                                        <input type="text" value={optD} onChange={(e) => setOptD(e.target.value)} placeholder="الخيار الرابع" style={{ width: '100%', padding: '10px', border: '1px solid var(--border-color)', borderRadius: 'var(--border-radius-sm)', fontFamily: 'var(--font-family)', backgroundColor: '#F8FAFC' }} />
+                                    </div>
+                                </div>
 
-                             <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '10px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-                                <UserPlus size={16} />
-                                <span>إضافة وتنشيط الطالب</span>
-                            </button>
-                        </form>
-                    </div>
+                                <div>
+                                    <label style={{ display: 'block', fontWeight: 'bold', fontSize: '0.85rem', marginBottom: '6px' }}>الإجابة الصحيحة:</label>
+                                    <select 
+                                        value={correctOpt}
+                                        onChange={(e) => setCorrectOpt(parseInt(e.target.value))}
+                                        style={{ width: '100%', padding: '12px', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--border-color)', fontFamily: 'var(--font-family)', backgroundColor: '#F8FAFC' }}
+                                    >
+                                        <option value="0">خيار أ</option>
+                                        <option value="1">خيار ب</option>
+                                        <option value="2">خيار جـ</option>
+                                        <option value="3">خيار د</option>
+                                    </select>
+                                </div>
+
+                                <button type="submit" className="btn btn-secondary" style={{ width: '100%', padding: '12px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginTop: '10px' }}>
+                                    <Save size={16} />
+                                    <span>حفظ السؤال</span>
+                                </button>
+                            </form>
+                        </div>
+                    )}
+
+                    {/* Tab: Add Student */}
+                    {activeTab === 'add-student' && (
+                        <div style={{
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: 'var(--border-radius-lg)',
+                            padding: '24px',
+                            boxShadow: 'var(--shadow-sm)',
+                            border: '1px solid var(--border-color)',
+                            width: '100%'
+                        }}>
+                            <h3 style={{ color: 'var(--secondary-color)', fontWeight: '800', borderBottom: '1px dashed var(--border-color)', paddingBottom: '12px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <UserPlus size={20} style={{ color: 'var(--primary-color)' }} />
+                                <span>إضافة طالب جديد</span>
+                            </h3>
+                            
+                            <form onSubmit={handleAddStudent} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                <div>
+                                    <label style={{ display: 'block', fontWeight: 'bold', fontSize: '0.85rem', marginBottom: '6px' }}>اسم الطالب الكامل:</label>
+                                    <input 
+                                        type="text"
+                                        value={newStudentName}
+                                        onChange={(e) => setNewStudentName(e.target.value)}
+                                        placeholder="مثال: أحمد عبد الله"
+                                        style={{ width: '100%', padding: '12px', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--border-color)', fontFamily: 'var(--font-family)', backgroundColor: '#F8FAFC' }}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label style={{ display: 'block', fontWeight: 'bold', fontSize: '0.85rem', marginBottom: '6px' }}>البريد الإلكتروني:</label>
+                                    <input 
+                                        type="email"
+                                        value={newStudentEmail}
+                                        onChange={(e) => setNewStudentEmail(e.target.value)}
+                                        placeholder="example@email.com"
+                                        style={{ width: '100%', padding: '12px', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--border-color)', fontFamily: 'var(--font-family)', backgroundColor: '#F8FAFC' }}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label style={{ display: 'block', fontWeight: 'bold', fontSize: '0.85rem', marginBottom: '6px' }}>حالة الاشتراك المبدئية:</label>
+                                    <select 
+                                        value={newStudentSub}
+                                        onChange={(e) => setNewStudentSub(e.target.value)}
+                                        style={{ width: '100%', padding: '12px', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--border-color)', fontFamily: 'var(--font-family)', backgroundColor: '#F8FAFC' }}
+                                    >
+                                        <option value="free">مجاني (أول درسين فقط)</option>
+                                        <option value="active">مشترك (كل المحتوى)</option>
+                                    </select>
+                                </div>
+
+                                <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '12px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginTop: '10px' }}>
+                                    <UserPlus size={16} />
+                                    <span>إضافة الطالب</span>
+                                </button>
+                            </form>
+                        </div>
+                    )}
 
                 </div>
+
             </div>
         </section>
     );

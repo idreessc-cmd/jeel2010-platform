@@ -1,8 +1,14 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Send, MessageCircle, MapPin, Phone, Mail } from 'lucide-react';
 
 export const Footer = () => {
+    const location = useLocation();
+    
+    // Hide footer on admin pages
+    if (location.pathname.startsWith('/admin')) {
+        return null;
+    }
     return (
         <footer id="footer">
             <div className="container footer-grid">

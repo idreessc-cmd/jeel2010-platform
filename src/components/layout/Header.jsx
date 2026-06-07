@@ -143,7 +143,7 @@ export const Header = () => {
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                                 <span style={{ fontWeight: '700', fontSize: '0.95rem' }}>{user.studentName}</span>
                                 <Badge type={user.role === 'admin' ? 'success' : user.subscriptionStatus === 'active' ? 'success' : 'primary'}>
-                                    {user.role === 'admin' ? 'إدارة المنصة' : user.subscriptionStatus === 'active' ? 'مشترك بالكامل' : 'حساب تجريبي مجاني'}
+                                    {user.role === 'admin' ? 'إدارة المنصة' : user.subscriptionStatus === 'active' ? 'مشترك بالكامل' : 'حساب مجاني'}
                                 </Badge>
                             </div>
                             <button 
