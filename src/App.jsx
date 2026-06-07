@@ -45,6 +45,10 @@ const ProtectedRoute = ({ children }) => {
     if (user.role === 'admin') {
         return <Navigate to="/admin" replace />;
     }
+
+    if (user.subscriptionStatus === 'disabled' || user.isActive === false) {
+        return <Navigate to="/access-denied" state={{ disabled: true }} replace />;
+    }
     
     return children;
 };

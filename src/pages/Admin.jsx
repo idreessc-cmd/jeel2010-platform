@@ -32,6 +32,15 @@ export const Admin = () => {
     const [newStudentEmail, setNewStudentEmail] = useState('');
     const [newStudentSub, setNewStudentSub] = useState('free');
 
+    const refreshStudentList = async () => {
+        try {
+            const data = await authService.getStudents();
+            setStudents(data);
+        } catch (err) {
+            console.error("Failed to load students:", err);
+        }
+    };
+
     useEffect(() => {
         const currentUser = authService.getCurrentUser();
         setUser(currentUser);
@@ -45,9 +54,7 @@ export const Admin = () => {
 
         // Get student list if admin
         if (currentUser.role === 'admin') {
-            authService.getStudents()
-                .then(data => setStudents(data))
-                .catch(err => console.error("Failed to load students:", err));
+            refreshStudentList();
 
             // Load subjects list
             contentService.getSubjects()
@@ -60,8 +67,7 @@ export const Admin = () => {
         try {
             const res = await authService.updateStudentSubscription(email, nextStatus);
             if (res.success) {
-                const freshStudents = await authService.getStudents();
-                setStudents(freshStudents);
+                await refreshStudentList();
                 alert(`تم تغيير حالة اشتراك الطالب ${email} إلى: ${nextStatus === 'active' ? 'مشترك بالكامل' : 'تجريبي مجاني'} بنجاح!`);
             } else {
                 alert(res.error || 'فشلت عملية تحديث الاشتراك');
@@ -86,8 +92,7 @@ export const Admin = () => {
             });
 
             if (res.success) {
-                const freshStudents = await authService.getStudents();
-                setStudents(freshStudents);
+                await refreshStudentList();
                 setNewStudentName('');
                 setNewStudentEmail('');
                 alert('تم إضافة الطالب الجديد بنجاح في القائمة.');
@@ -323,7 +328,11 @@ export const Admin = () => {
                     {/* Tab: Students & Subscriptions */}
                     {activeTab === 'students' && (
                         <div>
-                            <StudentsTable students={students} onToggleSubscription={handleToggleSubscription} />
+                            <StudentsTable 
+                                students={students} 
+                                onToggleSubscription={handleToggleSubscription} 
+                                onRefresh={refreshStudentList} 
+                            />
                         </div>
                     )}
 

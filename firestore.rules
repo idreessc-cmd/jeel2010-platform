@@ -38,9 +38,9 @@ service cloud.firestore {
         request.resource.data.role == 'student' && 
         request.resource.data.subscriptionStatus == 'free';
       
-      // التعديل: يُمنع الطالب تماماً من تعديل دوره 'role' أو حالة اشتراكه 'subscriptionStatus'، فقط الإدمن يفعل ذلك
+      // التعديل: يُمنع الطالب تماماً من تعديل دوره 'role' أو حالة اشتراكه 'subscriptionStatus' أو صلاحياته 'access'، فقط الإدمن يفعل ذلك
       allow update: if isSignedIn() && (
-        (isOwner(userId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'subscriptionStatus']))
+        (isOwner(userId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'subscriptionStatus', 'access']))
         || isAdmin()
       );
       

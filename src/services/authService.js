@@ -1,5 +1,5 @@
 import { auth, db, isFirebaseEnabled } from '../config/firebase';
-import { signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { doc, getDoc, getDocs, collection, updateDoc, setDoc, query, where } from 'firebase/firestore';
 import { storage } from '../utils/storage';
 import { getDefaultStudents } from '../data/students';
@@ -112,7 +112,7 @@ export const authService = {
             } catch (error) {
                 let errorMsg = 'حدث خطأ أثناء إنشاء الحساب';
                 if (error.code === 'auth/email-already-in-use' || error.message?.includes('EMAIL_EXISTS')) {
-                    errorMsg = 'هذا البريد الإلكتروني مستخدم بالفعل، جرّب تسجيل الدخول بدل إنشاء حساب جديد.';
+                    errorMsg = 'هذا البريد الإلكتروني مستخدم بالفعل، يمكنك تسجيل الدخول أو إعادة تعيين كلمة المرور.';
                 } else if (error.code === 'auth/weak-password') {
                     errorMsg = 'كلمة المرور ضعيفة للغاية (يجب أن تكون 6 أحرف على الأقل)';
                 } else if (error.code === 'auth/invalid-email') {
@@ -123,7 +123,7 @@ export const authService = {
         } else {
             const students = initializeStudents();
             if (students.some(s => s.email === email)) {
-                return { success: false, error: 'هذا البريد الإلكتروني مستخدم بالفعل، جرّب تسجيل الدخول بدل إنشاء حساب جديد.' };
+                return { success: false, error: 'هذا البريد الإلكتروني مستخدم بالفعل، يمكنك تسجيل الدخول أو إعادة تعيين كلمة المرور.' };
             }
             
             const newStudent = {
@@ -154,6 +154,20 @@ export const authService = {
         storage.remove(CURRENT_USER_KEY);
         if (isFirebaseEnabled) {
             signOut(auth).catch(() => {});
+        }
+    },
+
+    // Password Reset
+    sendPasswordReset: async (email) => {
+        if (isFirebaseEnabled) {
+            try {
+                await sendPasswordResetEmail(auth, email);
+                return { success: true };
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        } else {
+            return { success: true };
         }
     },
     
@@ -235,10 +249,16 @@ export const authService = {
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
                     list.push({
+                        uid: doc.id,
                         email: data.email,
                         studentName: data.name || data.studentName,
+                        phone: data.phone || '',
                         role: data.role || 'student',
                         subscriptionStatus: data.subscriptionStatus || 'free',
+                        subscriptionPlan: data.subscriptionPlan || 'free',
+                        isActive: data.isActive !== false,
+                        joinedVipGroups: data.joinedVipGroups || false,
+                        access: data.access || { subjects: [], units: [], lessons: [], quizzes: [] },
                         joinDate: data.createdAt ? data.createdAt.split('T')[0] : '2026-06-01'
                     });
                 });
@@ -261,12 +281,16 @@ export const authService = {
                     const userDoc = querySnapshot.docs[0];
                     await updateDoc(userDoc.ref, {
                         subscriptionStatus: status,
+                        subscriptionPlan: status === 'active' ? 'full' : 'free',
+                        isActive: true,
                         updatedAt: new Date().toISOString()
                     });
                     
                     const currentUser = authService.getCurrentUser();
                     if (currentUser && currentUser.email === email) {
                         currentUser.subscriptionStatus = status;
+                        currentUser.subscriptionPlan = status === 'active' ? 'full' : 'free';
+                        currentUser.isActive = true;
                         storage.set(CURRENT_USER_KEY, currentUser);
                     }
                     return { success: true };
@@ -280,11 +304,15 @@ export const authService = {
             const index = students.findIndex(s => s.email === email);
             if (index !== -1) {
                 students[index].subscriptionStatus = status;
+                students[index].subscriptionPlan = status === 'active' ? 'full' : 'free';
+                students[index].isActive = true;
                 storage.set(STUDENTS_LIST_KEY, students);
                 
                 const currentUser = authService.getCurrentUser();
                 if (currentUser && currentUser.email === email) {
                     currentUser.subscriptionStatus = status;
+                    currentUser.subscriptionPlan = status === 'active' ? 'full' : 'free';
+                    currentUser.isActive = true;
                     storage.set(CURRENT_USER_KEY, currentUser);
                 }
                 return { success: true };
@@ -300,39 +328,146 @@ export const authService = {
                 const querySnapshot = await getDocs(q);
                 
                 if (!querySnapshot.empty) {
-                    return { success: false, error: 'البريد الإلكتروني مسجل بالفعل' };
+                    // Update instead of failing
+                    const docId = querySnapshot.docs[0].id;
+                    const docRef = doc(db, 'users', docId);
+                    const updateData = {
+                        name: student.studentName,
+                        phone: student.phone || '',
+                        subscriptionStatus: student.subscriptionStatus || 'free',
+                        subscriptionPlan: student.subscriptionStatus === 'active' ? 'full' : (student.subscriptionStatus === 'custom' ? 'custom' : 'free'),
+                        isActive: true,
+                        updatedAt: new Date().toISOString()
+                    };
+                    await updateDoc(docRef, updateData);
+                    return { success: true, exists: true, uid: docId };
                 }
                 
                 const tempId = `temp_${Date.now()}`;
                 const newDocRef = doc(db, 'users', tempId);
-                await setDoc(newDocRef, {
+                const profile = {
                     uid: tempId,
                     name: student.studentName,
                     email: student.email,
+                    phone: student.phone || '',
                     role: student.role || 'student',
                     subscriptionStatus: student.subscriptionStatus || 'free',
-                    createdAt: new Date().toISOString()
-                });
+                    subscriptionPlan: student.subscriptionStatus === 'active' ? 'full' : (student.subscriptionStatus === 'custom' ? 'custom' : 'free'),
+                    isActive: true,
+                    joinedVipGroups: false,
+                    access: student.access || { subjects: [], units: [], lessons: [], quizzes: [] },
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+                await setDoc(newDocRef, profile);
+                return { success: true, exists: false, uid: tempId };
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        } else {
+            const students = initializeStudents();
+            const existing = students.find(s => s.email === student.email);
+            if (existing) {
+                existing.studentName = student.studentName;
+                existing.phone = student.phone || '';
+                existing.subscriptionStatus = student.subscriptionStatus || 'free';
+                existing.subscriptionPlan = student.subscriptionStatus === 'active' ? 'full' : (student.subscriptionStatus === 'custom' ? 'custom' : 'free');
+                existing.isActive = true;
+                storage.set(STUDENTS_LIST_KEY, students);
+                return { success: true, exists: true, uid: `mock_${student.email}` };
+            }
+            students.push({
+                email: student.email,
+                password: student.password || '123',
+                studentName: student.studentName,
+                phone: student.phone || '',
+                role: student.role || 'student',
+                subscriptionStatus: student.subscriptionStatus || 'free',
+                subscriptionPlan: student.subscriptionStatus === 'active' ? 'full' : (student.subscriptionStatus === 'custom' ? 'custom' : 'free'),
+                isActive: true,
+                access: student.access || { subjects: [], units: [], lessons: [], quizzes: [] },
+                joinDate: new Date().toISOString().split('T')[0]
+            });
+            storage.set(STUDENTS_LIST_KEY, students);
+            return { success: true, exists: false, uid: `mock_${student.email}` };
+        }
+    },
+
+    updateStudentAccess: async (uid, access) => {
+        if (isFirebaseEnabled) {
+            try {
+                const docRef = doc(db, 'users', uid);
+                const hasCustom = (access.subjects?.length || 0) > 0 || (access.units?.length || 0) > 0 || (access.lessons?.length || 0) > 0 || (access.quizzes?.length || 0) > 0;
                 
+                await updateDoc(docRef, {
+                    access: access,
+                    subscriptionPlan: hasCustom ? 'custom' : 'free',
+                    updatedAt: new Date().toISOString()
+                });
                 return { success: true };
             } catch (error) {
                 return { success: false, error: error.message };
             }
         } else {
             const students = initializeStudents();
-            if (students.some(s => s.email === student.email)) {
-                return { success: false, error: 'البريد الإلكتروني مسجل بالفعل' };
+            const email = uid.replace('mock_', '');
+            const index = students.findIndex(s => s.email === email);
+            if (index !== -1) {
+                students[index].access = access;
+                const hasCustom = (access.subjects?.length || 0) > 0 || (access.units?.length || 0) > 0 || (access.lessons?.length || 0) > 0 || (access.quizzes?.length || 0) > 0;
+                students[index].subscriptionPlan = hasCustom ? 'custom' : 'free';
+                storage.set(STUDENTS_LIST_KEY, students);
+                return { success: true };
             }
-            students.push({
-                email: student.email,
-                password: student.password || '123',
-                studentName: student.studentName,
-                role: student.role || 'student',
-                subscriptionStatus: student.subscriptionStatus || 'free',
-                joinDate: new Date().toISOString().split('T')[0]
-            });
-            storage.set(STUDENTS_LIST_KEY, students);
-            return { success: true };
+            return { success: false, error: 'الطالب غير موجود' };
+        }
+    },
+
+    disableStudent: async (uid) => {
+        if (isFirebaseEnabled) {
+            try {
+                const docRef = doc(db, 'users', uid);
+                await updateDoc(docRef, {
+                    isActive: false,
+                    subscriptionStatus: 'disabled',
+                    updatedAt: new Date().toISOString()
+                });
+                return { success: true };
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        } else {
+            const students = initializeStudents();
+            const email = uid.replace('mock_', '');
+            const index = students.findIndex(s => s.email === email);
+            if (index !== -1) {
+                students[index].isActive = false;
+                students[index].subscriptionStatus = 'disabled';
+                storage.set(STUDENTS_LIST_KEY, students);
+                return { success: true };
+            }
+            return { success: false, error: 'الطالب غير موجود' };
+        }
+    },
+
+    deleteStudentFirestore: async (uid) => {
+        if (isFirebaseEnabled) {
+            try {
+                // Return descriptive error advising they cannot delete from client directly
+                return { success: false, error: 'الحذف النهائي من Authentication يتطلب Cloud Function آمنة. يرجى تعطيل الحساب لحظر الطالب فوراً.' };
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        } else {
+            const students = initializeStudents();
+            const email = uid.replace('mock_', '');
+            const index = students.findIndex(s => s.email === email);
+            if (index !== -1) {
+                students.splice(index, 1);
+                storage.set(STUDENTS_LIST_KEY, students);
+                return { success: true };
+            }
+            return { success: false, error: 'الطالب غير موجود' };
         }
     }
 };

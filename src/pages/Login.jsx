@@ -46,6 +46,11 @@ export const Login = () => {
         try {
             const res = await authService.loginWithEmail(loginEmail, loginPassword);
             if (res.success) {
+                if (res.user.subscriptionStatus === 'disabled') {
+                    authService.logout();
+                    setError('تم تعطيل هذا الحساب الدراسي. يرجى التواصل مع الدعم الفني لتفعيل الحساب.');
+                    return;
+                }
                 if (res.user.role === 'admin') {
                     navigate('/admin');
                 } else {
@@ -116,9 +121,39 @@ export const Login = () => {
         }
     };
 
-    const handleForgotPassword = (e) => {
+    const handleForgotPassword = async (e) => {
         e.preventDefault();
-        alert('يرجى التواصل مع إدارة المنصة أو الدعم الفني لإعادة تعيين كلمة المرور الخاصة بك.');
+        setError('');
+        setSuccessMsg('');
+        
+        let email = loginEmail.trim();
+        if (!email) {
+            email = prompt('يرجى إدخال البريد الإلكتروني لإرسال رابط إعادة تعيين كلمة المرور:');
+            if (!email) return;
+        }
+        
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            setError('يرجى إدخال بريد إلكتروني صحيح.');
+            return;
+        }
+
+        try {
+            const res = await authService.sendPasswordReset(email);
+            if (res.success) {
+                setSuccessMsg('تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني. يرجى التحقق من صندوق الوارد أو البريد العشوائي (Spam).');
+            } else {
+                let errorMsg = 'حدث خطأ أثناء إرسال رابط إعادة التعيين.';
+                if (res.error?.includes('user-not-found')) {
+                    errorMsg = 'البريد الإلكتروني المدخل غير مسجل لدينا.';
+                } else if (res.error?.includes('invalid-email')) {
+                    errorMsg = 'البريد الإلكتروني غير صالح.';
+                }
+                setError(errorMsg);
+            }
+        } catch (err) {
+            setError('حدث خطأ غير متوقع: ' + err.message);
+        }
     };
 
     return (
@@ -205,30 +240,62 @@ export const Login = () => {
                                 <AlertCircle size={18} style={{ flexShrink: 0 }} />
                                 <span>{error}</span>
                             </div>
-                            {error.includes('تسجيل الدخول') && (
-                                <button
-                                    onClick={() => {
-                                        setLoginEmail(registerEmail);
-                                        setActiveTab('login');
-                                        setError('');
-                                    }}
-                                    type="button"
-                                    style={{
-                                        alignSelf: 'flex-start',
-                                        marginTop: '5px',
-                                        backgroundColor: 'transparent',
-                                        border: 'none',
-                                        color: 'var(--primary-color)',
-                                        textDecoration: 'underline',
-                                        cursor: 'pointer',
-                                        fontWeight: '800',
-                                        fontSize: '0.85rem',
-                                        padding: 0,
-                                        fontFamily: 'var(--font-family)'
-                                    }}
-                                >
-                                    الانتقال إلى تسجيل الدخول
-                                </button>
+                            {(error.includes('مستخدم بالفعل') || error.includes('EMAIL_EXISTS')) && (
+                                <div style={{ display: 'flex', gap: '15px', marginTop: '10px', flexWrap: 'wrap' }}>
+                                    <button
+                                        onClick={() => {
+                                            setLoginEmail(registerEmail);
+                                            setActiveTab('login');
+                                            setError('');
+                                        }}
+                                        type="button"
+                                        style={{
+                                            backgroundColor: 'var(--primary-color)',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: 'var(--border-radius-sm)',
+                                            padding: '8px 12px',
+                                            cursor: 'pointer',
+                                            fontWeight: '700',
+                                            fontSize: '0.85rem',
+                                            fontFamily: 'var(--font-family)',
+                                            boxShadow: 'var(--shadow-sm)'
+                                        }}
+                                    >
+                                        تسجيل الدخول بهذا البريد
+                                    </button>
+                                    <button
+                                        onClick={async () => {
+                                            const emailToReset = registerEmail.trim();
+                                            if (!emailToReset) return;
+                                            try {
+                                                const res = await authService.sendPasswordReset(emailToReset);
+                                                if (res.success) {
+                                                    setSuccessMsg('تم إرسال رابط إعادة تعيين كلمة المرور إلى ' + emailToReset);
+                                                    setError('');
+                                                } else {
+                                                    setError('فشل إرسال الرابط: ' + res.error);
+                                                }
+                                            } catch (err) {
+                                                setError('حدث خطأ: ' + err.message);
+                                            }
+                                        }}
+                                        type="button"
+                                        style={{
+                                            backgroundColor: 'transparent',
+                                            border: '1px solid var(--primary-color)',
+                                            color: 'var(--primary-color)',
+                                            borderRadius: 'var(--border-radius-sm)',
+                                            padding: '8px 12px',
+                                            cursor: 'pointer',
+                                            fontWeight: '700',
+                                            fontSize: '0.85rem',
+                                            fontFamily: 'var(--font-family)'
+                                        }}
+                                    >
+                                        إعادة تعيين كلمة المرور
+                                    </button>
+                                </div>
                             )}
                         </div>
                     )}
